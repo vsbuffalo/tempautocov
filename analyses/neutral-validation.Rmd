@@ -1,0 +1,166 @@
+---
+title: "R sims neutral validation"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.width=12, fig.height=8, 
+               echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(devtools)
+library(tidyverse)
+load_all()
+```
+
+## Variance Effective Population Size
+
+First, we compare the variance effective population size, as calculated as $N_e
+= 1/(2F)$ where $F=V(\Delta p)/p(1-p)$, to the real population sizes:
+
+```{r}
+load('../simdata/neutral-covs.Rdata')
+
+Ne_ests <- neut_res %>% unnest(covs) %>% filter(t0 == t1) %>% 
+  group_by(N, rho, t0, t1) %>% 
+  summarize(var=mean(cov), Ne=1/(2*var*(1-1/(2*unique(N))))) %>%
+  mutate(group=factor('A'))
+
+
+Ne_ests %>%
+  ggplot() + 
+  geom_hline(aes(yintercept=N), color='red') + 
+  geom_point(aes(t0, Ne)) + facet_grid(N ~ rho, scales='free_y') + 
+  xlab('generation')
+
+Ne_fits <- crossing(rho=unique(Ne_ests$rho), N=unique(Ne_ests$N), 
+                    t0=0:50, group=factor("A")) %>% mutate(Ne=N)
+
+
+# save data for figures
+write_tsv(Ne_ests, '../data/supp_Ne_est_neutral.tsv')
+devtools::use_data(Ne_ests, overwrite=TRUE)
+devtools::use_data(Ne_fits, overwrite=TRUE)
+
+neut_res %>% unnest(covs) %>% filter(t0 == t1) %>% 
+  group_by(N, rho) %>% 
+  summarize(var=mean(cov), Ne_corr=1/(2*var*(1-1/(2*unique(N)))),
+            Ne=1/(2*var))
+
+
+```
+
+## LD Decay Rate
+
+We simulate  a neutral Wright-Fisher population started with $N$ gametes with
+111...111 alleles and $N$ gametes with 000...000 alleles, and measure $D$
+between the two outermost markers. The initial state of the population creates a
+baseline level of $D$ that we decay at different rates of $\rho$ and $N$
+according to the simulations `r-sims/ld-test.r`. This should decay under a
+finite population model as:
+
+$$
+D_t = D_1 (1-1/(2N))^{t-1} (1-r)^{t-1}
+$$
+
+We see this theoretic decay below in red compared to the average across
+simulations in blue.
+
+```{r, ld-decay}
+load('../simdata/ld-res.Rdata')
+
+D_decay <- function(D0, N, r, t, haldane=TRUE) {
+  if (haldane)
+    r <- haldane(r)
+  D0*(1-1/(2*N))^t*(1-r)^t 
+}
+
+ldd <- ld_res %>% mutate(D=map(res, 'D')) %>% unnest(D) 
+ldd_mean <- ldd %>% group_by(N, r, gen) %>% summarize(D=mean(D))
+ldd_mean %>% ggplot(aes(gen, D)) + geom_point() + facet_grid(r ~ N)
+
+# calculate D0 across replicates, and then calc the theoretic decay 
+# through time using this for each N/r
+D0 <- ldd %>% filter(gen==1) %>% summarize(D0 = mean(D)) %>% pull(D0)
+ldd_fits  <- ldd %>% mutate(theory_D=pmap_dbl(list(D0, N, r, gen-1), D_decay)) 
+
+ldd_fits %>%  ggplot() + geom_point(aes(gen, D), size=0.1, alpha=0.1) + 
+  facet_grid(r ~ N) + 
+  geom_line(data=ldd_mean, aes(gen, D)) + 
+  geom_line(aes(gen, theory_D), col='red', size=1) + ylim(-0.1, 0.3) + ylab('D')
+
+
+```
+
+Now, we generate some data for supplementary figures:
+
+```{r}
+
+rparams <- c(0, 0.001, 0.01, 0.1, 0.5)
+neut_ld_sims <- ldd  %>% arrange(r, N, gen) %>% 
+  filter(r %in% rparams) %>%
+  mutate(grp=factor('L'))  
+
+neut_ld_fits <- ldd_fits %>% 
+  filter(r %in% rparams) %>%
+  mutate(D=theory_D, grp=factor('L')) %>%  arrange(r, N, gen)   %>%
+  group_by(gen, r, N) %>%
+  summarize(D=mean(D))
+
+write_tsv(neut_ld_sims, '../data/supp_ld_neutral.tsv')
+devtools::use_data(neut_ld_fits, overwrite=TRUE)
+devtools::use_data(neut_ld_sims, overwrite=TRUE)
+
+
+
+```
+
+## Decay of Heterozygosity
+
+First, we extract the neutral frequency and then calculate the mean site
+heterozygosity. Then, we extract the initial heterozygosity at the start of the
+simulations and use this to parameterize the decay of heterozygosity through time:
+
+$$
+H_t \approx H_1 (1-1/(2N))^t
+$$
+
+These match closely:
+
+```{r}
+
+freqdf <- function(mat) {
+  setNames(melt(mat), c('gen', 'locus', 'freq'))
+}
+
+neut_freqs <- neut_res %>% mutate(neut_freqs=map(res, 'neut_freqs'), 
+                           freqs=map(neut_freqs, freqdf)) %>% unnest(freqs)
+
+neut_het <- neut_freqs %>% mutate(het=2*freq*(1-freq)) %>% 
+              group_by(N, rho, gen) %>%
+              summarize(het=mean(het)) 
+
+neut_het_init <- neut_het %>% filter(gen==1) %>% select(h1=het)
+
+neut_het_fit <- neut_het %>% left_join(neut_het_init) %>% mutate(ht=h1*(1-1/(2*N))^gen) 
+
+neut_het_fit %>%
+   ggplot(aes(gen, het)) + geom_point() + 
+   geom_line(aes(gen, ht), color='red', size=1) + facet_grid(N~rho) +
+   ylab('heterozygosity') + xlim('generation')
+
+neut_het_fits <- neut_het_fit %>% mutate(het=ht) %>% select(-h1, -ht) %>% 
+                   ungroup() %>% mutate(group=factor('A')) 
+
+neut_het_sims <- neut_het %>% 
+                   ungroup() %>% mutate(group=factor('A')) 
+
+devtools::use_data(neut_het_fits, overwrite=TRUE)
+devtools::use_data(neut_het_sims, overwrite=TRUE)
+
+
+
+
+```

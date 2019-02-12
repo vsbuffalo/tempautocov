@@ -1,0 +1,914 @@
+---
+title: "Analysis of Temporal Autocovariance Simulation Results"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+library(rmarkdown)
+opts_chunk$set(fig.width=12, fig.height=8, 
+               echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r, load-libraries}
+library(devtools)
+library(tidyverse)
+library(viridis)
+load_all()
+load('../simdata/expfit-varyl-covs.Rdata')
+opar <- par(no.readonly=TRUE)
+
+```
+
+## Dynamics of Genetic and Offspring Number Variation 
+
+Our theoretical models for temporal autocovariance $\text{cov}(\Delta p_t,
+\Delta p_s)$ under directional selection show that a key parameter is the
+additive genic variation at time $s$. With our linked regions and polygenic
+selection, there isn't good theory for the dynamics of additive genic
+variation through time. Here, we look at the empirical dynamics of different
+types of variation (additive genetic, additive genic, only LD contributions to
+additive genetic variance, and offspring variance).
+
+First, we average across simulation replicates for the different measures of
+variation (and mean breeding value and fitness):
+
+```{r, vark}
+
+# summarize empirical variances across sims
+vark <- expfit_varyl_res %>% 
+          filter(Va != 0) %>% # ignore neutral sims
+          unnest(stats, genic_va, allelic_cov) %>% 
+          {if (all(.$gen == .$gen1)) return(.) else stop()}  %>%
+          group_by(L, N, Va, alpha, genlen, r, gen) %>% 
+          summarize(kvar=mean(kvar),  # variation in offspring
+                    zvar=mean(zvar),  # variation in trait breeding value
+                    zbar=mean(zbar),  # mean breeding value 
+                    genic_va=mean(genic_va, na.rm=TRUE),  # genic variance, Va
+                    ac_var=mean(ac_var),  # allelic covariance diagonal terms
+                    ac_cov=mean(ac_cov)   # allelic covariance off-diagonal terms
+                    ) %>% 
+          ungroup()
+
+```
+
+
+### Comparing the dynamics of additive genetic variance with the decay due to drift alone
+
+Under the infinitesimal model, the dynamics of additive genic variation, $V_a =
+2 \sum_l \alpha_l^2 p_l (1-p_l)$ are driven entirely by the decay in
+heterozygosity due to drift in a finite population. Here, we compare the
+empirical dynamics of additive genetic variance for the trait with the
+predicted decay due to drift only, e.g., 
+
+$$
+V_A(t) = V_A(0) \left(1-\frac{1}{2N}\right)^t
+$$
+
+```{r, vark-decay}
+# calculate theoretic decay under finite pop size
+decay_Va <- Vectorize(function(N, t, Va) Va*(1 - 1/(2*N))^t)
+theory_va <- vark %>% filter(gen == 1) %>% select(L:r, zvar) %>% 
+                crossing(gen=1:50) %>% group_by(L) %>% 
+                mutate(theory_Va=pmap_dbl(list(N, gen, Va), decay_Va))
+ggplot() + 
+  geom_point(data=vark, mapping=aes(gen, zvar, color=as.factor(L)), size=0.5) + 
+  geom_line(data=theory_va, mapping=aes(gen, theory_Va, color=as.factor(L))) +
+  facet_grid(Va ~ genlen, scales='free_y') + 
+  geom_hline(yintercept=0)
+
+```
+
+This model is inappropriate (unsurprisingly) for strong selection (i.e. large
+$V_A$), low recombination, and smaller number of loci contributing to the trait
+(small $L$).
+
+### The dynamics of the different components of additive genetic variance
+
+Additive genetic variance ($V_A$) is compared of two components: (1) the
+additive genic variance ($V_a = 2 \sum_l \alpha_l^2 p_l(1-p_l)$) and (2) the
+contribution of allelic covariance due to LD between sites contributing to the
+trait ($\sum_{i \ne j} \alpha_i \alpha_j D_{ij}$). We can write the total
+additive genetic variance as:
+
+$$
+V_A = 2 \sum_l \alpha_l^2 p_l(1-p_l)  + \sum_{i \ne j} \alpha_i \alpha_j D_{ij}
+$$
+
+Now, we look at the dynamics of each component, using the empirically measured
+allelic covariation (effect sizes + LD components, additive genic variation,
+and additive genetic variation):
+
+```{r, vark-dyn-comp}
+# compare allelic vars/covs to genic/VA 
+# we use different line types let us see despite overplotting
+vark %>% select(-kvar) %>%
+  filter(L==500, Va > 0.01) %>%
+  mutate(ac_cov=2*ac_cov, ac_var=2*ac_var, ac_tot=ac_cov + ac_var) %>%
+  gather(type, var, zvar, genic_va, ac_var, ac_cov, ac_tot) %>%
+  ggplot(aes(gen, var, color=type, linetype=type)) + geom_line() + facet_grid(Va ~ genlen)
+
+```
+
+Let's consider just $L == 500$, looking at how the allelic variances and
+covariance (a proxy for genic variance and linkage disequilibria contribution
+to genetic variance) changes through time:
+
+```{r, vark-L500-ld}
+vark %>% select(L:gen, ac_var, ac_cov) %>%
+  filter(L == 500) %>%
+  gather(type, var, ac_var:ac_cov) %>%
+  ggplot(aes(gen, var, color=type)) + geom_line() + 
+  facet_grid(Va ~ genlen, scales='free_y')
+```
+
+Now looking at just $V_A == 0.05$:
+
+```{r, vark-dyn}
+vark %>% select(L:gen, ac_var, ac_cov) %>%
+  gather(type, var, ac_var:ac_cov) %>%
+  filter(genlen > 0, Va == 0.05) %>%
+  ggplot(aes(gen, var, color=type, linetype=as.factor(L))) + geom_line() + 
+  facet_grid(Va ~ genlen, scales='free_y')
+
+```
+
+### Approximating the change in additive genetic variance with a logistic function
+
+Can we approximate the variance through time as a logistic function?
+
+```{r, vark-logit}
+
+# nest the data
+dvark <- vark %>% filter(Va > 0, gen >= 5) %>% 
+  mutate(t = gen-5, Va0=first(zvar)) %>% group_by(N, Va, L, genlen) %>% nest()
+
+fit_logit_va <- function(t, va, va0, weight_gamma=0.1) {
+  g <- weight_gamma
+  fit <- try(nls(va ~ va0 / (1 + exp(G * (t-tinfl))) + b, data.frame(t=t, va=va), 
+             start=list(G=0.4, tinfl=13, b=0.01), 
+             control=nls.control(maxiter=100, warnOnly=TRUE)))
+  fit
+}
+
+# apply the approximation function
+dvark <- dvark %>%  mutate(va0 = map_dbl(data, ~ .$zvar[.$t == 0])) %>% 
+  mutate(fit = pmap(list(data, va0), ~ fit_logit_va(.x$t, .x$zvar, .y)))
+
+dvark %>% mutate(converged=map_lgl(fit, ~ .$convInfo$isConv)) %>% 
+  filter(converged) %>%
+  mutate(pred=map(fit, ~ tibble(pred_va=predict(.)))) %>% unnest(data, pred) %>% 
+  filter(L == 500) %>% ggplot() + geom_point(aes(t, zvar), color='blue') + 
+  geom_line(aes(t, pred_va), col='red') + facet_grid(Va ~ genlen, scales='free_y')
+
+```
+
+Overall the logistic approximation is not bad. Note that some cells are empty,
+as the `nls()` procedure failed to converge.
+
+## Fixations
+
+We want to ensure we don't have an unrealistic number of fixations in our
+simulations. Our population size is relatively small for our main simulations
+($N=1000$).
+
+What does the proportion of fixed SNPs look like when Va > 0 and Va = 0?
+
+```{r, fixed-snps}
+
+# get the generation that an allele is lost or fixed
+gen_fixed_or_lost <- function(x) {
+  neutfreqs <- x$neut_freqs
+  neutgen <- apply(neutfreqs == 0 | neutfreqs == 1, 2, function(y) min(which(y)))
+  if (!is.null(x$sel_freqs)) {
+    selfreqs <- x$sel_freqs
+    selgen <- apply(selfreqs == 0 | selfreqs == 1, 2, function(y) min(which(y)))
+    selgen[!is.finite(selgen)]  <- NA
+  } else {
+    selgen <- numeric()
+  }
+  neutgen[!is.finite(neutgen)]  <- NA
+  tibble(gen=c(selgen, neutgen),
+         type=c(rep('sel', length(selgen)), rep('neut', length(neutgen))))
+}
+
+
+# get the generation that a mutation is fixed/lost across all sims
+expfit_varyl_res <- expfit_varyl_res %>% 
+  mutate(genfixed=map(res, gen_fixed_or_lost)) 
+
+expfit_varyl_res %>% unnest(genfixed) %>%
+  ggplot(aes(gen, fill=type)) + geom_density(alpha=0.3) + facet_grid(Va ~ genlen)
+
+```
+
+There's not a huge difference in fixation times between selected and neutral
+sites. Also, note that the distribution for neutral site fixation times does
+not difference much between $V_A > 0$ and $V_A = 0$ simulations. The mode over
+short fixation times is due to the loss of rare alleles. For example, looking
+at one simulation replicate ($V_0 = 0$):
+
+```{r, trajs}
+
+a <- (expfit_varyl_res %>% filter(Va ==0, genlen > 4, rep %in% 1:5))
+
+afix <- a$res[[1]]$neut_freqs
+fixgen <- apply(afix == 0 | afix == 1, 2, function(x) min(which(x)))
+
+matplot(a$res[[1]]$neut_freqs, type='l', col=c('red', 'blue')[is.finite(fixgen) +1L])
+
+```
+
+From this, we see low frequency alleles are getting knocked out.
+
+## Temporal Autocovariance Models
+
+Here, we look at temporal autocovariance, checking our theory matches our
+simulations and creating plots for the paper. First, we average the covariances
+across all replicates, grouping only by the simulation parameters.
+
+```{r, calc-covs}
+
+covs <- expfit_varyl_res %>% 
+         unnest(covs) %>% 
+         # see note in temp_cov() for why these times are incremented
+         mutate(t0=t0+1L, t1=t1+1L) %>%  
+         group_by(L, N, Va, genlen, r, t0, t1) %>% 
+         summarize(cov=mean(cov))
+
+```
+
+### Temporal Autocovariance with generation 5 (first generation of selection)
+
+Our temporal autocovariances are between two generations. We choose the
+generation after the onset of selection, $t=5$, as a reference generation and
+look how our predicted temporal autocovariance $\text{cov}(\Delta p_5, \Delta p_s)$
+changes further out, where $s$ is some other generation. We first do some EDA:
+
+```{r, calc-covs5}
+
+pd5 <- covs %>% filter((t1 == 5 & t1 != t0) | (t0 == 5 & t1 != t0)) %>% 
+          ungroup() %>% mutate(L=factor(L), gen=ifelse(t1 > 5, t1, t0))
+
+ggplot(pd5) + geom_point(aes(gen, cov, color=L), size=0.8) + 
+  facet_grid(Va ~ genlen, scales='free_y') 
+
+```
+
+These are the empirical covariances. Now, we superimpose our theory on these,
+plugging in different genetic variances (the empirical additive genetic
+variance and the empirical additive genic variance):
+
+```{r, covs5-pred}
+
+# for both genic and var(z)
+pred_all <- vark %>% ungroup() %>% 
+          mutate(N=as.integer(as.character(N)), 
+                        pred_zvar=pmap_dbl(list(genlen, gen-5, zvar, N), 
+                                      analytic_cov),
+                        pred_genic=pmap_dbl(list(genlen, gen-5, genic_va, N), 
+                                      analytic_cov))
+
+# just zvar (for a figure)
+pred <- vark %>% ungroup() %>% 
+          mutate(N=as.integer(as.character(N)), 
+                        pred=pmap_dbl(list(genlen, gen-5, zvar, N), 
+                                      analytic_cov))
+
+pd5r  <- pd5 %>% filter(genlen > 0) 
+predr <- pred_all %>% filter(genlen<=4, genlen > 0) %>% 
+  gather(type, pred, pred_zvar, pred_genic)
+
+
+ggplot() +  geom_point(data=pd5r, aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=predr, aes(gen, pred, color=as.factor(L), linetype=type)) + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+```
+
+Now, we see that the real covariance is driven by the additive genetic
+variation, not additive genic variation. This works well for relatively loose
+linkage, but not so well for tighter linked regions.
+
+### Using a subset of the data for the publication figures
+
+Now, we save a few of the specific cases of these data we want for the figures,
+which the `figures/ms-plots.r` will use to create them.
+
+
+```{r, covs5-graphics}
+
+rec_params <- c(0.5, 0.1, 0.01, 1.5)
+va_params <- c(0.01, 0.02, 0.05)
+va_params_oom <- c(0.001, 0.01, 0.1)  # for Va over orders of magnitude 
+
+pd5f <- pd5 %>% filter(Va %in% va_params, genlen %in% rec_params)
+predf <- pred_all %>% filter(Va %in% va_params, genlen %in% rec_params) %>% 
+             gather(type, pred, pred_zvar, pred_genic) %>%
+             mutate(L=factor(L), cov=pred) %>% filter(L == 500)
+
+
+ggplot() +  geom_point(data=pd5f, aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=predf, aes(gen, pred, color=type))  + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+
+# tables and Rda files for plots:
+write_tsv(pd5f, '../data/pd5f.tsv')
+write_tsv(predf, '../data/predf.tsv')
+devtools::use_data(pd5f, overwrite=TRUE)
+devtools::use_data(predf, overwrite=TRUE)
+
+```
+
+### Comparing fit with other initial generations
+
+Here, we check that our theory approximately holds for a temporal
+autocovariance with a timepoint during selection, in this case
+$\text{cov}(\Delta p_{15}, \Delta p_s)$. Note that this is a very rough
+approximation, as the LD changes *considerably* during selection and our
+theoretic function `analytic_cov()` assumes levels of LD determined only
+mutation and drift and thus will expectedly be quite off under cases of strong
+selection where LD will have changed. Consequently the fit gets worse under
+stronger selections (higher levels of target $V_A$):
+
+```{r, covs13}
+
+refgen <- 15
+
+pd13 <- covs %>% filter(L == 500, (t1 > t0) & t0 == refgen) %>%
+          ungroup() %>% mutate(L=factor(L), gen=t1)  
+
+pred13 <- vark %>% ungroup() %>% 
+          mutate(N=as.integer(as.character(N)), 
+                        pred=pmap_dbl(list(genlen, gen-refgen, zvar, N), 
+                                      analytic_cov))
+
+ggplot() +  geom_point(data=pd13 %>% filter(Va <= 0.02), aes(gen, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=pred13 %>% filter(gen >= 13, Va <= 0.02), 
+            aes(gen, pred, color=as.factor(L))) + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+
+pred13f <- pred13 %>% filter(gen > 13, Va < 0.02, genlen %in% rec_params, L==500)  %>% 
+  mutate(Va=as.factor(Va), genlen=as.factor(genlen), L=as.factor(L)) %>%
+  rename(cov = pred) # panel_plot() requires col names to be same across data/theory
+pd13f <- pd13 %>% filter(Va < 0.02, genlen %in% rec_params) %>%
+  mutate(Va=as.factor(Va), genlen=as.factor(genlen), L=as.factor(L))
+
+
+# tables and Rda files for plots:
+write_tsv(pd13f, '../data/pd13f.tsv')
+write_tsv(pred13f, '../data/pred13f.tsv')
+devtools::use_data(pd13f, overwrite=TRUE)
+devtools::use_data(pred13f, overwrite=TRUE)
+
+```
+
+In the function `simpop()`, the argument `include_ld` includes the average LD
+each neutral site has with all selected sites, squared. This can be used to
+demonstrate that the average LD variance decreases during selection consistent
+with the fit getting worse as selection continues.
+
+### Varying N
+
+To validate that our model works with varying population sizes (and thus
+varying initial LD levels aside from the recombination level), we look at the
+covariances and their analytic predictions here. These rely on different data,
+as the entire varying $L$, varying $N$ dataset is rather large and was
+summarized on the server.
+
+```{r, covs-varyn}
+data(pd5f_varyn)
+data(predf_varyn)
+
+ggplot() +  geom_point(data=pd5f_varyn %>% filter(L==500),
+                       aes(t1, cov, color=as.factor(N)), alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=predf_varyn %>% filter(L==500, type=='pred_zvar', gen > 5),
+            aes(gen, pred, color=as.factor(N)))  + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+```
+
+## Approximating the additive genetic variance dynamics with the sum of site heterozygosity
+
+For real data, we won't have $V_A$ (it will be a parameter to be inferred). We
+will, however, have the sum of site heterozygosity in the region. Here, we
+look at whether SSH decay is a good proxy for $V_A$ decay through time.
+
+```{r, ssh}
+
+het_ssh <- 
+  expfit_varyl_res %>% unnest(hets) %>% 
+  mutate(neut_ssh=neut_ssh, sel_ssh=sel_ssh) %>% 
+  # gather('type', 'ssh', neut_ssh, sel_ssh) %>% 
+  group_by(L, N, Va, genlen, gen)  %>%
+  summarize(neut_ssh=mean(neut_ssh), sel_ssh=mean(sel_ssh), 
+            sel_het = mean(sel_ssh)/mean(nsel),
+            neut_het = mean(neut_ssh)/mean(nneut) )
+
+```
+
+How different are selected and neutral site SSHs through time?
+
+```{r, ssh-plot}
+
+het_ssh %>% gather('type', 'het', neut_het, sel_het) %>% 
+ filter(L==500) %>%
+ ggplot(aes(gen, het, color=type)) + 
+  geom_line() + facet_grid(Va ~ genlen)
+
+```
+
+The difference is minimal. How fast is the decay?
+
+```{r, ssh-decay}
+
+het_ssh  <- het_ssh %>% group_by(Va, genlen, N) %>% 
+  mutate(neut_ssh_delta=lead(neut_het)/neut_het)
+
+summary(het_ssh$neut_ssh_delta)
+
+```
+
+
+Next, we join the variances (and `zbar`), with the **neutral sum of site
+heterozygosity** (SSH), and compare these visually. The SSH proxy variable is:
+
+$$
+V_A(s) =   \alpha_l \sum_l 2 p_l(s) (1-p_l)(s) \\
+V_A(s) =   \alpha_l SSH(s) \\
+V_A(s)/V_A(t) = SSH(s)/V_A(t) \\
+V_A(s)= V_A(t) SSH(s)/V_A(t) \\
+$$
+
+We calculate this proxy variance for our data:
+
+```{r, ssh-proxy}
+
+vark_ssh <- left_join(vark, het_ssh) 
+
+vark_ssh0 <- vark_ssh %>% filter(gen==5) %>%
+               group_by(L, N, alpha, r) %>% 
+               summarize(neut_ssh0=mean(neut_ssh), 
+                         sel_ssh0=mean(sel_ssh), 
+                         zvar0=mean(zvar))
+
+# this uses the VA0! Not genic, but they are equivalent under exp. fitness model
+vark_ssh  <- left_join(vark_ssh, vark_ssh0) %>% 
+               mutate(neut_ssh_proxy=zvar0*neut_ssh/neut_ssh0,
+                      sel_ssh_proxy=zvar0*sel_ssh/sel_ssh0) %>%
+               ungroup()
+
+# long version
+vark_sshd <- vark_ssh %>% 
+  mutate(C2=(kvar-2)/4) %>%
+  gather('var_type', 'variance', 
+         C2, zvar, genic_va, neut_ssh_proxy, sel_ssh_proxy) 
+
+
+vark_sshd %>%
+  filter(L==500) %>% ggplot() + 
+  geom_line(aes(gen, variance, color=var_type, linetype=var_type)) + 
+  facet_grid(alpha ~ genlen, scales='free') + simple_theme()
+
+
+vark_types <- vark_sshd %>% filter(genlen %in% rec_params,
+                     Va %in% va_params, L==500) %>%
+       mutate(var_type=as.factor(var_type),
+              variance = ifelse(gen >= 5, variance, NA))
+
+levels(vark_types$var_type)  <- c('offspring', 'additive genic', 'neutral SSH', 
+                                  'sel SSH', 'additive genetic')
+
+write_tsv(vark_types, '../data/expfit_vark_types.tsv')
+devtools::use_data(vark_types, overwrite=TRUE)
+
+
+```
+
+
+### How well does SSH work instead of VA?
+
+Here, we look at the predicted temporal autocovariance from our theory.
+
+
+```{r, pred-ssh}
+
+pred_ssh <- vark_sshd %>% ungroup() %>% 
+          filter(var_type %in% c('genic_va', 'neut_ssh_proxy', 'zvar')) %>%
+          filter(L==500) %>% 
+          mutate(cov=pmap_dbl(list(genlen, gen-5, variance, N), 
+                                      analytic_cov))
+
+pd5r  <- pd5 %>% filter(r > 0.05, r<=0.49) %>% mutate(genlen_cM=100*genlen)
+predr <- pred_ssh %>% filter(r > 0.05, r<=0.49)  %>% mutate(genlen_cM=100*genlen)
+
+
+ggplot() +  geom_point(data=pd5r, aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=predr, aes(gen, cov, color=as.factor(var_type))) + 
+  facet_grid(Va ~ genlen, scales='free_y')  + simple_theme()
+
+
+# averaging across recombination regimes
+# summarize variances, but averaging over recombination
+vark_rec <- expfit_varyl_res %>% 
+              unnest(stats, genic_va, allelic_cov) %>% 
+              group_by(L, N, Va, alpha, gen) %>% 
+              summarize(kvar=mean(kvar), 
+                        zvar=mean(zvar), 
+                        zbar=mean(zbar), 
+                        genic_va=mean(va),
+                        ac_var=mean(ac_var),
+                        ac_cov=mean(ac_cov)) %>% 
+              ungroup() %>%
+              # Now, add back in region genetic lengths
+              crossing(genlen=unique(expfit_varyl_res$genlen))
+pred_rec <- vark_rec %>% filter(genlen < 4, genlen > 0) %>%
+  mutate(N=as.integer(as.character(N)), 
+         pred=pmap_dbl(list(genlen, gen-5, zvar, 2*N), analytic_cov))
+
+
+ggplot() + 
+  geom_point(data=pd5 %>% filter(genlen >0, genlen<4), aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=pred_rec, aes(gen, pred, color=as.factor(L))) + 
+  facet_grid(Va ~ genlen, scales='free_y') 
+
+
+
+pd5f_ssh <- pd5 %>% filter(Va %in% va_params, genlen %in% rec_params, L==500)
+predf_ssh <- pred_ssh %>% 
+              filter(Va %in% va_params, genlen %in% rec_params, gen>5) %>%
+              mutate(var_type=factor(var_type))
+
+levels(predf_ssh$var_type) <- c('additive genic', 'neutral SSH', 'additive genetic')
+
+devtools::use_data(predf_ssh, overwrite=TRUE)
+devtools::use_data(pd5f_ssh, overwrite=TRUE)
+
+write_tsv(predf_ssh, '../data/predf_ssh.tsv')
+write_tsv(pd5f_ssh, '../data/pd5f_ssh.tsv')
+
+
+## an alternate plot with VA varying over orders of magnitude
+pd5f_ssh2 <- pd5 %>% filter(Va %in% va_params_oom, genlen %in% rec_params, 
+                            as.integer(as.character(L))>0)
+pd5f_ssh2$L <- droplevels(pd5f_ssh2$L)
+predf_ssh2 <- pred_ssh %>% 
+              filter(Va %in% va_params_oom, genlen %in% rec_params, gen>5) %>%
+              mutate(var_type=factor(var_type))
+
+levels(predf_ssh2$var_type) <- c('additive genic', 'neutral SSH', 'additive genetic')
+
+devtools::use_data(predf_ssh2, overwrite=TRUE)
+devtools::use_data(pd5f_ssh2, overwrite=TRUE)
+
+write_tsv(predf_ssh2, '../data/predf_ssh2.tsv')
+write_tsv(pd5f_ssh2, '../data/pd5f_ssh2.tsv')
+
+
+```
+
+## Temporal Variances though time
+
+Now we look at the special case of $\text{cov}(\Delta p_t, \Delta p_s)$ for
+$s=t$, the variance of allele frequency change. Our predictions are in blue,
+the smoothed empirical values in green, and the theoretic drift ($1/2N$) value
+in red:
+
+```{r, vars}
+
+vars <- covs %>% filter(t1 == t0) %>%
+          #filter(t0 >= 5, t1>=5) %>% 
+          ungroup() %>% mutate(gen=ifelse(t1 >= 5, t1, t0)-4) %>%
+          left_join(vark) %>%
+          filter(L==500) %>%
+          mutate(pred_var= (pmap_dbl(list(genlen, 0, zvar, N), analytic_cov) + 1/2e3 )) %>%
+          mutate(Ne=1/(2*cov)) 
+
+
+vars_plot <- vars %>% 
+  mutate(L=as.factor(L)) %>% 
+  filter(genlen > 0, Va < 0.05) 
+
+vars_plot %>%
+  ggplot(aes(gen, cov)) + geom_point() + 
+  geom_line(aes(t0, pred_var), color='blue') + 
+  geom_hline(yintercept=1/2e3, color='red') + 
+  geom_smooth(data=vars_plot %>% filter(gen>0), se=FALSE, color='green') +
+  facet_grid(Va ~ genlen, scales='free_y')
+
+```
+
+
+## Cumulative Variances and Covariances
+
+Now, we look at the cumulative variances and covariances across many
+generations.
+
+### Calculate the variances and covariances for each allele frequency change
+
+First, we process the covariance matrices (easier to process than long tibble versions),
+summarizing into var/cov components using `sum_covmat()`:
+
+```{r, cum-mat}
+
+covs_mat_df <- expfit_varyl_res %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=5, before=15)) %>% unnest(cdf)
+
+```
+
+Now, we translate these variances into $N_e$ equivalents. Note that even in
+highest rec. regions, we don't see recovery to true Ne.
+
+```{r, cum-plot}
+
+covs_mat_df %>% filter(type=='var') %>% 
+  mutate(var=vals/(16-5), Ne=1/(2*var)) %>% 
+  ggplot(aes(as.factor(genlen), Ne)) + geom_boxplot() + facet_wrap(~ Va)
+
+```
+
+Now, we calculate the cumulative variances/covariances and create some plots
+(as well as save data for the `ms-plots.R` script to generate pub figures).
+
+```{r, pred-cum-cov}
+
+pred_covs <- vark %>% filter(L == 500, genlen>0, genlen<4.5) %>%
+                 filter(gen >= 5, gen <= 15) %>%
+                 select(Va, genlen, gen, zvar, genic_va) %>%
+                 group_by(Va, genlen) %>%
+                 nest() %>%
+                 mutate(pred_covvar=pmap(list(genlen, data), 
+                      ~ pred_covvar(.y$zvar, nrow(.y), unique(.x), 1e3))) %>%
+                 unnest(pred_covvar) %>% spread(type, vals) %>% 
+                 rename(pred_cov=cov, pred_var=var) 
+
+
+pred_covs_ssh <- vark_ssh %>% filter(L == 500, genlen>0, genlen<4.5) %>%
+                 filter(gen >= 5, gen <= 15) %>%
+                 select(Va, genlen, gen, neut_ssh_proxy) %>%
+                 group_by(Va, genlen) %>%
+                 nest() %>%
+                 mutate(pred_covvar=pmap(list(genlen, data), 
+                      ~ pred_covvar(.y$neut_ssh_proxy, nrow(.y), 
+                                    unique(.x), 1e3))) %>%
+                 unnest(pred_covvar) %>% spread(type, vals) %>% 
+                 rename(pred_cov_ssh=cov, pred_var_ssh=var) 
+
+
+pred_covs_all <- pred_covs %>% 
+    rename(pred_cov_zvar=pred_cov, pred_var_zvar=pred_var) %>%
+    left_join(pred_covs_ssh, by=c('Va', 'genlen'))
+
+
+emp_covs <- 
+  covs_mat_df %>% 
+  filter(L==500, genlen>0, genlen < 4.5) %>% 
+  mutate(vals=vals) %>% spread(type, vals) %>%
+  mutate(cov=cov+var) %>%
+  gather(type, vals, cov, var)  %>%
+  group_by(L, N, Va, genlen, rho, type) %>% 
+  summarize(mean=mean(vals, na.rm=TRUE),
+            lower=quantile(vals, 0.25, na.rm=TRUE),
+            upper=quantile(vals, 0.75, na.rm=TRUE)) %>%
+  gather(stat, val, mean:upper) %>%
+  mutate(val=val) %>% unite(col, type, stat) %>%
+  spread(col, val) 
+
+va_params2 <- c(0.001, 0.005, 0.01, 0.05, 0.08)
+
+cumcov_plot_df <- emp_covs %>% left_join(pred_covs)  %>% 
+  filter(genlen %in% rec_params, Va %in% va_params2) 
+ 
+cumcov_plot_all_nofilt_df <- emp_covs %>% left_join(pred_covs_all)
+ 
+cumcov_plot_all_df <- emp_covs %>% left_join(pred_covs_all)  %>% 
+  filter(genlen %in% rec_params, Va %in% va_params2) 
+ 
+cumcov_panels(cumcov_plot_df, TRUE,  ylab="var$(p_{t} - p_{0})$", 
+             lx=1.8, ly=0.5, lwd=1.2, ymax=0.5)
+
+cumcov_panels(cumcov_plot_all_df, TRUE,  ylab="var$(p_{t} - p_{0})$", 
+             lx=1.8, ly=0.5, lwd=1.2, ymax=0.5, basic=FALSE)
+ 
+# tables and Rda files for plots:
+write_tsv(cumcov_plot_df, '../data/cumcov.tsv')
+devtools::use_data(cumcov_plot_df, overwrite=TRUE)
+
+write_tsv(pred_covs_all, '../data/cumcov_all.tsv')
+devtools::use_data(cumcov_plot_all_df, overwrite=TRUE)
+
+# unfiltered version
+devtools::use_data(cumcov_plot_all_nofilt_df, overwrite=TRUE)
+
+```
+
+
+## Compound Parameter 
+
+Now, we look at the how much of the parameter space of the simulations can be
+understood with a single compound parameter, $V_A/R$.
+
+```{r, compound}
+
+pd5 %>% mutate(va_r=Va/genlen, gen=as.factor(t1)) %>% 
+  filter(t0 == 5) %>% 
+  ggplot(aes(va_r, cov, color=gen)) + geom_point() + 
+  geom_smooth(se=FALSE) + scale_x_log10() + ylim(-0.01, 0.01)
+
+
+gls <- unique(pd5$genlen)
+vas <- unique(pd5$Va)
+covs <- 10^{-c(-5:-1)}
+
+
+vard <- crossing(Va=vas,
+         genlen=gls,
+         gen=c(2*(1:24))) %>% 
+  filter(Va != 0, genlen != 0) %>%
+  mutate(cov=pmap_dbl(list(genlen, Va, gen), 
+                      ~ analytic_cov(..1, ..3, ..2, 1e3)),
+         va_r=Va/genlen)
+
+# for only cov(Δp_5, Δp_s)
+pd5_vard <- pd5 %>% mutate(va_r=Va/genlen, gen=as.factor(t1)) %>% 
+  filter(t0 == 5, Va > 0) %>% 
+  mutate(covbin=cut_number(cov, 10)) 
+
+## EDA
+pd5_vard %>% filter(t1 < 30) %>% ggplot(aes(va_r, cov, color=gen)) + 
+  geom_jitter()  + scale_x_log10() + geom_smooth() + ylim(-0.005, 0.01) 
+
+
+# tables and Rda files for plots:
+write_tsv(pd5_vard, '../data/pd5_vard.tsv')
+devtools::use_data(pd5_vard, overwrite=TRUE)
+
+
+```
+
+## Single Replicate
+
+Now, we look at the noise in a single replicate.
+
+```{r, single-replicate}
+
+
+est_Va_neutR2 <- function(covs, r, N, t=5, s=6) {
+  emp_cov <- covs %>% filter(t0 == t, t1 == s) %>% pull(cov)
+  2*emp_cov/assoc_int(s-t, r, N) 
+}
+
+get_va <- function(x, t=5) x %>% filter(gen == t) %>% pull(zvar)
+
+
+expfit_varyl_res <- expfit_varyl_res %>% filter(genlen>0) %>%
+      mutate(empva5_6=pmap_dbl(list(covs, genlen, N), est_Va_neutR2)) %>%
+      mutate(va = map_dbl(stats, get_va))
+
+expfit_varyl_res %>% filter(Va > 0, va < 0.2) %>%
+ggplot()+ geom_point(aes(va, empva5_6)) +
+  geom_abline(slope=1, intercept=0, color='cornflowerblue', size=1) +
+  geom_smooth(aes(va, empva5_6), method='lm')
+
+
+expfit_varyl_res %>% filter(Va > 0, va < 0.2) %>%
+mutate(mse=(empva5_6 - va)^2) %>%
+ggplot(aes(L, mse))+ geom_point() +
+  geom_smooth(method='lm')
+
+
+expfit_varyl_res %>% filter(Va > 0, va < 0.2) %>%
+mutate(mse=(empva5_6 - va)^2) %>%
+ggplot(aes(Va, mse))+ geom_point() +
+  geom_smooth(method='lm')
+
+
+
+
+expfit_varyl_res %>% filter(Va > 0) %>%
+ggplot(aes(va, empva5_6, color=as.factor(genlen))) + geom_point() + 
+  facet_grid(~ Va, scales='free')+ 
+  geom_abline(slope=1, intercept=0, color='cornflowerblue', size=1) +
+  geom_smooth(method='lm')
+
+
+
+```
+
+## Method of Moments
+
+Here, we use the generalized method of moments to estimate $V_a(1)$ and $N$.
+Essentially, by equating the empirical 2nd moments and cross moments for all
+timepoints to their theoretic counterparts, we have an overdetermined system of
+equations. We can solve this using least squares, giving us estimates of
+$V_a(1)$ and $N$.
+
+```{r, mom}
+
+# reshape the covariance matrices for linear model 
+# cached method of moments ("mom") fits
+mom_fits_data <- '../data/mom_fits.rda'
+if (!file.exists(mom_fits_data)) {
+  mom_fits <- expfit_varyl_res %>% 
+    filter(rep %in% 1:20) %>%
+    mutate(mom_df = pmap(list(covs_mat, genlen, N, hets, res), 
+                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5$pos, trange=c(5, 10)))) 
+    mom_fits <- mom_fits %>% mutate(lsfit = map(mom_df, fit_mom)) %>%
+                mutate(params=map(lsfit, fit2params))
+  devtools::use_data(mom_fits, overwrite=TRUE)
+} else {
+  data(mom_fits)
+}
+
+mom_fitsd <- mom_fits %>% unnest(params)  %>% 
+  filter(rep %in% 1:3) %>%
+  mutate(emp_va=map_dbl(stats, ~ .$zvar[5])) %>%
+  select(rep, L:genlen, Nest=N_est, va0_est, emp_va) %>%
+  filter(genlen %in% rec_params) %>%
+  mutate(genlen=as.factor(as.character(genlen)))
+
+
+mom_fits %>% filter(Va != 0) %>% 
+  filter(rep %in% 1:3) %>%
+  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
+  unnest(params) %>%
+  ggplot(aes(emp_genic_va, va0_est, color=as.factor(genlen))) + geom_point() + 
+  geom_smooth(method='lm', color='red') +
+  geom_abline(yintercept=0, slope=1, color='blue') + 
+  scale_x_log10() + scale_y_log10()
+
+
+mom_fits %>% filter(Va != 0) %>% 
+  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
+  unnest(params) %>%
+  ggplot(aes(N, N_est, color=as.factor(genlen))) + geom_boxplot() + 
+  geom_smooth(method='lm', color='red') +
+  geom_hline(yintercept=1e3, color='blue') + 
+  scale_x_log10() + scale_y_log10()
+
+# save results for graphics
+devtools::use_data(mom_fitsd, overwrite=TRUE)
+write_tsv(mom_fitsd, '../data/mom_fits.tsv')
+
+```
+
+## Fraction of Variance due to Linked Selection
+
+Here, we look at the total fraction of selection due to linked selection (e.g.
+the covariances):
+
+```{r, frac-var-ls}
+
+calc_total_var <- function(res, start, end) total_var(res$neut_freqs, start, end)
+
+mom_fits_g <- expfit_varyl_res %>%
+  # note that since Va = 0 cases have L == 0 by default, we 
+  # need to include it here to get Va = 0 case
+  filter(L == 500 | L == 0) %>%
+  mutate(before_sel_var=map_dbl(res, calc_total_var, start=1, end=4)) %>%
+  mutate(after_sel_var=map_dbl(res, calc_total_var, start=5, end=10)) %>%
+  mutate(G_before=map_dbl(covs_mat, G, start=1, end=4)) %>%
+  mutate(G_after=map_dbl(covs_mat, G, start=5, end=10)) 
+
+devtools::use_data(mom_fits_g, overwrite=TRUE)
+
+ggplot(mom_fits_g, aes(x=as.factor(Va), G_before, fill=as.factor(genlen))) + 
+  geom_boxplot(position='dodge') 
+
+ggplot(mom_fits_g, aes(x=as.factor(Va), G_after, fill=as.factor(genlen))) + 
+  geom_boxplot(position='dodge') 
+
+# Gprime
+mom_fits_gp <- mom_fits %>% 
+  # note that since Va = 0 cases have L == 0 by default, we 
+  # need to include it here to get Va = 0 case
+  filter(L == 500 | L == 0) %>%
+  mutate(before_sel_var=map_dbl(res, calc_total_var, start=1, end=4)) %>%
+  mutate(after_sel_var=map_dbl(res, calc_total_var, start=5, end=10)) %>%
+  unnest(params) %>% 
+  mutate(Gp_before = map2_dbl(before_sel_var, N_est, Gprime)) %>%
+  mutate(Gp_after = map2_dbl(after_sel_var, N_est, Gprime))
+
+devtools::use_data(mom_fits_gp, overwrite=TRUE)
+
+ggplot(mom_fits_gp, aes(x=as.factor(Va), Gp_after, fill=as.factor(genlen))) + 
+  geom_boxplot(position='dodge') 
+
+ggplot(mom_fits_gp, aes(x=as.factor(Va), Gp_before, fill=as.factor(genlen))) + 
+  geom_boxplot(position='dodge') 
+
+```
+
