@@ -1,4 +1,4 @@
-all: expon-varyl-covs.html expon-varyl-varyn-covs.html neutral-validation.html sl-cov.html data
+all: expon-varyl-covs.html neutral-validation.html sl-cov.html expon-fluct-covs.html
 
 # The data set with all Ns of simulation runs is quite large, and our focal
 # analysis focuses on N=1000. 
@@ -17,6 +17,8 @@ $(varyn_data) ../simdata/expfit-varyl-covs.Rdata: ../simdata/expfit-varyl-varyn-
 
 expon-varyl-covs.html: expon-varyl-covs.Rmd ../simdata/expfit-varyl-covs.Rdata $(varyn_data)
 neutral-validation.html: neutral-validation.Rmd ../simdata/neutral-covs.Rdata
+sl-cov.html: sl-cov.Rmd ../simdata/sl-covs.Rdata
+expon-fluct-covs.html: expon-fluct-covs.Rmd ../simdata/expfit-fluct-covs.Rdata
 
 %.html: %.Rmd
 	Rscript --vanilla -e 'library(rmarkdown); render("$<")'

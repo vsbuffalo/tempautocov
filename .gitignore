@@ -1,0 +1,14 @@
+# produced data files too large for Github
+data/mom_fits_gp.rda
+data/mom_fits_g.rda
+data/mom_fits.tsv
+data/mom_fits.rda
+sl_wvar_trajs.tsv
+
+# main simulation files (too large)
+expfit-fluct-covs.Rdata
+expfit-varyl-covs.Rdata
+expfit-varyl-varyn-covs.Rdata
+ld-res.Rdata
+neutral-covs.Rdata
+sl-covs.Rdata

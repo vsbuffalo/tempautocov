@@ -1,0 +1,223 @@
+---
+title: "Single locus simulations"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.width=12, fig.height=8, 
+               echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(devtools)
+library(tidyverse)
+load_all()
+load('../simdata/sl-covs.Rdata') 
+
+```
+
+Parameterization notes: In my R sims, we use $w = 1 + \alpha g$ where $\alpha$
+is the effect size and $g$ is the gene count for the selected allele. 
+
+
+## Additive Genetic Variation in a Single Locus Model
+
+There's something very subtle that happens with single-locus additive genetic
+variation under our simulation routines. Because the selected site is chosen
+randomly from a neutral stationary distribution, the mean allele frequency is
+1/2, but the modes are near 0 and 1. The behavior of $p(1-p)$ over time at the
+selected site is asymmetric: sites near fixation immediately fix and don't
+contribute much to the mean trajectory of $p(1-p)$, where as sites at low
+frequency raise in frequency with selection, increasing $V_A$ over the short
+run, before then declining. Thus, $E(V_A(t))$ does not decrease; we can see
+this by bootstrapping for $\alpha = 0$ and the free recombination case:
+
+```{r}
+
+sl_res %>% filter(alpha == 0.1, rec_frac > 0.4) %>% 
+  unnest(stats) %>% filter(gen > 4) %>%
+  modelr::bootstrap(20) %>%
+  mutate(strap=map(strap, as_tibble)) %>% unnest(strap) %>%
+  ggplot(aes(gen, wvar, group=.id)) + geom_smooth(se=FALSE)
+
+
+```
+
+Compare to conditioning on initial allele frequency:
+
+```{r}
+
+get_init_freq <- function(x) x$sel_freqs[1]
+
+
+sl_wvar_trajs <- sl_res %>% filter(alpha == 0.1, rec_frac > 0.4) %>% 
+  mutate(p0=map_dbl(res, get_init_freq)) %>%
+  unnest(stats) %>% filter(gen > 4) %>%
+  mutate(p0_bin=cut_number(p0, 5)) %>%
+  #mutate(p0_bin=cut(p0, c(0, 0.05, 0.1, 0.3, 0.7, 0.9, 0.095, 1))) %>%
+  group_by(p0_bin) %>%
+  do(rs=modelr::bootstrap(., 20)) %>% unnest(rs) %>%
+  mutate(strap=map(strap, as_tibble)) %>%
+  unnest(strap) 
+
+
+sl_wvar_trajs %>% ggplot(aes(gen, wvar, group=interaction(.id, p0_bin), color=p0_bin)) + 
+  geom_smooth(se=FALSE) 
+
+# write data for plot
+devtools::use_data(sl_wvar_trajs, overwrite=TRUE)
+write_tsv(sl_wvar_trajs, '../data/sl_wvar_trajs.tsv')
+
+
+```
+
+This explains why we see $V_A(t)$ has a hump above.
+
+In our data, we want to condition on intermediate frequency. We do that below,
+and calculate the theoretic single locus $V_A(t)$ (using `sl_va()`).
+
+
+```{r}
+
+# condition on intermediate freq
+sl_res_int <- sl_res %>% select(-covs) %>% 
+              mutate(init_freq=map_dbl(res, ~ .$sel_freqs[1])) %>% 
+              filter(abs(init_freq - 0.5) < 0.1) 
+
+# empirical variances
+vark_int <- sl_res_int %>% 
+          unnest(stats) %>% 
+          group_by(N, alpha, rec_frac, gen) %>% 
+          summarize(wvar=mean(wvar)) %>%
+          ungroup() 
+
+ngens <- max(vark_int$gen)
+
+
+theory_vark <- 
+  vark_int %>% select(N, alpha, rec_frac) %>% 
+                 distinct(.keep_all=TRUE) %>%
+                 mutate(va=map(alpha, ~ sl_var_traj(p0=0.5, ngens, s=.*2)))  %>%
+                 unnest(va) %>% mutate(gen=gen+5)
+
+
+all_vark_int <- vark_int %>% left_join(theory_vark) 
+
+all_vark_int %>% 
+  ggplot() + geom_point(aes(gen, wvar), color='red') + geom_line(aes(gen, theory_va), color='blue') + facet_grid(~alpha)
+
+
+```
+
+Compare to the case where we don't condition on intermediate frequency:
+
+
+```{r}
+
+# empirical variances
+vark <- sl_res %>% 
+          unnest(stats) %>% 
+          group_by(N, alpha, rec_frac, gen) %>% 
+          summarize(wvar=mean(wvar), kvar=mean(kvar), wbar=mean(wbar)) %>%
+          ungroup() 
+
+ngens <- max(vark$gen)
+theory_vark <- 
+  vark %>% select(N, alpha, rec_frac) %>% 
+                 distinct(.keep_all=TRUE) %>%
+                 mutate(va=map(alpha, ~ sl_var_traj(p0=0.5, ngens, s=.)))  %>%
+                 unnest(va) %>% mutate(gen=gen)
+
+all_vark <- vark %>% left_join(theory_vark) 
+
+
+all_vark %>% mutate(kvar=(kvar-2)/2) %>% 
+  mutate(rec_frac=as.factor(rec_frac)) %>%
+  ggplot() + geom_point(aes(gen, wvar, color=rec_frac)) + geom_line(aes(gen+4, theory_va), color='blue', size=1.2) + facet_grid(~ alpha)
+
+```
+
+## Calculate Covariances
+
+First we calculate the covariances. First, recall that there are two sites per
+simulation: the selected site and the neutral site. We can calculate the
+covariance by either calculating it on a single site as $\Delta p_t \Delta
+p_s$, and then average the covariances across replicates. Or, we can bind each
+of the neutral sites and calculate the covariance, calculating the covariance
+by averaging across replicates (this essentially treats each replicate as a
+different loci). The former is much, much nosier -- likely due to how fixations
+are handled (and perhaps because the mean isn't subtracted off).  Here, we
+reshape the neutral allele frequencies:
+
+
+```{r}
+
+sl_freqs <- sl_res %>% select(-covs, -stats) %>% 
+              mutate(neut_freqs = map(res, get_neut_freqs)) %>%
+              select(-res) %>%
+              group_by(N, alpha, rec_frac) %>% nest() %>%
+              # reshape neutral allele frequencies, binding 
+              # replicates into a single matrix
+              # that we can then calculate covariance over
+              mutate(freqs=map(data, reshape_neut_freqs)) 
+
+```
+
+We calculate the temporal covariances on all of these replicates reshaped, such
+that the covariance is averaging across replicates.
+
+```{r}
+
+sl_covs <- sl_freqs %>% 
+  mutate(covs=map(freqs, ~ temp_cov(., as_df=TRUE, remove_fixed=FALSE))) %>% 
+             unnest(covs)
+
+pred <- all_vark %>% ungroup() %>% mutate(N=as.integer(as.character(N)), 
+            cov=pmap_dbl(list(rec_frac, gen-5, theory_va, N), sl_analytic_cov))  %>%
+           mutate(N=factor('1000'))
+
+rec_params <- c(1e-4, 5e-4, 0.02)
+alpha_params <- c(0.05, 0.1, 0.2)
+covs5 <- sl_covs %>% filter(t1 > t0, t0 == 5, 
+                            # $alpha %in% alpha_params,
+                            #rec_frac %in% rec_params,
+                            ) %>% mutate(gen=t1) %>%
+           mutate(N=as.factor(N))
+
+
+covs5 %>%
+ggplot(aes(gen, cov)) + geom_point() + 
+  geom_line(data=pred, aes(gen, cov), color='red') +
+  geom_smooth() + 
+  facet_grid(alpha~rec_frac, scales='free_y')
+
+```
+
+This shows that we get good fits, but at a certain point (high $\alpha$, low
+$r$), we end up with interference.
+
+We write the files necessary to produce the supplementary figure to file:
+
+
+```{r}
+
+sl_pd5f <- filter(covs5, alpha %in% alpha_params, rec_frac %in% rec_params) 
+# only keep predictions when gen > 5, when selection is turned on. 
+# our V_A just looks at sel. allele freq, not when sel. is turned 
+# on so this is needed:
+sl_predf <- filter(pred, alpha %in% alpha_params, rec_frac %in% rec_params, gen >= 5)
+
+
+# tables and Rda files for plots:
+write_tsv(sl_pd5f, '../data/sl_pd5f.tsv')
+write_tsv(sl_predf, '../data/sl_predf.tsv')
+devtools::use_data(sl_pd5f, overwrite=TRUE)
+devtools::use_data(sl_predf, overwrite=TRUE)
+
+panel_plot(sl_pd5f, sl_predf, gen, cov, alpha, rec_frac, N, pch_cex=1)
+
+```
+
+
+

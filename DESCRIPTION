@@ -1,5 +1,5 @@
 Package: TempSigLinkedSel
-Title: Package to reproduce the analyses of Buffalo and Coop (2018)
+Title: Package to reproduce the analyses of Buffalo and Coop (2019)
 Version: 0.0.0.9000
 Authors@R: 'Vince Buffalo <vsbuffaloAAAAA@gmail.com> [aut, cre]'
 Description: This R package has the analyses to reproduce my theoretic results using forward simulations.
@@ -9,3 +9,4 @@ Imports: tidyverse, gsl, parallel
 License: BSD
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.1.0
