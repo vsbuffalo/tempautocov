@@ -1,18 +1,19 @@
 # fluct-plot.r -- a hellish amount of base plot code for a complex figure
 # ¯\ _ (ツ) _ /¯ 
-pkgload::load_all()
-library(viridis)
 
+# TODO look at flip r sim file, this should be what creates cov mats
+
+pkgload::load_all()
 textwidth <- 7 # 426 pts to inches
 phi <- (1 + sqrt(5))/2
 axs_col <- 'gray12'
 
 pdf('fluct-sel.pdf', width=textwidth, height=textwidth/phi * 0.8)
 
-
 data(pd5_fluctf)
 data(pred_fluctf) ## for predictions
 data(cumd)
+data(cumd_abs)
 pd5_fluctf2 <- pd5_fluctf %>% filter(genlen == 0.1, Va == 0.05, L==500, N==1e3)
 pred_fluctf2 <- pred_fluctf %>% filter(genlen == 0.1, Va == 0.05, L==500, N==1e3)
 
@@ -90,39 +91,15 @@ mtext('A', 3, cex=1.2, adj=-.2, line=-1.4, col=subfig_col)
 plot.new()
 
 
-#dd <- cumd %>% filter(genlen == 0.1, Va == 0.02)  
-#tmp = dd %>% spread(type, val) %>% mutate(tot=cov+var)
-#dd_mat <- tmp %>% select(gen, cov, var, tot) %>% t()
-#mat <- dd_mat[c(2, 3), 1:21] 
-##colnames(mat) <- dd_mat[1,]
-#x <- mat %>% barplot(col=cols, border=0, axes=FALSE)
-#mat[1, ] %>% barplot(col=cols[1], border=0, add=TRUE, axes=FALSE, axisnames=FALSE)
-#axis(1, at=x[seq(1, 25, by=5)], labels=rep('', 5), col.axis=axs_col, col=axs_col, line=0.4, 
-#     lwd=1.2, padj=-0.9, tck=0.01, las=1)
-#axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.01, cex.axis=0.9)
-#mtext('cumulative variance/covariance', 2, line=3.1, adj=1.4)
-## mtext('cumulative var/cov', 2, line=3.1, adj=-23)
-
-#dd_abs <- cumd_abs %>% filter(genlen == 0.1, Va == 0.02)  
-#tmp_abs = dd_abs %>% spread(type, val) %>% mutate(tot=cov+var)
-#dd_abs_mat <- tmp_abs %>% select(gen, cov, var, tot) %>% t()
-#mat_abs <- dd_abs_mat[c(2, 3), 1:21] 
-##colnames(mat_abs) <- dd_abs_mat[1,]
-#mat_abs %>% barplot(col=cols, border=0, axes=FALSE)
-#axis(1, at=seq(0, 25, by=5), labels=seq(5, 30, by=5), col.axis=axs_col, col=axs_col, 
-#     line=0.3, lwd=1.2, padj=-1.8, tck=0.01, cex.axis=0.9)
-#axis(2, col.axis=axs_col, col=axs_col, las=1, 
-#     line=0, hadj=0.63, lwd=1.2, tck=0.01, cex.axis=0.9)
-#mtext('generation', 1, line=1.6)
-
 # there's a subtle off by one issue here; temp_cov() uses Δp_{t-1}.
 # 4th row/col is 5th timepoint
+end <- 21
 dd <- cumd %>% filter(genlen == 0.1, Va == 0.02) 
 tmp = dd %>% spread(type, val) %>% mutate(tot=cov+var)
 dd_mat <- tmp %>% select(gen, cov, var, tot) %>% t()
-mat <- dd_mat[c(3, 2), ] 
+mat <- dd_mat[c(3, 2), 1:end] 
 # divide through by starting time
-mat <- sweep(mat, 2, dd_mat[1,]-3, '/')
+mat <- sweep(mat, 2, dd_mat[1,1:end]-3, '/')
 
 # this is a bunch of messy code that gets barplot() to move the negative bars down,
 # not plotting them above. It does this if we have rows ordered c(2, 3) (see above),
@@ -144,7 +121,7 @@ overlay[overlay > 0] <- 0
 overlay %>% barplot(col=adjustcolor(cols_after[2], alpha.f=1), border=0, add=TRUE, axes=FALSE, axisnames=FALSE)
 axis(1, at=x[seq(1, 25, by=5)], labels=rep('', 5), col.axis=axs_col, col=axs_col, line=0.5, 
      lwd=1.2, padj=-0.9, tck=0.01, las=1)
-segments(0, 1/2e3, 26.5, 1/2e3, col='gray12', lty=2)
+segments(0, 1/2e3, 25, 1/2e3, col='gray12', lty=2)
 #mtext(latex2exp::TeX('$1/2N$'), 4, xpd=TRUE, cex=0.5, line=-0, adj=0.25, padj=-1.5, srt=45)
 mtext(latex2exp::TeX('$1/2N$'), 1, xpd=TRUE, cex=0.5, line=-2.6, adj=1.05)
 axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.01, cex.axis=0.9)
@@ -152,7 +129,7 @@ axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.0
 mtext('cumulative\ncov + var', 2, line=3.1, cex=0.9)
 # mtext('cumulative var/cov', 2, line=3.1, adj=-23)
 ly <- 0.0023
-lx <- 19
+lx <- 18
 legend(lx, ly, legend=c('', ''), fill=c(cols_before),
        title='',
        adj=c(0.1, 0.4),
@@ -171,26 +148,11 @@ text(23, ly-0.0004, 'after flip', srt=45, adj=c(0, 0))
 mtext('B', 3, cex=1.2, adj=.029, line=-1.5, col=subfig_col)
 
 
-#dd <- cumd %>% filter(genlen == 0.1, Va == 0.02)  
-#tmp = dd %>% spread(type, val) %>% mutate(tot=cov+var)
-#dd_mat <- tmp %>% select(gen, cov, var, tot) %>% t()
-#mat <- dd_mat[c(3, 2), 1:21] 
-#mat <- sweep(mat, 2, dd_mat[1,], '/')
-#x <- mat %>% barplot(col=adjustcolor(cols, alpha.f=0.4), border=0, axes=FALSE)
-##mat[1, ] %>% barplot(col=cols[2], border=0, add=TRUE, axes=FALSE, axisnames=FALSE)
-#axis(1, at=x[seq(1, 25, by=5)], labels=rep('', 5), col.axis=axs_col, col=axs_col, line=0.5, 
-#     lwd=1.2, padj=-0.9, tck=0.01, las=1)
-#abline(h=1/2e3, col=dashed_gray, lty=2)
-#axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.01, cex.axis=0.9)
-##mtext('cumulative variance/covariance', 2, line=3.1, adj=1.4)
-#mtext('covariance', 2, line=3.1)
-## mtext('cumulative var/cov', 2, line=3.1, adj=-23)
-
 dd_abs <- cumd_abs %>% filter(genlen == 0.1, Va == 0.02)  
 tmp_abs = dd_abs %>% spread(type, val) %>% mutate(tot=cov+var)
 dd_abs_mat <- tmp_abs %>% select(gen, cov, var, tot) %>% t()
-mat_abs <- dd_abs_mat[c(3, 2), 1:21] 
-mat_abs <- sweep(mat_abs, 2, dd_abs_mat[1,], '/')
+mat_abs <- dd_abs_mat[c(3, 2), 1:end] 
+mat_abs <- sweep(mat_abs, 2, dd_abs_mat[1,1:end]-3, '/')
 
 mat_abs2 <- cbind(rbind(mat_abs[, 1:flip], matrix(0, ncol=flip, nrow=2)),
               rbind(matrix(0, ncol=ncol(mat_abs)-flip, nrow=2), mat_abs[, (flip+1):ncol(mat_abs)]))

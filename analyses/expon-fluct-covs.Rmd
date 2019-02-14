@@ -1,0 +1,284 @@
+---
+title: "Analysis of Temporal Autocovariance Simulation Results"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.width=12, fig.height=8, 
+               echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r, load-libraries}
+pkgload:::load_all()
+library(tidyverse)
+library(viridis)
+#load('../simdata/expfit-flip-covs.Rdata')
+load('../simdata/expfit-fluct-covs.Rdata')
+opar <- par(no.readonly=TRUE)
+
+```
+
+## Calculate covariances
+
+First, we average the covariances across replicates:
+
+```{r}
+
+covs <- expfit_fluct_res %>%
+         unnest(covs) %>% 
+         # see note in temp_cov() for why these times are incremented
+         mutate(t0=t0+1L, t1=t1+1L) %>%  
+         group_by(L, N, Va, genlen, r, t0, t1) %>% 
+         summarize(cov=mean(cov))
+
+```
+
+Now, we look at the covariances with the initial generations of selection, 5 to
+6.
+
+```{r}
+
+pd5_fluct <- covs %>% filter((t1 == 5 & t1 != t0) | (t0 == 5 & t1 != t0)) %>% 
+          ungroup() %>% mutate(L=factor(L), gen=ifelse(t1 > 5, t1, t0)) %>% 
+          filter(N==1e3)
+
+ggplot(pd5_fluct) + geom_point(aes(gen, cov, color=L), size=0.8) + 
+  facet_grid(Va ~ genlen, scales='free_y') 
+
+
+```
+
+Subset of parameters:
+
+```{r}
+
+rec_params <- c(0.5, 0.1, 0.01, 1.5)
+va_params <- c(0.01, 0.02, 0.05)
+
+pd5_fluctf <- pd5_fluct %>% filter(Va %in% va_params, genlen %in% rec_params)
+
+ggplot() +  geom_point(data=pd5_fluctf, aes(gen, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+write_tsv(pd5_fluctf, '../data/pd5f_fluct.tsv')
+devtools::use_data(pd5_fluctf, overwrite=TRUE)
+
+
+```
+
+## Additive Genetic Variance Dynamics
+
+```{r}
+
+vark <- expfit_fluct_res %>% unnest(stats) %>% 
+          filter(Va %in% va_params, genlen %in% rec_params) %>%
+          group_by(genlen, N, Va, L, gen) %>% 
+          summarize(zvar=mean(zvar)) 
+
+vark %>% ggplot(aes(gen, zvar, color=as.factor(L))) + geom_point() + facet_grid(Va ~ genlen)
+
+```
+
+
+## Predictions based on a simple extension of the directional selection model
+
+```{r}
+
+pred_fluctf <- vark %>% filter(N==1e3) %>% ungroup() %>% 
+          filter(Va %in% va_params, genlen %in% rec_params) %>%
+          mutate(N=as.integer(as.character(N)), 
+                 pred=pmap_dbl(list(genlen, gen-5, zvar, N), analytic_cov)) %>%
+          mutate(pred=ifelse(gen >= 15, -pred, pred))
+
+
+ggplot() + geom_point(data=pd5_fluctf, aes(gen, cov, color=as.factor(L)), alpha=0.3) + 
+            geom_line(data=pred_fluctf, aes(gen, pred, color=as.factor(L))) + facet_grid(Va ~ genlen)
+
+
+ggplot() + geom_point(data=pd5_fluctf%>% filter(genlen == 0.1, Va == 0.05), 
+                      aes(gen, cov, color=as.factor(L)), alpha=0.3) + 
+            geom_line(data=pred_fluctf%>% filter(genlen == 0.1, Va == 0.05), 
+                      aes(gen, pred, color=as.factor(L))) + facet_grid(Va ~ genlen)
+
+
+write_tsv(pred_fluctf, '../data/pred_fluctf.tsv')
+devtools::use_data(pred_fluctf, overwrite=TRUE)
+
+```
+
+
+
+## Cumulative Variances and Covariances
+
+
+```{r, cum-mat}
+
+covs_mat_df <- expfit_fluct_res %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=5, before=25)) %>% unnest(cdf)
+
+covs_mat_abs_df <- expfit_fluct_res %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=5, before=25, use_abs=TRUE)) %>% unnest(cdf)
+
+
+Gest  <- bind_rows(
+          expfit_fluct_res %>% 
+           mutate(G=map_dbl(covs_mat, G, start=5, end=25, use_abs=TRUE)) %>% 
+           group_by(L, N, Va, genlen) %>% summarize(G=mean(G)) %>% mutate(abs=TRUE),
+
+         expfit_fluct_res %>% 
+           mutate(G=map_dbl(covs_mat, G, start=5, end=25, use_abs=FALSE)) %>% 
+           group_by(L, N, Va, genlen) %>% summarize(G=mean(G)) %>% mutate(abs=FALSE))
+
+
+ggplot(Gest %>% filter(L==500, N==1e3), aes(as.factor(genlen), G, fill=abs)) + geom_bar(stat='identity') + facet_grid(~Va)
+
+```
+
+```{r``}
+
+covsmat <- bind_rows(covs_mat_df %>% filter(L==500, N==1000) %>% mutate(abs=FALSE),
+            covs_mat_abs_df %>% filter(L==500, N==1000) %>% mutate(abs=TRUE)) %>%
+           group_by(L, N, Va, genlen, type, abs) %>% summarize(vals=mean(vals))
+
+shape_barplot <- function(x) {
+  b <- x %>% filter(abs) %>% spread(type, vals)
+  c <- x %>% filter(!abs) %>% spread(type, vals)
+  mat <- full_join(b, c, by=c('genlen', 'abs')) %>%
+    arrange(genlen, abs) %>% select(-abs) %>% t()
+  mat[is.na(mat)] <- 0
+  out <- mat[-1, ]
+  colnames(out) <- mat[1,]
+  out
+}
+
+shape_barplot2 <- function(x) {
+  mat <- x %>% spread(type, vals) %>%  t()
+  out <- mat[-1, ]
+  colnames(out) <- mat[1,]
+  out
+}
+
+a <- covsmat %>% filter(Va %in% va_params, genlen %in% rec_params) %>% 
+  ungroup() %>% select(-L, -N) %>% group_by(Va) %>% nest() %>% mutate(barplot_data=map(data, shape_barplot))
+
+cols <- c('red', 'green', 'blue', 'purple')
+par(opar)
+par(mfrow=c(1, length(va_params)),
+    mar=c(0, .5, 1.5, 0),
+    oma=c(3, 4, 0.5, 4.5))
+ymin <- -1/20; ymax <- 0.6
+axs_col <- 'gray12'; cex <- 1; lwd=1
+for (i in seq_along(va_params)) {
+  mat <- do.call(cbind, a %>% filter(Va == va_params[i]) %>% pull(barplot_data))
+  mat[1:4, ] %>% barplot(col=cols, border=0, axes=FALSE, ylim=c(ymin, ymax))
+  mat[, seq(2, ncol(mat), 2)] <- 0
+  mat[4, ]  %>% barplot(col=cols[3:4], add=TRUE, border=0, axes=FALSE, ylim=c(ymin, ymax))
+  abline(h=0, lty='solid', col='gray12')
+  if (i == 1)
+    axis(2, col.axis=axs_col, cex.axis=cex*0.8, col=axs_col, 
+     lwd=lwd, tck=0.018, las=1, line=1, hadj=0.6)
+}
+
+```
+
+## Taking Absolute Value in Cumulative Covariances 
+
+```{r}
+
+cumdgg <- 
+  expfit_fluct_res %>% 
+  filter(N==1e3, L==500) %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=5, before=25, bygen=TRUE)) %>% unnest(cdf) %>%
+  filter(Va %in% va_params, genlen %in% rec_params) %>%
+  group_by(gen, L, N, Va, genlen, type) %>% 
+  summarize(val=mean(var)) %>%
+  group_by(L, N, Va, genlen, type) %>% 
+  arrange(gen) %>% mutate(cumval=cumsum(val)) %>% ungroup()
+
+
+cumdgg %>% filter(genlen == 0.1, Va == 0.05) %>% ggplot() + 
+  geom_bar(aes(gen, cumval/gen, fill=type), alpha=0.4, position='dodge', stat='identity') + 
+  #geom_point(aes(gen, val, color=type)) + 
+  facet_grid(Va ~ genlen)
+
+
+cumdgg_before <- 
+  expfit_fluct_res %>% 
+  filter(N==1e3, L==500) %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=0, before=5, bygen=TRUE)) %>% unnest(cdf) %>%
+  filter(Va %in% va_params, genlen %in% rec_params) %>%
+  group_by(gen, L, N, Va, genlen, type) %>% 
+  summarize(val=mean(var)) %>%
+  group_by(L, N, Va, genlen, type) %>% 
+  arrange(gen) %>% mutate(cumval=cumsum(val)) %>% ungroup()
+
+
+cumdgg_before %>% filter(genlen == 0.1, Va == 0.05) %>% ggplot() + 
+  geom_bar(aes(gen, cumval, fill=type), alpha=0.4, position='dodge', stat='identity') + 
+  geom_point(aes(gen, val, color=type)) + 
+  facet_grid(Va ~ genlen)
+
+# there's a subtle off by one issue here; temp_cov() uses Δp_{t-1}.
+# 4th row/col is 5th timepoint. 
+
+cumd <- 
+  expfit_fluct_res %>% 
+  filter(N==1e3, L==500) %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=4, before=25, bygen=TRUE)) %>% 
+  unnest(cdf) %>%
+  filter(Va %in% va_params, genlen %in% rec_params) %>%
+  group_by(gen, L, N, Va, genlen, type) %>% 
+  summarize(val=mean(var, na.rm=TRUE)) %>%
+  group_by(L, N, Va, genlen, type) %>% 
+  arrange(gen) %>% mutate(val=cumsum(val)) %>% ungroup()
+
+devtools::use_data(cumd, overwrite=TRUE)
+
+cumd_abs <- 
+  expfit_fluct_res %>% 
+  filter(N==1e3, L==500) %>% 
+  mutate(cdf = map(covs_mat, sum_covmat, after=4, before=25, bygen=TRUE, use_abs=TRUE)) %>% 
+  unnest(cdf) %>%
+  filter(Va %in% va_params, genlen %in% rec_params) %>%
+  group_by(gen, L, N, Va, genlen, type) %>% 
+  summarize(val=mean(var, na.rm=TRUE)) %>%
+  group_by(L, N, Va, genlen, type) %>% 
+  arrange(gen) %>% mutate(val=cumsum(val)) %>% ungroup()
+
+devtools::use_data(cumd_abs, overwrite=TRUE)
+
+
+
+```
+
+Some EDA plots (final plot is in `analyeses/figures/fluct-plots.r`).
+
+```{r}
+
+cumd %>% filter(genlen == 0.1, Va == 0.05)  %>%
+  mutate(gen=gen+4) %>%
+  ggplot() + 
+  geom_bar(aes(gen, val, fill=type), alpha=0.4, position='dodge', stat='identity') + 
+  #geom_point(aes(gen, val, color=type)) + 
+  facet_grid(Va ~ genlen)
+
+
+cumd %>% filter(genlen == 0.1, Va == 0.05)  %>%
+  mutate(gen=gen+4) %>%
+  ggplot() + 
+  geom_bar(aes(gen, val/gen, fill=type), alpha=0.4, position='dodge', stat='identity') + 
+  #geom_point(aes(gen, val, color=type)) + 
+  facet_grid(Va ~ genlen)
+
+
+cumd_abs %>% filter(genlen == 0.1, Va == 0.05) %>% ggplot() + 
+  geom_bar(aes(gen, val/gen, fill=type), alpha=0.4, position='dodge', stat='identity') + 
+  #geom_point(aes(gen, val, color=type)) + 
+  facet_grid(Va ~ genlen)
+
+
+```
+

@@ -8,13 +8,13 @@ MCCORES <- 10
 NUM_NEUTSITES <- 200
 
 # parameter space
-expfit_fluct_res <- crossing(L=c(10, 50, 100, 500),
-                             N=c(100, 500, 1000),
+expfit_fluct_res <- crossing(L=c(500),
+                             N=c(1000),
                              # last two are the other end of a chromosome ~1.5M long
                              # and two (nearly) unlinked loci
                              #
                              # see fitness notes
-                             Va=c(0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.08, 0.1), 
+                             Va=c(0, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.08, 0.1), 
                              genlen=c(0, 0.005, 0.01, 0.05, 0.1, 0.5, 1.5, 4.5),
                              rep=seq_len(NREPS)) %>% 
                              mutate(r=haldane(genlen),
@@ -24,7 +24,6 @@ expfit_fluct_res <- crossing(L=c(10, 50, 100, 500),
                                     alpha=alpha(Va, theta_L)) %>%
 			     # add seeds
 			     mutate(seeds = map(L, ~ rand_seed()))
-
 
 expfit_fluct_res$res <- mclapply(seq_len(nrow(expfit_fluct_res)),
               function(i) {
@@ -54,13 +53,17 @@ expfit_fluct_res <- expfit_fluct_res %>%
 	             mutate(success=map_lgl(res, ~ class(.) != 'try-error')) %>%
 		     filter(success)
 
-save(expfit_fluct_res, file='simdata/expfit-flip-sims')
+save(expfit_fluct_res, file='simdata/expfit-fluct-sims')
 
 # calculate all the covariances
 expfit_fluct_res <- expfit_fluct_res %>% mutate(covs=map(res, process_covs), 
                                          stats=map(res, 'stats'))
+
+#
+expfit_fluct_res <- expfit_fluct_res %>%
+    mutate(covs_mat=map(res, process_covs, as_df=FALSE))
    
 # save the covariances
-expfit_fluct_res_covs <- expfit_fluct_res %>% select(-res)
-save(expfit_fluct_res, file='simdata/expfit-flip-covs.Rdata')
+expfit_fluct_res <- expfit_fluct_res %>% select(-res)
+save(expfit_fluct_res, file='simdata/expfit-fluct-covs.Rdata')
 
