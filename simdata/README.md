@@ -21,11 +21,11 @@ ld-test.r -> ld-res.Rdata
 neutral-sims.r -> neutral-covs.Rdata
 ```
 
-## Version Details
+## Running Simulations
 
-MSPrime:
+All simulations are meant to be run in the main repository directory. They an
+be executed with:
 
-Most of this was run on a server, with the following `sessionInfo()`. 
-
-
-
+```
+Rscript --vanilla scriptname.r
+```

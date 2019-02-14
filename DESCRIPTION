@@ -3,7 +3,7 @@ Title: Package to reproduce the analyses of Buffalo and Coop (2019)
 Version: 0.0.0.9000
 Authors@R: 'Vince Buffalo <vsbuffaloAAAAA@gmail.com> [aut, cre]'
 Description: This R package has the analyses to reproduce my theoretic results using forward simulations.
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.4.1), msr
 Suggests: knitr, rmarkdown
 Imports: tidyverse, gsl, parallel
 License: BSD
