@@ -129,7 +129,7 @@ axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.0
 mtext('cumulative\ncov + var', 2, line=3.1, cex=0.9)
 # mtext('cumulative var/cov', 2, line=3.1, adj=-23)
 ly <- 0.0023
-lx <- 18
+lx <- 16.5
 legend(lx, ly, legend=c('', ''), fill=c(cols_before),
        title='',
        adj=c(0.1, 0.4),
