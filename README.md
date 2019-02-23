@@ -35,7 +35,7 @@ knitr
 
 ## Reproducing the Results
 
-1. The following files were created by the simulation routines in `r_sims` on
+1. The following files were created by the simulation routines in `r_sims/` on
    the server, 
 
    ```
@@ -46,7 +46,7 @@ knitr
    sl-covs.Rdata
    ```
 
-each by running `Rscript --vanilla scriptname.r` for the corresponding script.
+    each by running `Rscript --vanilla scriptname.r` for the corresponding script.
 
 2. On the server,  run `make server` in `analyses/`, which generates some
    processed data from the main simulations, filtering out the N=1000 case, and
