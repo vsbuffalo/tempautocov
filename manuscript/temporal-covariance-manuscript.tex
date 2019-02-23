@@ -12,6 +12,12 @@
 \RequirePackage{bm}
 \RequirePackage{bbm}
 \RequirePackage{tikz}
+
+% line numbers:
+\RequirePackage{lineno}
+%\modulolinenumbers[5]
+\renewcommand\linenumberfont{\normalfont\tiny\sffamily}
+ 
 % \RequirePackage[osf]{mathpazo}
 \RequirePackage[bibstyle=authoryear,citestyle=authoryear-comp,
                 date=year,
@@ -68,8 +74,9 @@
 % - R^2 changes through time note?
 
 
-\begin{abstract}
 
+\linenumbers
+\begin{abstract}
   Populations can adapt over short, ecological timescales via standing genetic
   variation. Genomic data collected over tens of generations in both natural
   and lab populations is increasingly used to find selected loci underpinning
@@ -868,6 +875,10 @@ selective interference only affects the temporal autocovariances through the
 variance term $V_a(s)$, and that the actual variance determining temporal
 autocovariance is the additive genetic variance, $V_A(s)$.
 
+% \vb{Should we include mention of HRi / N, AND mention the measured negative LD?}
+%\paragraph{Total variance in allele frequencies} 
+% \vb{COMMENTED OUT paragraph header -- hesitant to have this be the only paragraph header in main paper -- really needed?}
+
 In addition to modeling autocovariance through time, our theory can predict the
 total temporal variance in allele frequency, $\var(p_t - p_0)$, when there is
 heritable variation for fitness. Furthermore, from Equation
@@ -1585,8 +1596,8 @@ We thank Matt Osmond and Doc Edge for feedback on previous versions of the
 manuscript, and Nick Barton, Dave Begun, Sarah Friedman, Bill Hill, John Kelly,
 Chuck Langley, Sally Otto, Jonathan Pritchard, Anita To, Michael Turelli, and
 members of the Coop lab for helpful conversations. This research was supported
-by an NSF Graduate Research Fellowship grant awarded to VB (1650042), and an
-NIH (R01-GM108779) and NSF (1353380) grants awarded to GC.
+by an NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
+(R01-GM108779) and NSF (1353380) awarded to GC.
 
 \printbibliography
 
@@ -1893,7 +1904,7 @@ additive genic variation can be expressed as: $v_{a,l}(s) = \overline{v_a(s)} +
 \begin{align}
   \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{1}{2} \sum_{l=1}^L v_{a,l(s)} \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}  \nonumber \\
                                                    &= \frac{1}{2} \sum_{l=1}^L (\overline{v_a(s)} + \varepsilon_l) \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t} \nonumber  \\
-                                                   &= \frac{1}{2}\underbrace{\overline{v_{a(s)}}}_{\substack{\text{average genic\\variation per locus}} \times \underbrace{\left(\sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{sum of persistence associations}  + \frac{1}{2} \underbrace{\left(\sum_{l=1}^L \varepsilon_l \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{effect-association covariation}.
+                                                   &= \frac{1}{2}\underbrace{\overline{v_{a(s)}}}_{\substack{\text{average genic}\\ \text{variation per locus}}} \times \underbrace{\left(\sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{sum of persistence associations}  + \frac{1}{2} \underbrace{\left(\sum_{l=1}^L \varepsilon_l \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{effect-association covariation}.
 \end{align}
 %
 We assume that this last term, which is non-zero in expectation only if there
@@ -1902,7 +1913,7 @@ expected LD between the selected and the neutral sites is zero. Rewriting the
 total genic variation as $V_a(s)$,
 
 \begin{align}
-  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}.
+  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t)} &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}.
 \end{align}
 
 \paragraph{Continuous approximation to chromosomes}
@@ -2100,14 +2111,17 @@ neutral allele where there is (1) unlinked heritable fitness variation (their
 1995 paper), or (2) linkage, where fitness-determining sites are randomly
 scattered along a chromosome (their 1998 paper). Overall, their models are
 formulated in a quantitative genetics tradition, where the population genetic
-dynamics at the selected loci are not explicitly modeled. In contrast, in
-deriving our expressions for temporal autocovariance and variances, we use a
-population genetic approach, modeling the dynamics at selected sites (though we
-simplify from the full multilocus treatment, e.g. we assume selected loci
-experience independent sweeps and we ignore the LD between selected sites). We
-show that we can reconcile the two approaches, and demonstrate that the
-temporal autocovariance expressions we develop in our models are implicit in
-their model.
+dynamics at the selected loci are not explicitly modeled (although these links
+are made more explicitly in their '98 paper). In contrast, in deriving our
+expressions for temporal autocovariance and variances, we use a population
+genetic approach, modeling the dynamics at selected sites (though we simplify
+from the full multilocus treatment, e.g. we assume selected loci experience
+independent sweeps and we ignore the LD between selected sites). We show that
+we can reconcile the two approaches, and demonstrate that the temporal
+autocovariance expressions we develop in our models are implicit in their
+model. We also work through their expressions for $N_e$ with heritable
+variance, because it represents quite useful result but their original
+presentation was spread across two papers (and a change in notation).
 
 \paragraph{Santiago and Caballero's 1995 and 1998 models for $N_e$}
 

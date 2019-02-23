@@ -11,8 +11,9 @@ all: expon-varyl-covs.html neutral-validation.html sl-cov.html expon-fluct-covs.
 # the processed data
 varyn_data=../data/pd5f_varyn.rda ../data/predf_varyn.rda 
 
-$(varyn_data) ../simdata/expfit-varyl-covs.Rdata: ../simdata/expfit-varyl-varyn-covs.Rdata
-	Rscript --vanilla expon-varyl-varyn-covs.R
+# RUN ON SERVER:
+#$(varyn_data) ../simdata/expfit-varyl-covs.Rdata: ../simdata/expfit-varyl-varyn-covs.Rdata
+#	Rscript --vanilla expon-varyl-varyn-covs.R
 
 
 expon-varyl-covs.html: expon-varyl-covs.Rmd ../simdata/expfit-varyl-covs.Rdata $(varyn_data)
