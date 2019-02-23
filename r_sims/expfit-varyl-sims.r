@@ -107,11 +107,11 @@ expfit_varyl_res <- expfit_varyl_res %>%
 
 # save the covariances
 message('writing sim results...')
-save(expfit_varyl_res, file='simdata/expfit-varyl-covs.Rdata')
+save(expfit_varyl_res, file='simdata/expfit-varyl-varyn-covs.Rdata')
 message('writing sim complete.')
 
 expfit_varyl_res_orig <- expfit_varyl_res
 expfit_varyl_res <- expfit_varyl_res %>% select(-res)
 
-save(expfit_varyl_res, file='simdata/expfit-varyl-covs-only.Rdata')
+save(expfit_varyl_res, file='simdata/expfit-varyl-varyn-covs-only.Rdata')
 
