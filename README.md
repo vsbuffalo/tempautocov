@@ -33,6 +33,12 @@ knitr
 
 `msr` is my [MS data parser for R](https://github.com/vsbuffalo/msr).
 
+## Simulation Data on FigShare
+
+For reproducibility purposes, we've uploaded the simulation data to FigShare.
+[FigShare link](https://figshare.com/articles/Raw_simulation_and_large_intermediate_processed_data/7709930.)
+and DOI: 10.6084/m9.figshare.7709930.
+
 ## Reproducing the Results
 
 1. The following files were created by the simulation routines in `r_sims/` on
