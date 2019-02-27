@@ -109,7 +109,7 @@ temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, N=NULL, upper_tri=TRUE,
 
   # the heterozygosity is the minimum for the generation that's min(t, s) of
   # the cov(Δp_t, Δp_s)
-  hetmat <- hets[pmax(row(covmat), col(covmat))]
+  hetmat <- hets[pmin(row(covmat), col(covmat))]
   dim(hetmat) <- dim(covmat)
   #attributes(covmat)$nloci <- sum()
 
