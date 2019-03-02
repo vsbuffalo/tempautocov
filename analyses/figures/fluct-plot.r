@@ -3,7 +3,7 @@
 
 # TODO look at flip r sim file, this should be what creates cov mats
 
-pkgload::load_all()
+#pkgload::load_all()
 textwidth <- 7 # 426 pts to inches
 phi <- (1 + sqrt(5))/2
 axs_col <- 'gray12'
@@ -129,7 +129,7 @@ axis(2, col.axis=axs_col, col=axs_col, las=1, line=0, hadj=0.7, lwd=1.2, tck=0.0
 mtext('cumulative\ncov + var', 2, line=3.1, cex=0.9)
 # mtext('cumulative var/cov', 2, line=3.1, adj=-23)
 ly <- 0.0023
-lx <- 16.5
+lx <- 18
 legend(lx, ly, legend=c('', ''), fill=c(cols_before),
        title='',
        adj=c(0.1, 0.4),
@@ -143,8 +143,9 @@ legend(lx+1.8, ly, legend=c('var', 'cov'), fill=c(cols_after),
        cex=1,
        bty='n', text.col='gray10',
        border=0)
-text(20.9, ly-0.0004, 'before flip', srt=45, adj=c(0, 0))
-text(23, ly-0.0004, 'after flip', srt=45, adj=c(0, 0))
+lxt <- 19.9
+text(lxt, ly-0.0004, 'before flip', srt=45, adj=c(0, 0))
+text(lxt + 2.1, ly-0.0004, 'after flip', srt=45, adj=c(0, 0))
 mtext('B', 3, cex=1.2, adj=.029, line=-1.5, col=subfig_col)
 
 

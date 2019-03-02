@@ -270,7 +270,7 @@ mtext(latex2exp:::TeX('$V_A / R$'), 1, line=0.5, cex=mtext_cex)
 mtext(latex2exp:::TeX('$cov(\\Delta p_5, \\; \\Delta p_s)$'), 2, line=3, 
       cex=mtext_cex)
 
-legend(10^{-2.8}, 0.0078, KEEP_GENS, fill=cols[KEEP_GENS-5], title='generation', bty='n', text.col=title_col, border=0, cex=0.6)
+legend(10^{-2.8}, 0.0078, KEEP_GENS, fill=cols[KEEP_GENS-5], title='generation (s)', bty='n', text.col=title_col, border=0, cex=0.6)
 
 
 # keep <- seq(1, n, length.out=6)

@@ -9,7 +9,11 @@ server: $(varyn_data) ../simdata/expfit-varyl-covs.Rdata
 #
 # also bring over the entire varyl (N=1k) dataset
 # scp bonjovi://home/vinceb/projects/tempautocov/simdata/expfit-varyl-covs.Rdata .
+# 
+# REMEMBER: touch both before running laptop, after download
 laptop: expon-varyl-covs.html neutral-validation.html sl-cov.html expon-fluct-covs.html
+
+all: server laptop
 
 # The data set with all Ns of simulation runs is quite large, and our focal
 # analysis focuses on N=1000. 

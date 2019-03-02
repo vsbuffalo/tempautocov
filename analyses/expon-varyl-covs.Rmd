@@ -491,14 +491,11 @@ levels(vark_types$var_type)  <- c('offspring', 'additive genic', 'neutral SSH',
 write_tsv(vark_types, '../data/expfit_vark_types.tsv')
 devtools::use_data(vark_types, overwrite=TRUE)
 
-
 ```
-
 
 ### How well does SSH work instead of VA?
 
 Here, we look at the predicted temporal autocovariance from our theory.
-
 
 ```{r, pred-ssh}
 
@@ -515,37 +512,14 @@ predr <- pred_ssh %>% filter(r > 0.05, r<=0.49)  %>% mutate(genlen_cM=100*genlen
 ggplot() +  geom_point(data=pd5r, aes(t1, cov, color=as.factor(L)), 
                        alpha=0.5, size=0.8) +
   geom_hline(yintercept=0, color='red') + 
-  geom_line(data=predr, aes(gen, cov, color=as.factor(var_type))) + 
+  geom_line(data=predr, aes(gen, cov, linetype=as.factor(var_type))) + 
   facet_grid(Va ~ genlen, scales='free_y')  + simple_theme()
+```
 
+Save all files used for predictions/data from reference generation, for
+different numeric variances:
 
-# averaging across recombination regimes
-# summarize variances, but averaging over recombination
-vark_rec <- expfit_varyl_res %>% 
-              unnest(stats, genic_va, allelic_cov) %>% 
-              group_by(L, N, Va, alpha, gen) %>% 
-              summarize(kvar=mean(kvar), 
-                        zvar=mean(zvar), 
-                        zbar=mean(zbar), 
-                        genic_va=mean(va),
-                        ac_var=mean(ac_var),
-                        ac_cov=mean(ac_cov)) %>% 
-              ungroup() %>%
-              # Now, add back in region genetic lengths
-              crossing(genlen=unique(expfit_varyl_res$genlen))
-pred_rec <- vark_rec %>% filter(genlen < 4, genlen > 0) %>%
-  mutate(N=as.integer(as.character(N)), 
-         pred=pmap_dbl(list(genlen, gen-5, zvar, 2*N), analytic_cov))
-
-
-ggplot() + 
-  geom_point(data=pd5 %>% filter(genlen >0, genlen<4), aes(t1, cov, color=as.factor(L)), 
-                       alpha=0.5, size=0.8) +
-  geom_hline(yintercept=0, color='red') + 
-  geom_line(data=pred_rec, aes(gen, pred, color=as.factor(L))) + 
-  facet_grid(Va ~ genlen, scales='free_y') 
-
-
+```{r}
 
 pd5f_ssh <- pd5 %>% filter(Va %in% va_params, genlen %in% rec_params, L==500)
 predf_ssh <- pred_ssh %>% 
@@ -577,6 +551,38 @@ devtools::use_data(pd5f_ssh2, overwrite=TRUE)
 write_tsv(predf_ssh2, '../data/predf_ssh2.tsv')
 write_tsv(pd5f_ssh2, '../data/pd5f_ssh2.tsv')
 
+```
+
+One thing we wondered is how sensitive our predictions are to the different
+levels of recombination. Below, we average the numeric variances over all
+recombination levels, and show the fit is very poor. 
+
+```{r}
+# averaging across recombination regimes
+# summarize variances, but averaging over recombination
+vark_rec <- expfit_varyl_res %>% 
+              unnest(stats, genic_va, allelic_cov) %>% 
+              group_by(L, N, Va, alpha, gen) %>% 
+              summarize(kvar=mean(kvar), 
+                        zvar=mean(zvar), 
+                        zbar=mean(zbar), 
+                        genic_va=mean(va),
+                        ac_var=mean(ac_var),
+                        ac_cov=mean(ac_cov)) %>% 
+              ungroup() %>%
+              # Now, add back in region genetic lengths
+              crossing(genlen=unique(expfit_varyl_res$genlen))
+pred_rec <- vark_rec %>% filter(genlen < 4, genlen > 0) %>%
+  mutate(N=as.integer(as.character(N)), 
+         pred=pmap_dbl(list(genlen, gen-5, zvar, 2*N), analytic_cov))
+
+
+ggplot() + 
+  geom_point(data=pd5 %>% filter(genlen >0, genlen<4), aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=pred_rec, aes(gen, pred, color=as.factor(L))) + 
+  facet_grid(Va ~ genlen, scales='free_y') 
 
 ```
 

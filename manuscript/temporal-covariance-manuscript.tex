@@ -12,6 +12,17 @@
 \RequirePackage{bm}
 \RequirePackage{bbm}
 \RequirePackage{tikz}
+
+% line numbers:
+\RequirePackage{lineno}
+%\modulolinenumbers[5]
+\definecolor{linenogray}{gray}{0.75}
+\renewcommand\linenumberfont{\normalfont\tiny\sffamily\color{linenogray}}
+
+% spacing
+\RequirePackage{setspace}
+%\doublespacing
+ 
 % \RequirePackage[osf]{mathpazo}
 \RequirePackage[bibstyle=authoryear,citestyle=authoryear-comp,
                 date=year,
@@ -56,10 +67,11 @@
 % \title{Rapid Polygenic Adaptation Creates a Detectable Signal of Linked Selection in Temporal Data}
 \title{The Linked Selection Signature of Rapid Adaptation in Temporal Genomic Data}
 
-\author[$\ast$,$\dag$]{Vince Buffalo}
+\author[$\ast$,$\dag$,$1$]{Vince Buffalo}
 \author[$\dag$]{Graham Coop}
 \affil[$\ast$]{\footnotesize Population Biology Graduate Group}
 \affil[$\dag$]{\footnotesize Center for Population Biology, Department of Evolution and Ecology, University of California, Davis, CA 95616}
+\affil[$1$]{\footnotesize Email for correspondence: \href{mailto:vsbuffalo@ucdavis.edu}{vsbuffalo@ucdavis.edu}}
 
 \begin{document}
 \maketitle
@@ -67,9 +79,11 @@
 %  TODO
 % - R^2 changes through time note?
 
+%% RUNNING TITLE
+%% KEYWORDS
 
+\linenumbers
 \begin{abstract}
-
   Populations can adapt over short, ecological timescales via standing genetic
   variation. Genomic data collected over tens of generations in both natural
   and lab populations is increasingly used to find selected loci underpinning
@@ -270,10 +284,9 @@ heritable fitness variation, due to systematic differences in the fitness of
 individuals caused by their genotypes.
 
 Second, heritable fitness variation creates \emph{temporal autocovariance} in
-allele frequency change across generations. We can see how this covariance
-contributes to the total cumulative variance in allele frequency change over
-$t$ generations by writing the total allele frequency change as the sum of
-allele frequency changes each generation,
+allele frequency change across generations. We can see the contribution of
+covariance by writing the total cumulative allele frequency change as the sum
+of allele frequency changes each generation,
 
 \begin{align}
   \label{eq:var-decomp}
@@ -525,7 +538,7 @@ We then write the temporal autocovariance experienced by a neutral allele in a r
 $R$ Morgans long containing $V_a(s)$ fitness variation at time $s$ as
 
 \begin{align}
-  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &\approx \frac{V_a(s)}{2 R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}_t^2(r(g))) e^{-r(g)(s-t)} \,dg
+  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &\approx \frac{V_a(s)}{2 R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}_t^2(r(g))) (1-r(g))^{(s-t)} \,dg
   \label{eq:ave-neut-autocov}
 \end{align}
 %
@@ -564,7 +577,7 @@ is
 
 \begin{align}
   \label{eq:multilocus-triangle}
-  \mathcal{C}(V_a, R, t, s) := \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; e^{-r(c)(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
+  \mathcal{C}(V_a, R, t, s) := \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
 \end{align}
 %
 where $\E_n(\cdot)$ indicates an expectation taken over the position of the
@@ -846,7 +859,7 @@ At the onset of selection, there is no expected linkage disequilibria between
 selected sites since the sites and effect sizes were randomly sampled --- in
 other words, $\E(D_{i,j}(s)) = 0$. We see this in Figure
 \ref{fig:multilocus-expfit-sims}, as the temporal autocovariance predicted with
-$V_a(s)$ match those of $V_A(s)$ when $s = 6$ (see also appendix Figure
+$V_a(s)$ match those of $V_A(s)$ when $s = 6$ (see also Supplementary Figure
 \ref{fig:multilocus-expfit-vark}, which plots the empirical additive genic and
 genetic variances over time). Over time, these two quantities diverge as
 negative linkage disequilibria build up. While negative linkage disequilibria
@@ -867,6 +880,10 @@ simulation results suggest that the negative linkage disequilibria created by
 selective interference only affects the temporal autocovariances through the
 variance term $V_a(s)$, and that the actual variance determining temporal
 autocovariance is the additive genetic variance, $V_A(s)$.
+
+% \vb{Should we include mention of HRi / N, AND mention the measured negative LD?}
+%\paragraph{Total variance in allele frequencies} 
+% \vb{COMMENTED OUT paragraph header -- hesitant to have this be the only paragraph header in main paper -- really needed?}
 
 In addition to modeling autocovariance through time, our theory can predict the
 total temporal variance in allele frequency, $\var(p_t - p_0)$, when there is
@@ -1165,13 +1182,13 @@ less-conservative estimator we call $G'$,
 We can think of the numerator of the second term in Equation \eqref{eq:g-prime}
 as the variance in allele frequency change in a Wright--Fisher population
 without selection.  Recall that under a Wright--Fisher model, the standardized
-variance across $t$ generations is $\var(p_t - p_0) \approx (1 -
-\exp(-\nicefrac{t}{2N})) \approx p_0(1-p_0) \times \nicefrac{t}{2N}$, where this second
-approximation works for short time spans ($\nicefrac{t}{2N} \ll 1$).  This
-suggests that we can use our method-of-moments estimate of the effective
-population size without the effects of selection, $\widehat{N}$, and compare
-the fraction of standardized variance we expect under this rate of drift to the
-empirical standardized variance,
+variance across $t$ generations is approximately $(1 - \exp(-\nicefrac{t}{2N}))
+\approx p_0(1-p_0) \times \nicefrac{t}{2N}$, where this second approximation
+works for short time spans ($\nicefrac{t}{2N} \ll 1$).  This suggests that we
+can use our method-of-moments estimate of the effective population size without
+the effects of selection, $\widehat{N}$, and compare the fraction of
+standardized variance we expect under this rate of drift to the empirical
+standardized variance,
 
 \begin{align}
   G' &= 1 - \frac{t \E(p_{0}(1-p_{0})) }{2 \widehat{N} \var(p_{t} - p_{0}) }.
@@ -1576,17 +1593,17 @@ of each distinct process with temporal data.
 
 \section{Code and Data Availability}
 
-All code and simulation data to reproduce these results is available on GitHub
+All code and simulation data to reproduce these results are available on GitHub
 at \url{https://github.com/vsbuffalo/tempautocov}.
 
 \section{Acknowledgments}
 
 We thank Matt Osmond and Doc Edge for feedback on previous versions of the
 manuscript, and Nick Barton, Dave Begun, Sarah Friedman, Bill Hill, John Kelly,
-Chuck Langley, Sally Otto, Jonathan Pritchard, Anita To, Michael Turelli, and
-members of the Coop lab for helpful conversations. This research was supported
-by an NSF Graduate Research Fellowship grant awarded to VB (1650042), and an
-NIH (R01-GM108779) and NSF (1353380) grants awarded to GC.
+Chuck Langley, Sally Otto, Jonathan Pritchard, Anita To, Kevin Thornton,
+Michael Turelli, and members of the Coop lab for helpful conversations. This
+research was supported by an NSF Graduate Research Fellowship grant awarded to
+VB (1650042), and NIH (R01-GM108779) and NSF (1353380) awarded to GC.
 
 \printbibliography
 
@@ -1893,7 +1910,7 @@ additive genic variation can be expressed as: $v_{a,l}(s) = \overline{v_a(s)} +
 \begin{align}
   \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{1}{2} \sum_{l=1}^L v_{a,l(s)} \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}  \nonumber \\
                                                    &= \frac{1}{2} \sum_{l=1}^L (\overline{v_a(s)} + \varepsilon_l) \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t} \nonumber  \\
-                                                   &= \frac{1}{2}\underbrace{\overline{v_{a(s)}}}_{\substack{\text{average genic\\variation per locus}} \times \underbrace{\left(\sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{sum of persistence associations}  + \frac{1}{2} \underbrace{\left(\sum_{l=1}^L \varepsilon_l \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{effect-association covariation}.
+                                                   &= \frac{1}{2}\underbrace{\overline{v_{a(s)}}}_{\substack{\text{average genic}\\ \text{variation per locus}}} \times \underbrace{\left(\sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{sum of persistence associations}  + \frac{1}{2} \underbrace{\left(\sum_{l=1}^L \varepsilon_l \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}\right)}_\text{effect-association covariation}.
 \end{align}
 %
 We assume that this last term, which is non-zero in expectation only if there
@@ -1902,7 +1919,7 @@ expected LD between the selected and the neutral sites is zero. Rewriting the
 total genic variation as $V_a(s)$,
 
 \begin{align}
-  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}.
+  \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t)} &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}.
 \end{align}
 
 \paragraph{Continuous approximation to chromosomes}
@@ -1960,7 +1977,7 @@ density PDF and average over the distance between sites,
 
 \begin{align}
   \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_t(1-p_t)) } %&=  \frac{V_a(s)}{2L} \sum_{l=1}^L \int_{0}^R \E(\mathcal{R}^2_{t}(r(c))) (1-r(c))^{s-t} \frac{2(R-c)}{R^2} d c \label{eq:exp-overselpos} \\
-  &= \frac{V_a(s)}{2} \int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(g))^{(s-t)} \frac{2(R-c)}{R^2} \,d c \\
+  &= \frac{V_a(s)}{2} \int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c \\
   &= \frac{V_a(s)}{2} \mathcal{A}(R, t, s)
 \end{align}
 %
@@ -1982,9 +1999,9 @@ recombination map and studies where linkage disequilibria can be calculated, we
 have the recombination fraction $r_{i,j}$ and the pairwise linkage
 disequilibria $\mathbf{R}^2_{i,j}$ between between two loci $i$ and $j$ (where
 $\mathbf{R}^2$ is the $M \times M$ matrix of pairwise LD calculated at time
-$t$). However, we do not \emph{a priori} know whether a site is selected or
-not, so we sum over all $M$ loci, thus characterizing the average linkage
-disequilibria in a region as
+$t$). Since we do not \emph{a priori} know whether a site is selected or not,
+so we sum over all polymorphic $M$ loci, thus characterizing the average
+linkage disequilibria in a region as
 
 \begin{align}
   \label{eq:supp-emp-assoc}
@@ -2100,14 +2117,17 @@ neutral allele where there is (1) unlinked heritable fitness variation (their
 1995 paper), or (2) linkage, where fitness-determining sites are randomly
 scattered along a chromosome (their 1998 paper). Overall, their models are
 formulated in a quantitative genetics tradition, where the population genetic
-dynamics at the selected loci are not explicitly modeled. In contrast, in
-deriving our expressions for temporal autocovariance and variances, we use a
-population genetic approach, modeling the dynamics at selected sites (though we
-simplify from the full multilocus treatment, e.g. we assume selected loci
-experience independent sweeps and we ignore the LD between selected sites). We
-show that we can reconcile the two approaches, and demonstrate that the
-temporal autocovariance expressions we develop in our models are implicit in
-their model.
+dynamics at the selected loci are not explicitly modeled (although these links
+are made more explicitly in their '98 paper). In contrast, in deriving our
+expressions for temporal autocovariance and variances, we use a population
+genetic approach, modeling the dynamics at selected sites (though we simplify
+from the full multilocus treatment, e.g. we assume selected loci experience
+independent sweeps and we ignore the LD between selected sites). We show that
+we can reconcile the two approaches, and demonstrate that the temporal
+autocovariance expressions we develop in our models are implicit in their
+model. We also work through their expressions for $N_e$ with heritable
+variance, because it represents quite useful result but their original
+presentation was spread across two papers (and a change in notation).
 
 \paragraph{Santiago and Caballero's 1995 and 1998 models for $N_e$}
 
@@ -2495,6 +2515,7 @@ variation per region of $V_a \in \{0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.08,
 0.1\}$.  Note that to prevent our plots from being too dense, we include only a
 representative subset of this parameter grid in our figures.
 
+\setcounter{figure}{0}    
 
 \newpage
 \section{Supplementary Figures}
@@ -2538,6 +2559,9 @@ parameters. Here, we estimate $N_e$ with $\widehat{N_e} = \nicefrac{p(1-p)}{2
   \label{fig:ne-neut}
 \end{figure}
 
+\clearpage
+\newpage
+
 \subsection{Dynamics of Variances}
 
 \begin{figure}[!ht]
@@ -2557,6 +2581,11 @@ heterozygosity proxies described in Section \ref{sec:dyn-var}.}
   \label{fig:multilocus-expfit-vark}
 \end{figure}
 
+\clearpage
+\newpage
+
+\subsection{Supplementary Temporal Autocovariance Figures}
+
 \begin{figure}[!ht]
   \centering
   \includegraphics{./images/sim-pred13-covs-varyl.pdf}
@@ -2572,7 +2601,6 @@ heterozygosity proxies described in Section \ref{sec:dyn-var}.}
 \label{fig:multilocus-expfit-sims-gen13} 
 \end{figure}
 
-\subsection{Supplementary Temporal Autocovariance Figures}
 
 \begin{figure}[!ht]
   \centering
