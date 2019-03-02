@@ -1,4 +1,15 @@
-all: expon-varyl-covs.html neutral-validation.html sl-cov.html expon-fluct-covs.html
+# run after running simulations
+server: $(varyn_data) ../simdata/expfit-varyl-covs.Rdata
+
+# bring over 
+# for varyn -- this is preprocessed varyn covs/etc, need to be run
+# on the server as it's too large to process covs on laptop
+# scp bonjovi://home/vinceb/projects/tempautocov/data/pd5f_varyn.rda .
+# scp bonjovi://home/vinceb/projects/tempautocov/data/predf_varyn.rda .
+#
+# also bring over the entire varyl (N=1k) dataset
+# scp bonjovi://home/vinceb/projects/tempautocov/simdata/expfit-varyl-covs.Rdata .
+laptop: expon-varyl-covs.html neutral-validation.html sl-cov.html expon-fluct-covs.html
 
 # The data set with all Ns of simulation runs is quite large, and our focal
 # analysis focuses on N=1000. 
