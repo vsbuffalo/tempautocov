@@ -18,144 +18,6 @@ load_all()
 load('../simdata/expfit-varyl-covs.Rdata')
 opar <- par(no.readonly=TRUE)
 
-freq_spec <- function(res, gen=50, nbins=1000) {
-  effects <- res$effects
-  neut_freqs <- res$neut_freqs
-  num_neut_sites <- sum(is.na(effects))
-  nvars <- neut_freqs[gen, ]
-  freqs <- nvars[(nvars > 0) & (nvars < 1)]
-  segvars_hist = cut(freqs, breaks=1/seq(0, nbins))
-  tbl = table(segvars_hist)
-  tibble(bin=1/seq(1, nbins), freqs=tbl)
-}
-
-sfs <- function(res, N, gen=5) {
-  effects <- res$effects
-  neut_freqs <- res$neut_freqs
-  num_neut_sites <- sum(is.na(effects))
-  nvars <- 2*N*neut_freqs[gen, ]
-  segvars <- nvars[(nvars > 0) & (nvars < 2*N)]
-  segvars_hist = cut(segvars, breaks=seq(0, (2*N)-1))
-  tibble(freq=seq(1, 2*N -1), nsites=table(segvars_hist))
-}
-
-
-sfs <- function(res, N, gen=5, p0=NULL, eps=0.05) {
-  effects <- res$effects
-  neut_freqs <- res$neut_freqs
-  num_neut_sites <- sum(is.na(effects))
-  if (!is.null(p0)) {
-    # use only loci within eps of p0 the first generation
-    keep_loci <- abs(neut_freqs[0, ] - p0) < eps
-    nvars <- 2*N*neut_freqs[gen, keep_loci]
-  } else {
-    nvars <- 2*N*neut_freqs[gen, ]
-  }
-  segvars <- nvars[(nvars > 0) & (nvars < 2*N)]
-  segvars_hist = cut(segvars, breaks=seq(0, (2*N)-1))
-  tibble(freq=seq(1, 2*N -1), nsites=table(segvars_hist))
-}
-
-
-a4 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=4)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-
-a1 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=1)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-b6 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=6)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-b10 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=10)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-#  Same with intermediate starting freqs
-a4_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=4, p0=0.5)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-
-a1_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=1, p0=0.5)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-b6_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=6, p0=0.5)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-b10_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=10, p0=0.5)) %>%
-  unnest(sfs) %>%
-  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
-  group_by(Va, genlen, L) %>% nest() %>%
-     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
-     unnest(norm)
-
-
-
-dd_int <- bind_rows(a1_int %>% mutate(type='pre-seletion-1'),
-                    a4_int %>% mutate(type='pre-seletion-4'),
-                    b6_int %>% mutate(type='seletion-6'),
-                    b10_int %>% mutate(type='seletion-10'))
-
-
-
-dd <- bind_rows(a1 %>% mutate(type='pre-seletion-1'),
-                a4 %>% mutate(type='pre-seletion-4'),
-                b6 %>% mutate(type='seletion-6'),
-                b10 %>% mutate(type='seletion-10'))
-
-
-dd_int %>% filter(L==50, genlen %in% c(0.01, 0.1, 0.5, 1.5), Va %in% c(0.01, 0.02, 0.05, 0.1)) %>%  
-  mutate(Va=as.factor(Va)) %>%
-  filter(freq > 3) %>% 
-  ggplot() + 
-  geom_smooth(aes(freq, nsites, color=type, group=type), 
-              method='loess', se=FALSE, span=1/50) + 
-  scale_x_log10() + scale_y_log10() +
-  facet_grid(Va ~ genlen) +
-  ylab('fraction of segregating sites')  +
-  xlab('frequency')
-
-
-dd %>% filter(L==50, genlen %in% c(0.01, 0.1, 0.5, 1.5), Va %in% c(0.01, 0.02, 0.05, 0.1)) %>%  
-  mutate(Va=as.factor(Va)) %>%
-  filter(freq > 3) %>% 
-  ggplot() + 
-  geom_smooth(aes(freq, nsites, color=type, group=type), 
-              method='loess', se=FALSE, span=1/50) + 
-  scale_x_log10() + scale_y_log10() +
-  facet_grid(Va ~ genlen) +
-  ylab('fraction of segregating sites')  +
-  xlab('frequency')
-
-
-
 ```
 
 ## Dynamics of Genetic and Offspring Number Variation 
@@ -429,6 +291,18 @@ ggplot() +  geom_point(data=pd5r, aes(t1, cov, color=as.factor(L)),
 Now, we see that the real covariance is driven by the additive genetic
 variation, not additive genic variation. This works well for relatively loose
 linkage, but not so well for tighter linked regions.
+
+```{r}
+
+ggplot() +  geom_point(data=pd5r %>% filter(Va == 0.05, genlen == 1.5),
+                       aes(t1, cov, color=as.factor(L)), 
+                       alpha=0.5, size=0.8) +
+  geom_hline(yintercept=0, color='red') + 
+  geom_line(data=predr %>% filter(Va == 0.05, genlen == 1.5) %>% mutate(pred = ifelse(gen < 5, NA, pred)), 
+            aes(gen, pred, color=as.factor(L), linetype=type)) + 
+  facet_grid(Va ~ genlen, scales='free_y')  
+
+```
 
 ### Using a subset of the data for the publication figures
 
@@ -940,8 +814,6 @@ ggplot(aes(Va, mse))+ geom_point() +
   geom_smooth(method='lm')
 
 
-
-
 expfit_varyl_res %>% filter(Va > 0) %>%
 ggplot(aes(va, empva5_6, color=as.factor(genlen))) + geom_point() + 
   facet_grid(~ Va, scales='free')+ 
@@ -1053,6 +925,152 @@ ggplot(mom_fits_gp, aes(x=as.factor(Va), Gp_after, fill=as.factor(genlen))) +
 
 ggplot(mom_fits_gp, aes(x=as.factor(Va), Gp_before, fill=as.factor(genlen))) + 
   geom_boxplot(position='dodge') 
+
+```
+
+## SFS under Selection
+
+A quick look at what the SFS looks like under polygenic selection. Overall, we
+don't see a large difference.
+
+```{r}
+freq_spec <- function(res, gen=50, nbins=1000) {
+  effects <- res$effects
+  neut_freqs <- res$neut_freqs
+  num_neut_sites <- sum(is.na(effects))
+  nvars <- neut_freqs[gen, ]
+  freqs <- nvars[(nvars > 0) & (nvars < 1)]
+  segvars_hist = cut(freqs, breaks=1/seq(0, nbins))
+  tbl = table(segvars_hist)
+  tibble(bin=1/seq(1, nbins), freqs=tbl)
+}
+
+sfs <- function(res, N, gen=5) {
+  effects <- res$effects
+  neut_freqs <- res$neut_freqs
+  num_neut_sites <- sum(is.na(effects))
+  nvars <- 2*N*neut_freqs[gen, ]
+  segvars <- nvars[(nvars > 0) & (nvars < 2*N)]
+  segvars_hist = cut(segvars, breaks=seq(0, (2*N)-1))
+  tibble(freq=seq(1, 2*N -1), nsites=table(segvars_hist))
+}
+
+
+sfs <- function(res, N, gen=5, p0=NULL, eps=0.05) {
+  effects <- res$effects
+  neut_freqs <- res$neut_freqs
+  num_neut_sites <- sum(is.na(effects))
+  if (!is.null(p0)) {
+    # use only loci within eps of p0 the first generation
+    keep_loci <- abs(neut_freqs[0, ] - p0) < eps
+    nvars <- 2*N*neut_freqs[gen, keep_loci]
+  } else {
+    nvars <- 2*N*neut_freqs[gen, ]
+  }
+  segvars <- nvars[(nvars > 0) & (nvars < 2*N)]
+  segvars_hist = cut(segvars, breaks=seq(0, (2*N)-1))
+  tibble(freq=seq(1, 2*N -1), nsites=table(segvars_hist))
+}
+
+
+a4 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=4)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+
+a1 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=1)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+b6 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=6)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+b10 <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=10)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+#  Same with intermediate starting freqs
+a4_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=4, p0=0.5)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+
+a1_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=1, p0=0.5)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+b6_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=6, p0=0.5)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+b10_int <- expfit_varyl_res %>% mutate(sfs=pmap(list(res, N), sfs, gen=10, p0=0.5)) %>%
+  unnest(sfs) %>%
+  group_by(Va, genlen, L, freq) %>% summarize(nsites=mean(nsites)) %>%
+  group_by(Va, genlen, L) %>% nest() %>%
+     mutate(norm=map(data, function(x) tibble(freq=x$freq, nsites=x$nsites/sum(x$nsites)))) %>%
+     unnest(norm)
+
+
+
+dd_int <- bind_rows(a1_int %>% mutate(type='pre-seletion-1'),
+                    a4_int %>% mutate(type='pre-seletion-4'),
+                    b6_int %>% mutate(type='seletion-6'),
+                    b10_int %>% mutate(type='seletion-10'))
+
+
+
+dd <- bind_rows(a1 %>% mutate(type='pre-seletion-1'),
+                a4 %>% mutate(type='pre-seletion-4'),
+                b6 %>% mutate(type='seletion-6'),
+                b10 %>% mutate(type='seletion-10'))
+
+dd_int %>% filter(L==50, genlen %in% c(0.01, 0.1, 0.5, 1.5), Va %in% c(0.01, 0.02, 0.05, 0.1)) %>%  
+  mutate(Va=as.factor(Va)) %>%
+  filter(freq > 3) %>% 
+  ggplot() + 
+  geom_smooth(aes(freq, nsites, color=type, group=type), 
+              method='loess', se=FALSE, span=1/50) + 
+  scale_x_log10() + scale_y_log10() +
+  facet_grid(Va ~ genlen) +
+  ylab('fraction of segregating sites')  +
+  xlab('frequency')
+
+
+dd %>% filter(L==50, genlen %in% c(0.01, 0.1, 0.5, 1.5), Va %in% c(0.01, 0.02, 0.05, 0.1)) %>%  
+  mutate(Va=as.factor(Va)) %>%
+  #filter(freq > 3) %>% 
+  ggplot() + 
+  geom_smooth(aes(freq, nsites, color=type, group=type), 
+              method='loess', se=FALSE, span=1/50) + 
+  scale_x_log10() + scale_y_log10() +
+  facet_grid(Va ~ genlen) +
+  ylab('fraction of segregating sites')  +
+  xlab('frequency')
+
+
+
 
 ```
 

@@ -138,7 +138,7 @@ sets from a single contemporary timepoint. More recently, studies have applied
 similar temporal approaches to whole-genome data to discover selected loci in
 contemporaneous natural populations
 \parencite{Bergland2014-ij,Rajpurohit2018-od}, evolve and re-sequence studies
-\parencite{Burke2010-tz,Johansson2010-ya,Teotonio2009-sa,Turner2011-sx,Turner2012-bm,Franssen2017-lx,Orozco-terWengel2012-fu},
+\parencite{Burke2010-tz,Johansson2010-ya,Teotonio2009-sa,Turner2011-sx,Turner2012-bm,Franssen2017-lx,Orozco-terWengel2012-fu,Barghi2019-qy},
 and ancient DNA \parencite{Mathieson2015-uw,Fu2016-ek}. These approaches have
 identified compelling examples where selection has driven extreme allele
 frequency change at particular loci that is inconsistent with drift alone.
@@ -148,7 +148,7 @@ phenotypes with polygenic architecture and abundant standing variation
 from theory that adaptation on such traits can result from very subtle allele
 frequency changes across the many loci that underlie the trait
 \parencite{Bulmer1980-zo}, at least for the short-term evolutionary response
-\parencite{Jain2017-mw,Jain2015-xy,Thornton2018-eo,Chevin2008-lt,Hermisson2005-hs}.
+\parencite{Jain2017-mw,Jain2015-xy,Thornton2018-eo,Chevin2008-lt,Hermisson2005-hs,Hollinger2019-mn}.
 These changes may be individually indistinguishable from genetic drift in
 temporal data. This poses a challenge for population genetic approaches to
 quantify selection: rapid phenotypic adaptations occurring on ecological
@@ -275,11 +275,12 @@ Appendix Section \ref{ap:decomp} for proof),
 \end{align}
 %
 where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
-neutral allele's frequency changes due to non-heritable variation in fitness,
-Mendelian segregation of heterozygotes into offspring, and heritable variation in
-fitness (we refer to this as the \emph{heritable change} in neutral allele
-frequency), respectively. Since each component is uncorrelated with the others,
-the variance in allele frequency change is
+neutral allele's frequency changes due to non-heritable variation in fitness
+\vb{between diploid individuals}, Mendelian segregation of heterozygotes into
+offspring, and heritable variation in fitness (we refer to this as the
+\emph{heritable change} in neutral allele frequency), respectively. Since each
+component is uncorrelated with the others, the variance in allele frequency
+change is
 
 \begin{align}
   \var(\Delta p_t) &= \var(\Delta_{_N} p_t)  + \var(\Delta_{_M} p_t) + \var(\Delta_{_H} p_t).
@@ -389,7 +390,10 @@ fitness variation has an additive, polygenic architecture. Then, with $L$ loci
 contributing to fitness, we can write individual $i$'s fitness as $f_i = 1 +
 \sum_{l=1}^L \alpha_{t,l} g_{i,l}$, where $\alpha_{t,l}$ is the effect size in
 generation $t$ and $g_{i,l} \in \{0, 1, 2\}$ is individual $i$'s gene content
-at locus $l$. This formulation is approximately equivalent to exponential
+at locus $l$. \vb{Here, each $\alpha_{t,l}$ is analogous to a selection
+coefficient acting at locus $l$, since the fitnesses for genotypes $A_1 A_1$,
+$A_1 A_2$, and $A_2 A_2$ are $1$, $1 + \alpha_{t,l}$, and $1 + 2\alpha_{t,l}$
+respectively}. This formulation is approximately equivalent to exponential
 directional selection on some additively determined trait, \vb{implying that
 selection does not create linkage disequilibria between unlinked loci}; see
 Appendix \ref{ap:multilocus} for more detail.
@@ -398,7 +402,7 @@ When fitness variation exists in the population (that is, $\var_i(f_i) > 0$),
 the frequency of the neutral allele changes stochastically, as more fit
 individuals leave more descendents that inherit the neutral allele they carry
 and less fit individuals leave fewer. Across the population, stochastic
-associations can form between the genetic components of an individual fitness
+associations can form between the genetic components of an individual's fitness
 and the neutral allele they carry, leading the neutral allele frequency to
 change due to fitness differences across individuals. The total heritable
 change in neutral allele frequency $\Delta_{_H} p_t$ can then be partitioned
@@ -475,12 +479,14 @@ of the second term of Equation \eqref{eq:multilocus-twopart}, $\E(D_{t,k}
 D_{s,l})$ (for $k \ne l$), to temporal autocovariance. Under the case where the
 population is initially at mutation-drift-recombination equilibrium, we expect
 this product to be zero as there is no directional association between the two
-selected sites and the neutral site. Third, we assume that the selected sites
-increase in frequency independently, such that the dynamics of the linkage
-disequilibria between the neutral and selected sites pairs can be modeled using
-two-locus dynamics. Using a deterministic continuous-time model for the
-dynamics of the linkage disequilibrium between the selected and neutral site
-\parencite{Maynard_Smith1974-lc,Barton2000-zg}, we rewrite the $\E(D_{t,l}
+selected sites and the neutral site. \vb{However, we note that interaction
+between selected sites (Hill-Robertson interference) will cause this term to
+become negative, a point we return to later.} Third, we assume that the
+selected sites increase in frequency independently, such that the dynamics of
+the linkage disequilibria between the neutral and selected sites pairs can be
+modeled using two-locus dynamics. Using a deterministic continuous-time model
+for the dynamics of the linkage disequilibrium between the selected and neutral
+site \parencite{Maynard_Smith1974-lc,Barton2000-zg}, we rewrite the $\E(D_{t,l}
 D_{s,l})$ terms in the expression for temporal autocovariance as
 
 \begin{subequations}
@@ -688,8 +694,7 @@ population size ($N$). We choose our grid of the selection and recombination
 parameters based on the levels we would expect across a wide variety of
 organisms; see Appendix Section \ref{sec:supp-ml-sim-param} for details. We
 used three different population sizes ($N \in \{100, 500, 1000\}$), but note
-that we use $N=1000$ and a subset of the other parameters in our figures to
-prevent overplotting.
+that we use $N=1000$ and a subset of the other parameters in our figures.
 
 %with $V_a \in \{0.001, 0.002, 0.005, 0.01,
 %0.02, 0.05, 0.08, 0.1\}$, $R \in \{0, 0.005, 0.01, 0.05, 0.1, 0.5, 1.5, 4.5\}$,
@@ -710,22 +715,22 @@ and that temporal autocovariance between a generation before selection and
 during selection is zero.
 
 We generate genetic variation for fitness by choosing $L$ random loci from the
-neutrally evolved sites, and randomly assign them an effect size in $\pm
-\alpha$, such that the expected total amount of additive genic variation is the
-$V_A$ parameter (note that the initial additive genic and genetic variance are
-equal, $V_A = V_a$, as the LD contribution is zero for randomly chosen sites).
-This approach creates some additional variance around the target level of
-additive genic variation, as the sum of site heterozygosities will vary
-stochastically across simulation replicates. At the onset of selection, an
-individual $i$'s trait value is calculated as $z_i = \sum_{i=1}^L \alpha
-g_{i,l}$ where $g_{i,l}$ is their number of alleles with effect size $\alpha$
-at locus $l$.  Then, their absolute fitness is calculated using an exponential
-fitness function $w(z_i) = e^{z_i}$ (\cite{Turelli1990-kd}, p. 17). Under our
+neutrally evolved sites, and randomly assign an \vb{effect size of $-\alpha$ or
+$+\alpha$}, such that the expected total amount of additive genic variation is
+$V_A$ (note that the initial additive genic and genetic variance are equal,
+$V_A = V_a$, as the LD contribution is zero for randomly chosen sites).  This
+approach creates some additional variance around the target level of additive
+genic variation, as the sum of site heterozygosities will vary stochastically
+across simulation replicates. At the onset of selection, an individual $i$'s
+trait value is calculated as $z_i = \sum_{i=1}^L \alpha g_{i,l}$ where
+$g_{i,l}$ is their number of alleles with effect size $\alpha$ at locus $l$.
+Then, their absolute fitness is calculated using an exponential fitness
+function $w(z_i) = e^{z_i}$ (\cite{Turelli1990-kd}, p. 17). Under our
 Wright--Fisher model, we sample the parents of the next generation according to
 a multinomial distribution, where the probability of individual $i$ being a
 parent is $\nicefrac{w(z_i)}{\bar{w}}$. 
 
-We record 50 generations of evolution total, after which we compute the
+We record 50 generations of \vb{simulated evolution}, after which we compute the
 empirical standardized temporal variance-covariance matrix
 $\widehat{\mathbf{Q}}$, for each replicate \vb{as follows}. First, we mark
 frequencies reaching fixation or loss as missing values. \vb{By marking the
@@ -748,6 +753,7 @@ loci such that element $q_{t,s}$ is calculated as
   \label{eq:ave-temp-autocov}
 \end{align}
 %
+
 Sums over missing values only use pairwise-complete observations, implemented
 by R's \texttt{cov()} function's \texttt{use='pairwise.complete'} argument.
 
@@ -789,18 +795,18 @@ heterozygosity at neutral sites ($V_{a,ssh_n}(1)$, as described in Section
     selection. Each point is the temporal autocovariance between $\Delta p_5$
     and the $\Delta p_s$ in a region, averaged over 100 simulation replicates,
     with the colors indicating the number of selected loci. The gray curves
-    indicate the theoretic predictions (for $L=500$ loci only to avoid
-    overplotting) using Equation \eqref{eq:multilocus-triangle}, with the
-    equation's variance provided by the empirically observed additive genic
-    (solid), the additive genetic (long dashes), and the neutral sum of site
-    heterozygosity approximation (short dashes). A thin horizontal dashed line
-    indicates $y=0$.  Across the columns, the level of recombination (in
-    Morgans) is varied; across rows, the initial level of additive genetic
-    variation is varied.  Note that while our results here are between the
-    frequency change at the onset of selection $\Delta p_5$ and some later
-  change $\Delta p_s$, our covariance theory matches simulation results between
-any two arbitrary frequency changes $\Delta p_t$, and $\Delta p_s$; see
-Supplementary Figure \ref{fig:multilocus-expfit-sims-gen13}.}
+    indicate the theoretic predictions (for $L=500$ loci only) using Equation
+    \eqref{eq:multilocus-triangle}, with the equation's variance provided by
+    the empirically observed additive genic (solid), the additive genetic (long
+    dashes), and the neutral sum of site heterozygosity approximation (short
+    dashes). A thin horizontal dashed line indicates $y=0$.  Across the
+    columns, the level of recombination (in Morgans) is varied; across rows,
+    the initial level of additive genetic variation is varied.  Note that while
+    our results here are between the frequency change at the onset of selection
+    $\Delta p_5$ and some later change $\Delta p_s$, our covariance theory
+    matches simulation results between any two arbitrary frequency changes
+  $\Delta p_t$, and $\Delta p_s$; see Supplementary Figure
+\ref{fig:multilocus-expfit-sims-gen13}.}
 
   \label{fig:multilocus-expfit-sims}
 \end{figure}
@@ -889,7 +895,7 @@ beneficial alleles in finite population resulting from the fact that beneficial
 alleles that are on the same haplotype move more quickly through the population
 than beneficial alleles on deleterious backgrounds, resulting in negative LD.
 This negative LD among beneficial alleles lowers $V_A$ compared to the genic
-$V_a$ \parencite{Barton2005-zq,Crouch2017-xr,Good2014-yz}.  Importantly, our
+$V_a$ \parencite{Hill1966-kd,Barton2005-zq,Crouch2017-xr,Good2014-yz}.  Importantly, our
 simulation results suggest that the negative linkage disequilibria created by
 selective interference only affects the temporal autocovariances through the
 variance term $V_a(s)$, and that the actual variance determining temporal
@@ -941,7 +947,7 @@ quartiles.} \label{fig:multilocus-expfit-cumcov}
 
 Finally, we have found that across a wide range of recombination and additive
 genetic variation parameters, the temporal autocovariance $\cov(\Delta p_t,
-\Delta p_s)$ is largely determined the compound parameter $\nicefrac{V_A}{R}$
+\Delta p_s)$ is largely determined by the compound parameter $\nicefrac{V_A}{R}$
 and the number of generations between $t$ and $s$, which is a factor in
 Equation \eqref{eq:ave-neut-autocov}. We show in Figure
 \ref{fig:multilocus-va-r} that the temporal autocovariance $\cov(\Delta p_5,
@@ -968,7 +974,7 @@ fall roughly on the same curve for each number of elapsed $s-t$ generations.
 \label{sec:meth-moments}
 
 Our multilocus theory provides analytic expressions for the expected variances
-and covariances for a neutral allele's frequency; thus a natural approach to
+and covariances of a neutral allele's frequency; thus a natural approach to
 parameter estimation is to equate these expectations to averages from the data
 and apply the method-of-moments. We describe a method-of-moments procedure
 below to estimate the initial additive genetic variance at the onset of
@@ -1731,13 +1737,13 @@ are of order $\nicefrac{1}{N}$.
 \label{ap:multilocus}
 
 We assume the phenotype of an individual $i$ has an additive polygenic basis,
-such that their phenotype is their breeding value $z_i = \sum_{l=1}^L
-\alpha_{t,l} g_{i,l}$ deviates around a mean of zero, where $\alpha_{t,l}$ is
-the additive effect size at locus $l$ in generation $t$, and $g_{i,l} \in
-\{0,1,2\}$ is individual $i$'s allele count at this locus (note that effect of
-non-heritable environmental noise affecting the trait is accounted for in the
-$d_i$ terms above). We impose directional selection on this trait using an
-exponential fitness function, such that individual $i$'s fitness is $f_i =
+such that their breeding value is $z_i = \sum_{l=1}^L \alpha_{t,l} g_{i,l}$
+which deviates around a mean of zero, and $\alpha_{t,l}$ is the additive effect
+size at locus $l$ in generation $t$, and $g_{i,l} \in \{0,1,2\}$ is individual
+$i$'s allele count at this locus (note that effect of non-heritable
+environmental noise affecting the trait is accounted for in the $d_i$ terms
+above). We impose directional selection on this trait using an exponential
+fitness function, such that individual $i$'s fitness is $f_i =
 \nicefrac{w(z_i)}{\bar{w}} \approx e^{z_i}$ (assuming $\bar{w} \approx 1$). If
 we assume individuals' phenotypic values do not deviate too far from their mean
 value of zero, we can approximate $f_i$ as: $f_i \approx 1 + \sum_{l=1}^L
@@ -2471,6 +2477,72 @@ terms in underbraces indicate the corresponding terms in Equation
 
 \subsection{Multilocus simulation details}
 \label{sec:supp-ml-sim}
+
+\subsection{The effects of sampling}
+\label{sec:sampling}
+
+\vb{GC: this section is all new and needs to be reviewed.}
+
+In practice, one will calculate the temporal variance-covariance matrix on
+allele frequency trajectories calculated from sampled chromosomes from the
+population. We assume a binomial sampling process, such that $\widetilde{p} =
+\nicefrac{X}{n}$, and $X \sim \textrm{Binom}(p, n)$. We can then write
+$\widetilde{p}_t = p_t + \varepsilon_t$, and our covariances can be written as
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(\widetilde{p}_{t+1} - \widetilde{p}_{t}, \widetilde{p}_{s+1} - \widetilde{p}_{s}) \nonumber \\
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{s+1} + \varepsilon_{s+1} - p_{s} - \varepsilon_{s}).
+\end{align}
+%
+Note this simplifies to
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(p_{t+1} - p_{t}, p_{s+1} - p_{s}) \; \; \mathrm{if} \;\; |t-s| > 1,
+\end{align}
+%
+since there the covariance between sampling noise at different timepoints is
+zero. However, if $|t - s| = 1$ the sampling noise from timepoint $t+1$ is
+shared, leading to a biased estimator of covariance:
+
+\begin{align}
+\cov(\Delta \widetilde{p_t}, \Delta \widetilde{p}_{t+1}) 
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{t+2} + \varepsilon_{t+2} - p_{t+1} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov( \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}, \Delta p_{t+1} + \varepsilon_{t+2} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov(\Delta p_{t}, \Delta p_{t+1}) - \var(\varepsilon_{t+1}).
+\end{align}
+%
+Similarly, the variance ($t = s$) is biased, as it is impacted by the binomial
+sampling noise too,
+%
+
+\begin{align} 
+  \var(\Delta \widetilde{p_t}) &= \cov( \Delta p_{t} + \varepsilon_{t+1} - 
+      \varepsilon_{t}, \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}) \nonumber \\ 
+                               &= \var( \Delta p_{t} ) + \var(\varepsilon_{t+1}) +
+\var(\varepsilon_{t}) \end{align}
+%
+In practice, these covariances are calculated over loci in a region or across the
+entire genome. We assume that the tracked allele has been randomly swapped
+(e.g. the tracked allele frequency is not systematically the minor, major, or
+reference allele, such that $\E(\Delta p_{t,l}) = 0$ for all $t$ and $l$. Then,
+the unbiased covariance estimate as calculated over loci is
+
+\begin{align}
+  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \varepsilon_{t+1,l}^2.
+\end{align}
+%
+We use a plugin estimate of $\E(\varepsilon_{t+1,l}^2) =
+\V(\varepsilon_{t+1,l}) = \nicefrac{p_{t+1,l}(1-p_{t+1,l})}{n_{t,l}}$ to find
+an unbiased estimator of the covariance, 
+
+\begin{align}
+  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l}}.
+\end{align}
+
 
 \paragraph{Targeting an initial level of Additive Genetic Variation}
 \label{sec:supp-ml-sim-va}

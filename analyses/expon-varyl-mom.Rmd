@@ -1,0 +1,139 @@
+---
+title: "Method of Moments with Sampling Noise"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+library(rmarkdown)
+opts_chunk$set(fig.width=12, fig.height=8, 
+               echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r, load-libraries}
+
+library(devtools)
+library(tidyverse)
+library(viridis)
+load_all()
+load('../simdata/expfit-varyl-covs.Rdata')
+opar <- par(no.readonly=TRUE)
+
+```
+
+## Adding in Sampling Noise
+
+We do this for only a single parameter combination, due to computational
+limitations.
+
+```{r}
+
+add_binomial_noise <- function(x, size) {
+  out <- sapply(x, function(y) rbinom(1, size, y))
+  dim(out) <- dim(x)
+  out/size
+}
+
+
+process_sampled_covs <- function(neut_freqs, as_df=TRUE, remove_fixed=TRUE,
+                         standardize=TRUE) {
+  # this averages across loci#
+  temp_cov(t(neut_freqs), as_df=as_df, swap=TRUE,
+           remove_fixed=remove_fixed, standardize=standardize)
+}
+
+
+sampled_covs <- expfit_varyl_res %>% #filter(Va == 0.1, genlen == 0.5) %>% 
+  filter(rep %in% 1:5) %>%
+  crossing(sample_size=c(50, 100, 200, 500)) %>%
+  mutate(sampled_freqs =  
+    map2(res, sample_size, ~ add_binomial_noise(.x$neut_freqs, size=.y))) %>%
+  mutate(sampled_covs = map(sampled_freqs, process_sampled_covs, as_df=FALSE))
+
+
+mom_fits <- sampled_covs %>% 
+    filter(rep %in% 1:20) %>%
+    mutate(mom_df = pmap(list(sampled_covs, genlen, N, hets, res, sample_size), 
+                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5$pos, trange=c(5, 10), 
+                                          sample_size=..6))) 
+
+mom_fits <- mom_fits %>% mutate(lsfit = map(mom_df, fit_mom)) %>%
+                mutate(params=map(lsfit, fit2params))
+
+
+mom_fits %>% filter(Va != 0) %>% 
+  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
+  unnest(params) %>%
+  ggplot(aes(emp_genic_va, va0_est, color=as.factor(sample_size))) + geom_point() + 
+  geom_abline(yintercept=0, slope=1) 
+
+
+mom_fits %>% filter(Va != 0) %>% 
+  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
+  unnest(params) %>%
+  ggplot(aes(N, N_est, color=as.factor(sample_size))) + geom_point() + 
+  geom_abline(yintercept=0, slope=1) 
+
+
+
+
+#### new stuff:
+
+
+random_tempcov <- function(N, nloci, ngens, alpha, decay=0.3) {
+  I = diag(ngens) * 1/(2*N)
+  vec = alpha * exp(-decay*0:(ngens-1))
+  Sigma = (vec %*% t(vec)) + I
+  X <- MASS::mvrnorm(nloci, rep(0, ngens), Sigma)
+  cov(X)
+}
+
+
+fit_wishart_mle <- function(cov, pos, R, ssh, log10_N_grid=seq(0, 6, length.out=10), 
+                    log10_va0_grid=seq(0, 3, length.out=10), verbose=TRUE) {
+  n <- dim(cov)[1]
+  ## SSH 
+
+  T <- pmin(row(cov), col(cov))  # the minimum of col, row indices
+  ssh_mat <- 1
+  if (!is.null(Sssh)) {
+    sshr <- ssh/ssh[1]
+    ssh_mat <- sshr[T+1] 
+    dim(ssh_mat) <- dim(cov)
+  }
+ 
+  Sigma <- function(log_va0, log_N, enforce_posdef=FALSE) {
+    N <- 10^log_N
+    va0 <- 10^log_va0
+    A <- calc_assoc_sum(pos, R, N, t=T)
+    dim(A) <- dim(cov)
+    sigma <- va0 * A/2 * ssh_mat + (diag(n) / (2*N))
+    if (enforce_posdef) return(as.matrix(Matrix::nearPD(sigma)$mat))
+    return(sigma)
+  }
+
+  cov_pd <- as.matrix(Matrix::nearPD(cov)$mat)
+
+  logLikelihood <- function(log_va0, log_N) {
+    if (verbose) 
+      message(sprintf("log10(va0) = %f, log10(N) = %f", log_va0, log_N))
+    CholWishart::dWishart(cov_pd, n-1, Sigma(log_va0, log_N))
+  }
+
+  crossing(logN=log10_N_grid, logVa=log10_va0_grid) %>%
+    mutate(ll=map2_dbl(logVa, logN, logLikelihood))
+}
+
+
+a  <- expfit_varyl_res %>% left_join(
+  het_ssh %>% group_by(L, N, Va, genlen) %>% nest(.key='ssh') %>%
+   mutate(neut_ssh=map(ssh, 'neut_ssh')) %>% select(-ssh)
+)  %>% 
+  # get neutral positions
+  mutate(pos=map(res, ~ .$pos[is.na(.$effects)])) %>%
+  # MLE
+  
+
+
+```
+
