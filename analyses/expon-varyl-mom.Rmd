@@ -68,14 +68,61 @@ mom_fits %>% filter(Va != 0) %>%
   geom_abline(yintercept=0, slope=1) 
 
 
-mom_fits %>% filter(Va != 0) %>% 
-  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
-  unnest(params) %>%
-  ggplot(aes(N, N_est, color=as.factor(sample_size))) + geom_point() + 
-  geom_abline(yintercept=0, slope=1) 
+```
+
+Clearly the fit here is not great, but this is due in part because of the
+limited number of neutral loci in each simulation replicate. Specifically:
+
+```{r}
+
+mom_fits %>% mutate(nloci=map_dbl(res, ~ ncol(.$neut_freqs))) %>% 
+  pull(nloci) %>% summary()
+
+```
+
+In reality, we will use thousands of SNPs across the genome. To mimic this, we
+pool across replicates to imagine simulating across many independent regions.
+
+## Pooled Region Estimates with Binomial Noise
+
+```{r}
+
+
+pool_replicates <- function(x) { 
+  neut_freqs <- map(x$res, 'neut_freqs')
+  do.call(cbind, neut_freqs)
+}
+
+
+sampled_covs_pooled <- expfit_varyl_res %>% #filter(Va == 0.1, genlen == 0.5) %>% 
+  # divide the replicates into groups
+  mutate(group = cut(rep, 5)) %>% 
+  # now, combine the neutral freqs for each group
+  nest(-group, -L, -N, -Va, -genlen) %>% 
+  mutate(neut_freqs = map(data, pool_replicates)) %>% 
+  crossing(sample_size=c(50, 100, 200, 500)) %>%
+  mutate(sampled_freqs =  
+    map2(neut_freqs, sample_size, ~ add_binomial_noise(.x, size=.y))) %>%
+  mutate(sampled_covs = map(sampled_freqs, process_sampled_covs, as_df=FALSE))
+
+
+mom_fits <- sampled_covs %>% 
+    filter(rep %in% 1:20) %>%
+    mutate(mom_df = pmap(list(sampled_covs, genlen, N, hets, res, sample_size), 
+                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5$pos, trange=c(5, 10), 
+                                          sample_size=..6))) 
+
+mom_fits <- mom_fits %>% mutate(lsfit = map(mom_df, fit_mom)) %>%
+                mutate(params=map(lsfit, fit2params))
 
 
 
+```
+
+
+
+
+```{r}
 
 #### new stuff:
 

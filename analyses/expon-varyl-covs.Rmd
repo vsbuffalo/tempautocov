@@ -326,7 +326,7 @@ ggplot() +  geom_point(data=pd5f, aes(t1, cov, color=as.factor(L)),
                        alpha=0.5, size=0.8) +
   geom_hline(yintercept=0, color='red') + 
   geom_line(data=predf, aes(gen, pred, color=type))  + 
-  facet_grid(Va ~ genlen, scales='free_y')  
+  facet_grid(Va ~ genlen, scales='free_y')  + scale_y_log10() 
 
 
 # tables and Rda files for plots:
