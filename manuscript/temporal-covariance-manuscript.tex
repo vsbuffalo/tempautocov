@@ -705,14 +705,14 @@ that we use $N=1000$ and a subset of the other parameters in our figures.
 Before the onset of selection, we create the initial diploid population from a
 pool of gametes created by \texttt{msprime} \parencite{Kelleher2016-oi}, such
 that the initial allele frequency distribution and linkage disequilibria
-between sites is at mutation-drift-recombination balance. Then, we pass this
-pool of gametes into a forward Wright--Fisher-with-recombination simulation
-routine and let it evolve for four generations neutrally before initiating
-selection on the fifth generation.  These first four generations of neutral
-evolution (without mutation) serve as a control to validate that the variance
-in neutral allele frequency change is as expected under a Wright--Fisher model
-and that temporal autocovariance between a generation before selection and
-during selection is zero.
+between sites is at mutation-drift-recombination balance. \vb{Details of the
+simulation procedure are available in the Github} Then, we pass this pool of gametes into a forward
+Wright--Fisher-with-recombination simulation routine and let it evolve for four
+generations neutrally before initiating selection on the fifth generation.
+These first four generations of neutral evolution (without mutation) serve as a
+control to validate that the variance in neutral allele frequency change is as
+expected under a Wright--Fisher model and that temporal autocovariance between
+a generation before selection and during selection is zero.
 
 We generate genetic variation for fitness by choosing $L$ random loci from the
 neutrally evolved sites, and randomly assign an \vb{effect size of $-\alpha$ or

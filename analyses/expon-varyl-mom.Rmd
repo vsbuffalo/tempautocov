@@ -88,22 +88,57 @@ pool across replicates to imagine simulating across many independent regions.
 ```{r}
 
 
+pool_positions <- function(x) { 
+  pos <- map(x$res, 'pos')
+  do.call(c, pos)
+}
+
 pool_replicates <- function(x) { 
   neut_freqs <- map(x$res, 'neut_freqs')
   do.call(cbind, neut_freqs)
+}
+
+pool_hets <- function(x) {
+  x$hets %>% bind_rows() %>% group_by(gen) %>%
+    summarize(neut_ssh = mean(neut_ssh, na.rm=TRUE),
+              sel_ssh=mean(sel_ssh, na.rm=TRUE),
+              nneut=mean(nneut, na.rm=TRUE), 
+              nsel=mean(nsel, na.rm=TRUE))
 }
 
 
 sampled_covs_pooled <- expfit_varyl_res %>% #filter(Va == 0.1, genlen == 0.5) %>% 
   # divide the replicates into groups
   mutate(group = cut(rep, 5)) %>% 
+  filter(Va != 0) %>%
   # now, combine the neutral freqs for each group
   nest(-group, -L, -N, -Va, -genlen) %>% 
-  mutate(neut_freqs = map(data, pool_replicates)) %>% 
-  crossing(sample_size=c(50, 100, 200, 500)) %>%
-  mutate(sampled_freqs =  
-    map2(neut_freqs, sample_size, ~ add_binomial_noise(.x, size=.y))) %>%
-  mutate(sampled_covs = map(sampled_freqs, process_sampled_covs, as_df=FALSE))
+  mutate(neut_freqs = map(data, pool_replicates))  %>%
+  mutate(hets = map(data, pool_hets)) %>%
+  mutate(pos = map(data, pool_positions))
+
+SAMPLE_SIZES <- c(50, 100, 200, 500)
+
+SAMPLE_SIZES <- c(50)
+res <- list()
+
+for (sample_size in SAMPLE_SIZES) {
+  temp_res = sampled_covs_pooled %>% 
+    mutate(sampled_freqs =  
+      map2(neut_freqs, sample_size, ~ add_binomial_noise(.x, size=.y))) %>%
+    mutate(sampled_covs = map(sampled_freqs, process_sampled_covs, as_df=FALSE)) 
+
+  res[[sample_size]] <- 
+    temp_res %>% 
+    mutate(mom_df = pmap(list(sampled_covs, genlen, N, hets, pos, sample_size), 
+                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5, 
+                                          trange=c(5, 10), sample_size=..6))) %>%
+    mutate(lsfit = map(mom_df, fit_mom)) %>%
+    mutate(params=map(lsfit, fit2params)) %>%
+    # prune redundant data to avoid memory issues
+    select(-neut_freqs, -data)
+}
+
 
 
 mom_fits <- sampled_covs %>% 

@@ -313,7 +313,7 @@ which the `figures/ms-plots.r` will use to create them.
 ```{r, covs5-graphics}
 
 rec_params <- c(0.5, 0.1, 0.01, 1.5)
-va_params <- c(0.01, 0.02, 0.05)
+va_params <- c(y0.01, 0.02, 0.05)
 va_params_oom <- c(0.001, 0.01, 0.1)  # for Va over orders of magnitude 
 
 pd5f <- pd5 %>% filter(Va %in% va_params, genlen %in% rec_params)
@@ -849,12 +849,14 @@ if (!file.exists(mom_fits_data)) {
   data(mom_fits)
 }
 
+# create the dataframe for final publication figures
 mom_fitsd <- mom_fits %>% unnest(params)  %>% 
-  filter(rep %in% 1:3) %>%
+  #filter(rep %in% 1:3) %>%
   mutate(emp_va=map_dbl(stats, ~ .$zvar[5])) %>%
   select(rep, L:genlen, Nest=N_est, va0_est, emp_va) %>%
   filter(genlen %in% rec_params) %>%
   mutate(genlen=as.factor(as.character(genlen)))
+
 
 
 mom_fits %>% filter(Va != 0) %>% 
@@ -874,6 +876,38 @@ mom_fits %>% filter(Va != 0) %>%
   geom_smooth(method='lm', color='red') +
   geom_hline(yintercept=1e3, color='blue') + 
   scale_x_log10() + scale_y_log10()
+
+estimate_Ne <- function(x, t0, t1) {
+  # a simple Ne estimator, Ne = t/2*F
+  # where F = var(p1 - p0) / ave(het1, het0)
+  x <- swap_alleles(x)
+  x[x == 0 | x == 1] <- NA
+  het <- x * (1-x)
+  F <- var(x[t1, ] - x[t0, ], na.rm=TRUE) / mean((het[t0, ] + het[t1, ]) / 2, na.rm=TRUE)
+  - (t1 - t0) / (2 * log(1-F))
+}
+
+
+temporal_Ne_ests <- mom_fits %>% filter(Va != 0) %>%
+  mutate(Ne_est = map_dbl(res, ~ estimate_Ne(.$neut_freqs, t0=5, t1=10))) %>%
+  group_by(N, Va, genlen) %>% summarize(Ne_est = mean(Ne_est, na.rm=TRUE))  %>%
+  mutate(genlen=as.factor(genlen))
+
+
+
+mom_fits %>% left_join(temporal_Ne_ests) %>% 
+  filter(Va !=0) %>%
+  mutate(emp_genic_va=map_dbl(genic_va, ~ .$genic_va[5])) %>%
+  unnest(params) %>%
+  mutate(genlen_label = as.factor(genlen), Va=as.factor(Va)) %>%
+  ggplot(aes(genlen_label, N_est, fill=Va)) + geom_boxplot() + 
+  geom_point(aes(genlen_label, Ne_est, color=Va)) + 
+  geom_hline(yintercept=1e3, color='blue') + 
+  scale_y_log10() 
+
+# combine this into the dataframe for publication figures
+mom_fitsd <- mom_fitsd %>% left_join(temporal_Ne_ests) %>%
+               mutate(genlen=as.factor(genlen))
 
 # save results for graphics
 devtools::use_data(mom_fitsd, overwrite=TRUE)
