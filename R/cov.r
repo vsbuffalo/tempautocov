@@ -42,6 +42,36 @@ calc_deltas2 <- function(freqs, t0=1, t1=ncol(freqs)) {
   freqs[, t1, drop=FALSE] - freqs[, t0, drop=FALSE]
 }
 
+conditioned_binomial_variance <- Vectorize(function(p, n) {
+  # this long expression was calculated with Mathematica
+  x <- seq(1, n-1) 
+  mu <- sum(x * dbinom(x, n, p))/(1 - p^n - (1-p)^n)
+  sum((x - mu)^2*dbinom(x, n, p))/(1 - p^n - (1-p)^n)
+}, 'p')
+
+conditioned_binomial_variance2 <- function(p, n) {
+  # UPDATE: this suffers severely from FP issues.
+  # this long expression was calculated with Mathematica
+  ((n*(-(n*(1 + (1/(1 - p))^n)*(1 - p)^n*(-1 + p)^(2*n)*p^(2*n)) + 
+       2*(-(n*(-1 + (1 - p)^n)*((1 - p)^n - 2*(1/(1 - p))^n*(-1 + p)^(2*n))*
+             (1 - p)^n) + (-1 + p)^(2*n))*p^(1 + n) + 
+       (n*(-2*(1 - p)^(2*n) + 2*(-1 + p)^(2*n) + 
+             (1/(1 - p))^(2*n)*(-(-1 + p)^2)^(2*n)) - 2*(-1 + p)^(2*n))*
+        p^(2 + n) + (-1 + 2*n*(1/(1 - p))^n*(1 - p)^n)*(-1 + p)^(2*n)*
+        p^(1 + 2*n) - (-1 + n)*(-1 + p)^(2*n)*p^(2 + 2*n) - 
+       2*n*(-1 + p)^(2*n)*(-((-1 + p)*p))^n + 
+       n*(-1 + p)^(2*n)*p^n*(1 + (-1 + p)^(2*n) + 2*(-((-1 + p)*p))^n) - 
+       (-1 + p)^(2*n)*p*(1 - 2*(1 - p)^n + (-1 + p)^(2*n) + 
+          2*(-((-1 + p)*p))^n) + 
+       p^2*((-1 + p)^(2*n)*(1 - 2*(1 - p)^n + (-1 + p)^(2*n) + 
+             2*(-((-1 + p)*p))^n) - 
+          n*(2*(-1 + (1 - p)^n)*(1 - p)^(2*n) + 
+             (1 - 2*(1 - p)^n)*(-1 + p)^(2*n) + 
+             (-1 + p)^(2*n)*((-1 + (1/(1 - p))^n)*(1/(1 - p))^(2*n)*
+                 (1 - p)^(3*n) + (-1 + p)^(2*n) + 2*(-((-1 + p)*p))^n)))))/
+   ((-1 + p)^(2*n)*(-1 + (1 - p)^n + p^n)^3))
+}
+
 
 #' Calculate the temporal covariance for a matrix of frequencies across time
 #'
@@ -60,8 +90,8 @@ calc_deltas2 <- function(freqs, t0=1, t1=ncol(freqs)) {
 #' @param swap randomly swap the alleles of the frequency matrix
 #' @param N a vector of the number of individuals sampled, to the adjacent time point correction.
 #' @export
-temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, N=NULL, upper_tri=TRUE, 
-                     remove_fixed=TRUE, standardize=TRUE) {
+temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, sample_size=NULL, upper_tri=TRUE, 
+                     remove_fixed=TRUE, standardize=TRUE, use_conditional_variance=FALSE) {
   # NOTE: all downstream code work with transpose of the matrix
   # provided by R simulation routines. swap_alleles() returns transpose
   # otherwise, we do it here.
@@ -79,11 +109,6 @@ temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, N=NULL, upper_tri=TRUE,
 
   dmat <- calc_deltas(mat)
 
-  if (FALSE) {  # experimental! Idea is to permute loci.
-    N <- NULL  # no correction with permutation
-    dmat <- apply(dmat, 2, function(x) sample(x))
-  }
-
   # remove loci with no allele frequency changes
   if (nrow(dmat) > 1) {
     covmat <- cov(dmat, use='pairwise.complete.obs')
@@ -91,15 +116,35 @@ temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, N=NULL, upper_tri=TRUE,
     covmat <- t(dmat) %*% dmat
   }
 
-  if (!is.null(N)) {
-    # TODO: this is *all* an approximation; needs to be worked through
-    stopifnot(length(N) == 1) # TODO: support different sizes
-    # corrective variation term
-    corr_var <- matrix(0, nrow=nrow(covmat), ncol=nrow(covmat))
-    binom_var <- (mat[, -ncol(mat)] * (1-mat[, -ncol(mat)]))/N
-    off_diag <- abs(row(covmat) - col(covmat)) == 1
-    corr_var[off_diag] <- binom_var[off_diag]
-    covmat <- covmat + corr_var
+  if (!is.null(sample_size)) {
+    stopifnot(length(sample_size) == 1) # TODO: support different sizes
+    #n <- nrow(mat)  # nloci
+    n <- sample_size
+    p <- mat[, -ncol(mat)]
+    if (use_conditional_variance) {
+      # conditional theoretical variance (on no fixation/loss)
+      # bias correct for number of loci
+      sample_var = n/(n-1) * conditioned_binomial_variance(p, sample_size)
+      dim(sample_var) <- dim(p)
+      sample_var <- colMeans(sample_var, na.rm=TRUE)
+    } else {
+      # unconditional theoretical variance
+      sample_var = n/(n-1) * sample_size*colMeans(p* (1-p), na.rm=TRUE)
+    }
+    #conditioned_binomial_variance(p, sample_size)
+    var_corr <- matrix(0, ncol=ncol(covmat), nrow=nrow(covmat))
+    # correction for variance 
+    # factor of two is because we're sampling at two timepoints
+    diag_elements <- abs(row(covmat) - col(covmat)) == 0
+    var_corr[diag_elements] <- 2 * sample_var/sample_size^2
+
+    # correction for off diagonal covariances
+    covar_corr <- matrix(0, ncol=ncol(covmat), nrow=nrow(covmat))
+    offdiag_het <- sample_var[-1] # we loose the first element, as there are n-1 offdiags
+    diagk <- row(covmat) - col(covmat)
+    covar_corr[diagk == 1] <- offdiag_het/sample_size^2
+    covar_corr[diagk == -1] <- offdiag_het/sample_size^2
+    covmat <- covmat + covar_corr - var_corr
   }
 
   # heterozygosity denominator. Drops the last timepoint, and finds

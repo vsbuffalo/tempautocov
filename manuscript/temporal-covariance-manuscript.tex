@@ -16,8 +16,8 @@
 % line numbers:
 \RequirePackage{lineno}
 %\modulolinenumbers[5]
-\definecolor{linenogray}{gray}{0.75}
-\renewcommand\linenumberfont{\normalfont\tiny\sffamily\color{linenogray}}
+%\definecolor{linenogray}{black}{0.75}
+%\renewcommand\linenumberfont{\normalfont\tiny\sffamily\color{linenogray}}
 
 % spacing
 \RequirePackage{setspace}
@@ -78,7 +78,6 @@
 
 %  TODO
 % - R^2 changes through time note?
-% - cite Feder, Yun Song
 
 %% RUNNING TITLE
 %% KEYWORDS
@@ -139,14 +138,19 @@ similar temporal approaches to whole-genome data to discover selected loci in
 contemporaneous natural populations
 \parencite{Bergland2014-ij,Rajpurohit2018-od}, evolve and re-sequence studies
 \parencite{Burke2010-tz,Johansson2010-ya,Teotonio2009-sa,Turner2011-sx,Turner2012-bm,Franssen2017-lx,Orozco-terWengel2012-fu,Barghi2019-qy},
-and ancient DNA \parencite{Mathieson2015-uw,Fu2016-ek}. These approaches have
-identified compelling examples where selection has driven extreme allele
-frequency change at particular loci that is inconsistent with drift alone.
-However, most adaptation on ecological timescales likely involves selection on
-phenotypes with polygenic architecture and abundant standing variation
-\parencite{Endler1986-wd,Hendry1999-zu,Kinnison2001-vb,Kopp2009-pj}.  We know
-from theory that adaptation on such traits can result from very subtle allele
-frequency changes across the many loci that underlie the trait
+and ancient DNA \parencite{Mathieson2015-uw,Fu2016-ek}. \vb{Furthermore,
+  numerous methods have been developed to estimate effective population size
+\parencite{Pollak1983-xh,Waples1989-sj,Nei1981-oy} and detect selected loci
+\parencite{Feder2014-lc,Mathieson2013-we,Terhorst2015-rg,Malaspinas2012-aw},
+and from time-series data.}
+
+Overall, these approaches have identified compelling examples where selection has driven
+extreme allele frequency change at particular loci that is inconsistent with
+drift alone.  However, most adaptation on ecological timescales likely involves
+selection on phenotypes with polygenic architecture and abundant standing
+variation \parencite{Endler1986-wd,Hendry1999-zu,Kinnison2001-vb,Kopp2009-pj}.
+We know from theory that adaptation on such traits can result from very subtle
+allele frequency changes across the many loci that underlie the trait
 \parencite{Bulmer1980-zo}, at least for the short-term evolutionary response
 \parencite{Jain2017-mw,Jain2015-xy,Thornton2018-eo,Chevin2008-lt,Hermisson2005-hs,Hollinger2019-mn}.
 These changes may be individually indistinguishable from genetic drift in
@@ -221,52 +225,60 @@ We first give an outline of how selection affects linked neutral sites through
 time. We summarize a neutral allele's frequency trajectory as the differences
 in adjacent timepoints, $\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
 population frequency at time $t$, and we assume a closed population with
-discrete, non-overlapping generations. Throughout, we assume that allele
-frequency changes can be measured every generation. Measurement in every
-generation may not be feasible for all study systems; however, the same
-approach can be extended to observations from non-consecutive generations. Our
-goal is to model linked selection's effects on the variances and
-across-generation covariances of these allele frequency changes at neutral
-polymorphisms. Here, we think about linked selection in a quantitative genetics
-framework, where a large number of polymorphisms contribute to fitness
-variation. Therefore, we think about the response to selection as being the
-result of heritable variation for fitness in the population, i.e. additive
-genetic variance for offspring number; we will use this terminology throughout.
-When a population lacks heritable variation for fitness, a neutral allele's
-frequency in the next generation is determined entirely by genetic drift: the
-random number of offspring each parent produces and the stochasticity of
-Mendelian segregation in heterozygotes. Changes in a neutral allele's frequency
-due to drift are directionless, such that when averaged over evolutionary
-replicates the expected change in allele frequency is $\E(\Delta p_t) = 0$.
-Assuming a Wright--Fisher model of reproduction where each of the $N$
-individuals in the population has a multinomial number of offspring, the
-variance of allele frequency change is: $\var(\Delta p_t) =
-\nicefrac{p_t(1-p_t)}{(2N)}$. Higher non-heritable variation in offspring
-number increases the rate of drift \parencite{Wright1938-tv}. This and a wide
-range of different mating systems can be accommodated under the Wright--Fisher
-model by replacing $N$ with $N_e$, the variance effective population size
-\parencite{Crow1970-wm,Charlesworth2009-sg}. 
+discrete, non-overlapping generations. While throughout the paper we assume
+that allele frequencies can be measured every generation, the same approach can
+be extended to situations where the study system cannot be observed every
+generation. Our goal is to understand how linked selection affects the
+frequency trajectories of neutral sites by modeling the variances and
+covariances of neutral allele frequency changes. Before considering the impact
+of linked selection, we first consider a population that lacks heritable
+fitness differences between individuals. In this case, the stochasticity of
+allele frequency change is determined entirely by two components: random
+non-heritable, or environmental differences in offspring number, and Mendelian
+segregation of heterozygotes. These two sources of stochasticity are
+collectively known as drift, and both are directionless such that when averaged
+over evolutionary replicates, the expected change in allele frequency due to
+drift alone is $\E(\Delta p_t) = 0$. The magnitude of drift's stochastic
+effects are quantified by the variance in allele frequency change $\var(\Delta
+p_t)$, which in a Wright--Fisher model of reproduction where offspring number
+has a multinomial distribution, is $\var(\Delta p_t) =
+\nicefrac{p_t(1-p_t)}{(2N)}$. Different mating systems and higher non-heritable
+variance in offspring number can be accommodated under the Wright--Fisher model
+by replacing $N$ with $N_e$, the variance effective population size
+\parencite{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
 
-When individuals in the population have heritable differences in fitness, this
-increases the variance in neutral allele frequency change ($\var(\Delta p_t)$).
-There is still no net direction to this change ($\E(\Delta p_t) = 0$) because
-the set of high- or low-fitness genetic backgrounds a neutral allele resides on
-is random, but the higher variance leads the neutral allele to experience a
-faster rate of \emph{apparent} `drift'. This has traditionally been thought of
-as a reduction in the long-run effective population size, as
-fitness-determining alleles persist on their backgrounds until disassociated by
-segregation and recombination \parencite{Robertson1961-ho,
-  Santiago1995-hx,Santiago1998-bs}. \vb{However, with temporal genomic samples,
-we can directly measure how heritable fitness variation affects neutral allele
-frequency changes over shorter timescales}. Specifically, heritable variation
-in fitness increases the variance in neutral allele frequency change in two
-ways. First, any additional variation in offspring number beyond that expected
-by the Wright--Fisher multinomial model increases the variance of allele
-frequency changes beyond the level expected under neutral drift. To understand
-how this and other factors contribute to the change in a neutral allele's
-frequency, we can partition this change into three uncorrelated components
-(following \citeauthor{Santiago1995-hx}, \citeyear{Santiago1995-hx}, see our
-Appendix Section \ref{ap:decomp} for proof),
+When there are heritable fitness differences between individuals in the
+population, a third source of stochasticity affects allele frequency change:
+random associations form between neutral alleles and the fitness of their
+genetic backgrounds. As heritable fitness differences lead individuals to leave
+differing numbers of offspring, the neutral alleles randomly associated with
+these individuals are dragged along. Overall, the random associations with
+heritable fitness backgrounds acts as a 
+
+
+
+random chance associations form between neutral alleles and the genetic
+background they happen to reside on. Since heritable fitness differences
+between individuals act to further increase 
+
+While classic hitchhiking
+theory \parencite{Maynard_Smith1974-lc} models how neutral alleles are dragged
+towards fixation by new beneficial alleles, we extend a body of theory that
+models linked selection from a quantitative genetics framework
+\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. In this
+framework, a large number of polymorphisms contribute to the heritable fitness
+differences between individuals i.e. the additive genetic variance for
+offspring number. 
+
+Traditionally
+
+
+\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. 
+
+We can partition
+a neutral allele frequency's change into three uncorrelated stochastic
+components (following \citeauthor{Santiago1995-hx}, \citeyear{Santiago1995-hx},
+see our Appendix Section \ref{ap:decomp} for proof),
 
 \begin{align}
   \Delta p_t %&= p_{t} - p_{t-1}  \\
@@ -274,13 +286,16 @@ Appendix Section \ref{ap:decomp} for proof),
   \label{eq:delp-decomp}
 \end{align}
 %
+
 where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
 neutral allele's frequency changes due to non-heritable variation in fitness
 \vb{between diploid individuals}, Mendelian segregation of heterozygotes into
 offspring, and heritable variation in fitness (we refer to this as the
-\emph{heritable change} in neutral allele frequency), respectively. Since each
-component is uncorrelated with the others, the variance in allele frequency
-change is
+\emph{heritable change} in neutral allele frequency), respectively. Note that
+each of these stochastic components is directionless, such that when averaged
+over evolutionary replicates the expected change in allele frequency is
+$\E(\Delta p_t) = 0$. Additionally, since each component is uncorrelated with
+the others, the variance in allele frequency change is
 
 \begin{align}
   \var(\Delta p_t) &= \var(\Delta_{_N} p_t)  + \var(\Delta_{_M} p_t) + \var(\Delta_{_H} p_t).
@@ -288,36 +303,119 @@ change is
 \end{align}
 %
 The terms $\var(\Delta_{_N} p_t)$ and $\var(\Delta_{_M} p_t)$ capture the
-variance due to the random reproduction process, and the former can
-accommodate extra non-heritable variance in offspring number (as long as
-individuals are exchangeable with respect to their genotype;
-\cite{Cannings1974-ps}), while the term $\var(\Delta_{_H} p_t)$ captures
-heritable fitness variation, due to systematic differences in the fitness of
-individuals caused by their genotypes.
+variance due to the random reproduction process, and the former can accommodate
+extra non-heritable variance in offspring number (as long as individuals are
+exchangeable with respect to their genotype; \cite{Cannings1974-ps}), while the
+term $\var(\Delta_{_H} p_t)$ captures heritable fitness variation due to
+systematic differences in the fitness of individuals caused by their genotypes.
 
-Second, heritable fitness variation creates \emph{temporal autocovariance} in
-allele frequency change across generations. We can see the contribution of
-covariance by writing the total cumulative allele frequency change as the sum
-of allele frequency changes each generation,
 
-\begin{align}
-  \label{eq:var-decomp}
-  \var(p_t - p_0) &= \var(\Delta p_{t-1} + \Delta p_{t-2} + \ldots + \Delta p_0) \nnn \\
-                  &= \sum_{i=0}^{t-1} \var(\Delta p_i) + \sum_{i \ne j} \cov(\Delta p_{i}, \Delta p_{j}) \nnn \\
-  \var(p_t - p_0) &= \underbrace{\sum_{i=0}^{t-1} \left(\var(\Delta_{_N} p_i) +  \var(\Delta_{_M} p_i) \right)}_\text{drift} +  \nonumber\\ 
-                  &\underbrace{\sum_{i=0}^{t-1} \var(\Delta_{_H} p_i)}_\text{genetic variance in offspring number} + \underbrace{\sum_{i \ne j} \cov(\Delta_{_H} p_i, \Delta_{_H} p_j)}_\text{temporal autocovariance}.
-\end{align}
-%
-These covariance terms are expected to be non-zero only when there is heritable
-variation in fitness, since the effects of Mendelian segregation and
-non-heritable variation in reproductive success (the factors that contribute to
-$\Delta_{_M} p_t$ and $\Delta_{_N} p_t$) are independent across generations
-(assuming there is neither non-Mendelian segregation nor covariance between
-parental and offspring environment, e.g. as in \cite{Heyer2005-cl}). 
 
-%This has the important consequence that when we
-%model the covariance across generations, we only need to consider how the
-%allele frequency change due to heritable fitness differences contributes.
+
+
+
+
+%We first give an outline of how selection affects linked neutral sites through
+%time. We summarize a neutral allele's frequency trajectory as the differences
+%in adjacent timepoints, $\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
+%population frequency at time $t$, and we assume a closed population with
+%discrete, non-overlapping generations. Throughout, we assume that allele
+%frequency changes can be measured every generation. Measurement in every
+%generation may not be feasible for all study systems; however, the same
+%approach can be extended to observations from non-consecutive generations. Our
+%goal is to model linked selection's effects on the variances and
+%across-generation covariances of these allele frequency changes at neutral
+%polymorphisms. Here, we think about linked selection in a quantitative genetics
+%framework, where a large number of polymorphisms contribute to fitness
+%variation. Therefore, we think about the response to selection as being the
+%result of heritable variation for fitness in the population, i.e. additive
+%genetic variance for offspring number; we will use this terminology throughout.
+%When a population lacks heritable variation for fitness, a neutral allele's
+%frequency in the next generation is determined entirely by genetic drift: the
+%random number of offspring each parent produces and the stochasticity of
+%Mendelian segregation in heterozygotes. Changes in a neutral allele's frequency
+%due to drift are directionless, such that when averaged over evolutionary
+%replicates the expected change in allele frequency is $\E(\Delta p_t) = 0$.
+%Assuming a Wright--Fisher model of reproduction where each of the $N$
+%individuals in the population has a multinomial number of offspring, the
+%variance of allele frequency change is: $\var(\Delta p_t) =
+%\nicefrac{p_t(1-p_t)}{(2N)}$. Higher non-heritable variation in offspring
+%number increases the rate of drift \parencite{Wright1938-tv}. This and a wide
+%range of different mating systems can be accommodated under the Wright--Fisher
+%model by replacing $N$ with $N_e$, the variance effective population size
+%\parencite{Crow1970-wm,Charlesworth2009-sg}. 
+
+%When individuals in the population have heritable differences in fitness, this
+%increases the variance in neutral allele frequency change ($\var(\Delta p_t)$).
+%There is still no net direction to this change ($\E(\Delta p_t) = 0$) because
+%the set of high- or low-fitness genetic backgrounds a neutral allele resides on
+%is random, but the higher variance leads the neutral allele to experience a
+%faster rate of \emph{apparent} `drift'. This has traditionally been thought of
+%as a reduction in the long-run effective population size, as
+%fitness-determining alleles persist on their backgrounds until disassociated by
+%segregation and recombination \parencite{Robertson1961-ho,
+%  Santiago1995-hx,Santiago1998-bs}. \vb{However, with temporal genomic samples,
+%we can directly measure how heritable fitness variation affects neutral allele
+%frequency changes over shorter timescales}. Specifically, heritable variation
+%in fitness increases the variance in neutral allele frequency change in two
+%ways. First, any additional variation in offspring number beyond that expected
+%by the Wright--Fisher multinomial model increases the variance of allele
+%frequency changes beyond the level expected under neutral drift. To understand
+%how this and other factors contribute to the change in a neutral allele's
+%frequency, we can partition this change into three uncorrelated components
+%(following \citeauthor{Santiago1995-hx}, \citeyear{Santiago1995-hx}, see our
+%Appendix Section \ref{ap:decomp} for proof),
+
+%\begin{align}
+%  \Delta p_t %&= p_{t} - p_{t-1}  \\
+%  &= \underbrace{\Delta_{_N} p_t + \Delta_{_M} p_t}_\text{drift} + \underbrace{\Delta_{_H} p_t}_\text{selection}
+%  \label{eq:delp-decomp}
+%\end{align}
+%%
+%where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
+%neutral allele's frequency changes due to non-heritable variation in fitness
+%\vb{between diploid individuals}, Mendelian segregation of heterozygotes into
+%offspring, and heritable variation in fitness (we refer to this as the
+%\emph{heritable change} in neutral allele frequency), respectively. Since each
+%component is uncorrelated with the others, the variance in allele frequency
+%change is
+
+%\begin{align}
+%  \var(\Delta p_t) &= \var(\Delta_{_N} p_t)  + \var(\Delta_{_M} p_t) + \var(\Delta_{_H} p_t).
+%  \label{eq:var-decomp-1}
+%\end{align}
+%%
+%The terms $\var(\Delta_{_N} p_t)$ and $\var(\Delta_{_M} p_t)$ capture the
+%variance due to the random reproduction process, and the former can
+%accommodate extra non-heritable variance in offspring number (as long as
+%individuals are exchangeable with respect to their genotype;
+%\cite{Cannings1974-ps}), while the term $\var(\Delta_{_H} p_t)$ captures
+%heritable fitness variation, due to systematic differences in the fitness of
+%individuals caused by their genotypes.
+
+%Second, heritable fitness variation creates \emph{temporal autocovariance} in
+%allele frequency change across generations. We can see the contribution of
+%covariance by writing the total cumulative allele frequency change as the sum
+%of allele frequency changes each generation,
+
+%\begin{align}
+%  \label{eq:var-decomp}
+%  \var(p_t - p_0) &= \var(\Delta p_{t-1} + \Delta p_{t-2} + \ldots + \Delta p_0) \nnn \\
+%                  &= \sum_{i=0}^{t-1} \var(\Delta p_i) + \sum_{i \ne j} \cov(\Delta p_{i}, \Delta p_{j}) \nnn \\
+%  \var(p_t - p_0) &= \underbrace{\sum_{i=0}^{t-1} \left(\var(\Delta_{_N} p_i) +  \var(\Delta_{_M} p_i) \right)}_\text{drift} +  \nonumber\\ 
+%                  &\underbrace{\sum_{i=0}^{t-1} \var(\Delta_{_H} p_i)}_\text{genetic variance in offspring number} + \underbrace{\sum_{i \ne j} \cov(\Delta_{_H} p_i, \Delta_{_H} p_j)}_\text{temporal autocovariance}.
+%\end{align}
+%%
+%These covariance terms are expected to be non-zero only when there is heritable
+%variation in fitness, since the effects of Mendelian segregation and
+%non-heritable variation in reproductive success (the factors that contribute to
+%$\Delta_{_M} p_t$ and $\Delta_{_N} p_t$) are independent across generations
+%(assuming there is neither non-Mendelian segregation nor covariance between
+%parental and offspring environment, e.g. as in \cite{Heyer2005-cl}). 
+
+%%This has the important consequence that when we
+%%model the covariance across generations, we only need to consider how the
+%%allele frequency change due to heritable fitness differences contributes.
 
 \begin{figure}[!ht]
   \centering
@@ -339,40 +437,40 @@ parental and offspring environment, e.g. as in \cite{Heyer2005-cl}).
   \label{fig:cartoon}
 \end{figure}
 
-The temporal autocovariances are due to persistence over generations of the
-statistical associations (linkage disequilibria) between a neutral allele and
-the fitnesses of the random genetic backgrounds it finds itself on. Neutral
-alleles associated with beneficial haplotypes will tend to leave more
-descendants, $\Delta_{_H} p_0 > 0$ (light blue line in Figure
-\ref{fig:cartoon}A), while those on average associated with disadvantageous
-haplotypes will leave fewer, $\Delta_{_H} p_0 < 0$ (orange line Figure
-\ref{fig:cartoon}A). As some of the associations between the neutral allele and
-selective alleles persist across the generations, heritable variation for
-fitness makes the change in one generation predictive of the change in later
-generations, as illustrated by the fact that $\cov(\Delta p_2, \Delta p_0) > 0$
-for both the blue and orange curves in Figure \ref{fig:cartoon}A.
+% The temporal autocovariances are due to persistence over generations of the
+% statistical associations (linkage disequilibria) between a neutral allele and
+% the fitnesses of the random genetic backgrounds it finds itself on. Neutral
+% alleles associated with beneficial haplotypes will tend to leave more
+% descendants, $\Delta_{_H} p_0 > 0$ (light blue line in Figure
+% \ref{fig:cartoon}A), while those on average associated with disadvantageous
+% haplotypes will leave fewer, $\Delta_{_H} p_0 < 0$ (orange line Figure
+% \ref{fig:cartoon}A). As some of the associations between the neutral allele and
+% selective alleles persist across the generations, heritable variation for
+% fitness makes the change in one generation predictive of the change in later
+% generations, as illustrated by the fact that $\cov(\Delta p_2, \Delta p_0) > 0$
+% for both the blue and orange curves in Figure \ref{fig:cartoon}A.
 
-Temporal autocovariance is broken down by the two forces that disassociate
-neutral alleles from their fitness backgrounds: segregation and recombination.
-Both forces break up haplotypes and shuffle alleles among chromosomes, leading
-to the decay of the statistical associations between neutral alleles and their
-fitness backgrounds. Population genetic models of linked selection have tended
-to focus on the strongest of these associations: those between very closely
-linked loci. These tight associations persist over long timescales, leading to
-lasting impressions in local genome-wide diversity around sweeps. These
-signatures are detectable in single contemporaneous samples, but diversity
-recovers to background levels quickly away from the selected site. By contrast,
-quantitative geneticists first considered the weakest forms of associations:
-between unlinked loci within an individual \parencite{Morley1954-yp,
-Robertson1961-ho, Santiago1995-hx}. These distant associations are quickly
-established but are rapidly broken down by segregation and independent
-assortment, yet still can have a marked effect on diversity
-\parencite{Robertson1961-ho,Santiago1995-hx}. We show temporal autocovariance
-is created under both tight and loose linked selection, and below, develop
-expressions for its magnitude that are applicable to both. Finally, we
-emphasize that with temporal genomic data, one can directly measure the levels
-of temporal variances and autocovariances of allele frequency change in the
-population.
+% Temporal autocovariance is broken down by the two forces that disassociate
+% neutral alleles from their fitness backgrounds: segregation and recombination.
+% Both forces break up haplotypes and shuffle alleles among chromosomes, leading
+% to the decay of the statistical associations between neutral alleles and their
+% fitness backgrounds. Population genetic models of linked selection have tended
+% to focus on the strongest of these associations: those between very closely
+% linked loci. These tight associations persist over long timescales, leading to
+% lasting impressions in local genome-wide diversity around sweeps. These
+% signatures are detectable in single contemporaneous samples, but diversity
+% recovers to background levels quickly away from the selected site. By contrast,
+% quantitative geneticists first considered the weakest forms of associations:
+% between unlinked loci within an individual \parencite{Morley1954-yp,
+% Robertson1961-ho, Santiago1995-hx}. These distant associations are quickly
+% established but are rapidly broken down by segregation and independent
+% assortment, yet still can have a marked effect on diversity
+% \parencite{Robertson1961-ho,Santiago1995-hx}. We show temporal autocovariance
+% is created under both tight and loose linked selection, and below, develop
+% expressions for its magnitude that are applicable to both. Finally, we
+% emphasize that with temporal genomic data, one can directly measure the levels
+% of temporal variances and autocovariances of allele frequency change in the
+% population.
 
 \section{A model for multilocus temporal autocovariance}
 
@@ -649,6 +747,7 @@ loci, we can rewrite the additive genic variation, $V_a(t) = 2 \alpha^2 \sum_l
 p_l(t) (1-p_l(t))$, as
 
 \begin{align}
+  \label{eq:VA-SSH}
   V_a(t) &= \alpha^2 SSH(t) \\
   V_a(t) &= V_a(1) \frac{SSH(t)}{SSH(1)}
 \end{align}
@@ -665,6 +764,7 @@ sites,
 
 \begin{align}
   V_{a,ssh_n}(t) := V_a(1) ssh_n(s)
+  \label{eq:VA-ssh}
 \end{align}
 %
 where we define $ssh_n(s) = \nicefrac{SSH_n(s)}{SSH_n(1)}$ as the factor by
@@ -705,8 +805,9 @@ that we use $N=1000$ and a subset of the other parameters in our figures.
 Before the onset of selection, we create the initial diploid population from a
 pool of gametes created by \texttt{msprime} \parencite{Kelleher2016-oi}, such
 that the initial allele frequency distribution and linkage disequilibria
-between sites is at mutation-drift-recombination balance. \vb{Details of the
-simulation procedure are available in the Github} Then, we pass this pool of gametes into a forward
+between sites is at mutation-drift-recombination balance. \vb{Details of how
+\texttt{msprime} was called are available on the project's Github repository,
+in \texttt{R/simpop.r}.} Then, we pass this pool of gametes into a forward
 Wright--Fisher-with-recombination simulation routine and let it evolve for four
 generations neutrally before initiating selection on the fifth generation.
 These first four generations of neutral evolution (without mutation) serve as a
@@ -718,7 +819,8 @@ We generate genetic variation for fitness by choosing $L$ random loci from the
 neutrally evolved sites, and randomly assign an \vb{effect size of $-\alpha$ or
 $+\alpha$}, such that the expected total amount of additive genic variation is
 $V_A$ (note that the initial additive genic and genetic variance are equal,
-$V_A = V_a$, as the LD contribution is zero for randomly chosen sites).  This
+$V_A = V_a$, as the LD contribution is zero for randomly chosen sites). The
+details of this are given in Appendix Section \ref{sec:supp-ml-sim-va}. This
 approach creates some additional variance around the target level of additive
 genic variation, as the sum of site heterozygosities will vary stochastically
 across simulation replicates. At the onset of selection, an individual $i$'s
@@ -1636,6 +1738,51 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
 \appendix
 
 \section{Appendix} 
+
+\subsection{Table of Notation}
+
+\begin{table}[]
+  \begin{tabular}{l|p{12cm}}
+ Symbol & Usage  \\ \hline
+ $p_t$ & Allele frequency in generation/timepoint $t$  \\
+ $\Delta p_t$ & Allele frequency change between generations $t+1$ and $t$; $\Delta p_t = p_{t+1} - p_t$ \\
+ $\Delta_{_N} p_t $ & Frequency change due to non-heritable variation in fitness  \\
+ $\Delta_{_M} p_t $ & Frequency change due to Mendelian segregation \\
+ $\Delta_{_H} p_t $ & Frequency change due to heritable differences \\
+ $N$ & Census population size of breeding individuals \\
+ $N_e$ & Effect population size \\
+ $f_i$ & Fitness (expected number of offspring) of individual $i$\\
+ $\alpha_{t,l}$ & Effect size in generation $t$ and locus $l$ \\
+ $L$ & Total number of loci impacting fitness \\
+ $g_{i,l} \in \{0, 1, 2\}$ & Individual $i$'s gene count at locus $l$ \\
+ $x_{i} \in \{0, 1, 2\}$ & Individual $i$'s neutral gene count at the tracked neutral site\\
+ $D_{t,l}$ or $D_{t,l}'$ & Gametic linkage disequilibrium between the tracked neutral site and selected locus $l$ at time $t$ (see Supplementary Figure \ref{fig:ld-cartoon}) \\
+ $D_{t,l}''$ & Non-gametic disequilibrium between the tracked neutral site and selected locus $l$ at time $t$ (see Supplementary Figure \ref{fig:ld-cartoon}) \\
+ $\E(\mathcal{R}_{t,l}^2)$ & The squared correlation coefficient of linkage disequilibrium between the tracked neutral site and selected site $l$ at time $t$\\
+ $r_l$ & The recombination fraction between the tracked neutral site and selected site $l$\\
+ $V_a(s)$ & The additive genic variance \\ 
+ $V_A(s)$ & The additive genetic variance \\ 
+ $R$ & The total level of recombination in the region, in Morgans \\ 
+ $r(g)$ & A mapping function (i.e. Haldane's), which maps a position $g$ to a recombination fraction.\\ 
+ $\rho$ & The population recombination rate, $\rho = 4Nr$\\ 
+ $\mathcal{A}(R, t, s)$ & The average linkage disequilibrium in a region of $R$ Morgans, that persisted from generation $t$ to generation $s$. \\
+ $V_N$ & The non-heritable variance in offspring number, \eqref{eq:multilocus-var} \\
+ $SSH(t)$ & The sum of site heterozygosity at selected sites time $t$, \eqref{eq:VA-SSH} \\
+ $SSH_n(t)$ & The sum of site heterozygosity at neutral sites at time $t$, \eqref{eq:VA-SSH} \\
+ $ssh_n(t)$ & The proportion of sum of site heterozygosity at neutral sites at time $t$ relative to $SSH(1)$, $SSH_n(t) / SSH_n(1)$ \eqref{eq:VA-ssh} \\
+ $z_i$ & The breeding value of the trait that determines fitness, $z_i = \sum_{i=1}^L \alpha g_{i,l}$, see Appendix Section \ref{ap:multilocus} \\
+ $w(z_i)$ & The fitness of individual $i$ with fitness function $w(\cdot)$ \\
+ $\mathbf{\widehat{Q}}$ & The sample standardized variance-covariance matrix \\
+ $q_{t,s}$ & The elements of the matrix $\mathbf{\widehat{Q}}$  \\
+ $\Delta p_{n,t}$ & The allele frequency change at site $n$ between times time $t+1$ and $t$, \eqref{eq:ave-temp-autocov} \\
+ $\tau$ & The number of allele frequency changes observed, e.g. after sampling for $\tau + 1$ timepoint\\
+ $V_{a,ssh_n}(t)$ & The additive genic variation at time $s$ as approximated by the observed decay in the sum of site heterozygosity at neutral sites  \\
+ $\var_i(z_i)$ & The variance in trait values taken over individuals, \eqref{eq:var-genic-z} \\
+
+
+% stopped at line 452
+\end{tabular}
+\end{table}
 
 \subsection{Decomposition of Allele Frequency Change}
 \label{ap:decomp}

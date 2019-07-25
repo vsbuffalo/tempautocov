@@ -4,6 +4,7 @@ textwidth <- 7 # 426 pts to inches
 mtext_cex  <- 0.8
 opar <- par(no.readonly=TRUE)
 phi <- (1 + sqrt(5))/2
+title_col='grey12'
 
 
 dashed_gray <- 'gray58'
@@ -20,7 +21,8 @@ pretty_log <- function(x, use_one=TRUE) {
 ## Estimation Figure -- both Va and N estimation, with N boxplot grouped by Va
 pdf('mom-fits-both-alt.pdf', width=textwidth, height=textwidth/2 * 0.9)
 
-# data(mom_fitsd)
+data(mom_fitsd_finite)
+mom_fitsd <- mom_fitsd_finite
 mom_fitsd_subset <- mom_fitsd %>% 
   filter(Va %in% c(0.001, 0.005, 0.01, 0.05, 0.1)) #%>%
   #filter(genlen %in% c(0.1, 0.5, 1.5))
@@ -76,11 +78,11 @@ boxplot(Nest ~ Va + genlen, mom_fitsd_subset,
                     medcex = 0.5, outcex = 0, staplelty = "blank"))
 
 #abline(h=1e3, col=dashed_gray, lty=2)
-segments(0, 1e3, length(x), 1e3, col=dashed_gray, lty=2)
 y <- mom_fitsd_subset %>% group_by(Va, genlen) %>% 
   summarize(Ne_est=mean(Ne_est, na.rm=TRUE)) %>%
   arrange(genlen, Va) %>% pull(Ne_est)
 x <- 1:length(y)
+segments(0, 1e3, length(x), 1e3, col=dashed_gray, lty=2)
 points(x, y, pch='-', col=brewercols)
 hadj  <- 2.3
 axis(1, at=c(1, 5), labels=c("", "0.01"),

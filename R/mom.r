@@ -2,7 +2,7 @@
 
 SIM_SSH_COLS <- c('gen', 'neut_ssh', 'sel_ssh', 'nneut', 'nsel')
 
-make_neutld_df <- function(cov, R, N, ssh=NULL, pos=NULL, trange=NULL, sample_size=NULL) {
+make_neutld_df <- function(cov, R, N, ssh=NULL, pos=NULL, trange=NULL) {
  if (!is.null(trange)) {
     cov <- cov[trange[1]:trange[2], trange[1]:trange[2]]
     if (!is.null(ssh)) {
@@ -26,12 +26,13 @@ make_neutld_df <- function(cov, R, N, ssh=NULL, pos=NULL, trange=NULL, sample_si
   s <- col(cov)
   s <- s[upper.tri(s, diag=TRUE)]
 
-  if (!is.null(sample_size)) {
-    # correction for variance 
-    cov <- cov - 2 * diag(ncol(cov)) / sample_size # 
-    # correction for off diagonal covariances
-    cov <- cov + as.integer(abs(row(cov) - col(cov)) == 1) * 1/sample_size
-  }
+  # if (!is.null(sample_size)) {
+  #   # correction for variance 
+  #   # factor of two is because we're sampling at two timepoints
+  #   cov <- cov - 2 * diag(ncol(cov)) / sample_size
+  #   # correction for off diagonal covariances
+  #   cov <- cov + as.integer(abs(row(cov) - col(cov)) == 1) * 1/sample_size
+  # }
 
   # association integral
   # if the positions aren't given (=NULL), then we use theory

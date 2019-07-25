@@ -1,0 +1,43 @@
+## Correction Conditional on segregation
+
+```{r}
+
+library(tidyverse)
+
+conditioned_binomial_var <- function(p, n) {
+  x <- seq(1, n-1) 
+  mu <- sum(x * dbinom(x, n, p))/(1 - p^n - (1-p)^n)
+  sum((x - mu)^2*dbinom(x, n, p))/(1 - p^n - (1-p)^n)
+}
+
+conditional_variance <- function(x, n) {
+  y <- x[x > 0 & x < n]
+  var(y)
+}
+
+unconditional_theoretic_variance <- function(p, n, finite=FALSE) {
+  out <- p*(1-p)*n / n^2
+  if (finite) return(n/(n-1) * out)
+  return(out)
+}
+
+
+d <- crossing(p=seq(1/100, 1-1/100, length.out=100), n=c(10, 100, 1000)) %>%
+  # sample binomial draws, divide by n
+  mutate(x=map2(p, n, ~ rbinom(500, .y, .x)/.y)) %>%
+  mutate(var_x = map_dbl(x, var),
+         conditioned_var_x=map2_dbl(x, n, conditional_variance)) %>%
+  mutate(theory_var=map2_dbl(p, n, unconditional_theoretic_variance),
+         theory_conditioned_var2=map2_dbl(p, n, ~ conditioned_binomial_variance(.x, .y)/.y^2),
+         theory_conditioned_var=map2_dbl(p, n, ~ conditioned_binomial_var(.x, .y)/.y^2))  
+
+
+# what do unconditional variances look like?
+d %>% ggplot(aes(var_x, theory_var, color=as.factor(n))) + geom_point() + 
+  geom_abline(yintercept=0, slope=1) # + scale_x_log10() + scale_y_log10()
+
+# how do conditional variances look?
+d %>%  gather(type, var, var_x:theory_conditioned_var) %>%
+  ggplot(aes(p, var, color=(type))) + geom_point()  + facet_wrap(~n, scales='free_y')
+
+```

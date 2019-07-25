@@ -230,6 +230,7 @@ across all replicates, grouping only by the simulation parameters.
 ```{r, calc-covs}
 
 covs <- expfit_varyl_res %>% 
+         mutate(covs_complete=map(res, process_covs, remove_fixed=FALSE)) %>%
          unnest(covs) %>% 
          # see note in temp_cov() for why these times are incremented
          mutate(t0=t0+1L, t1=t1+1L) %>%  
@@ -827,6 +828,8 @@ ggplot(aes(va, empva5_6, color=as.factor(genlen))) + geom_point() +
 ## Method of Moments
 
 Here, we use the generalized method of moments to estimate $V_a(1)$ and $N$.
+This is done on the population frequencies; see the R markdown file
+`expon-varyl-mom.Rmd` for the analyses with sampling noise added.
 Essentially, by equating the empirical 2nd moments and cross moments for all
 timepoints to their theoretic counterparts, we have an overdetermined system of
 equations. We can solve this using least squares, giving us estimates of
