@@ -126,24 +126,24 @@ temp_cov <- function(freqs, as_df=FALSE, swap=TRUE, sample_size=NULL, upper_tri=
       # bias correct for number of loci
       sample_var = n/(n-1) * conditioned_binomial_variance(p, sample_size)
       dim(sample_var) <- dim(p)
-      sample_var <- colMeans(sample_var, na.rm=TRUE)
+      sample_var <- colMeans(sample_var, na.rm=TRUE)/sample_size^2
     } else {
       # unconditional theoretical variance
-      sample_var = n/(n-1) * sample_size*colMeans(p* (1-p), na.rm=TRUE)
+      sample_var = n/(n-1) * colMeans(p* (1-p), na.rm=TRUE)/sample_size
     }
     #conditioned_binomial_variance(p, sample_size)
     var_corr <- matrix(0, ncol=ncol(covmat), nrow=nrow(covmat))
     # correction for variance 
     # factor of two is because we're sampling at two timepoints
     diag_elements <- abs(row(covmat) - col(covmat)) == 0
-    var_corr[diag_elements] <- 2 * sample_var/sample_size^2
+    var_corr[diag_elements] <- 2 * sample_var
 
     # correction for off diagonal covariances
     covar_corr <- matrix(0, ncol=ncol(covmat), nrow=nrow(covmat))
     offdiag_het <- sample_var[-1] # we loose the first element, as there are n-1 offdiags
     diagk <- row(covmat) - col(covmat)
-    covar_corr[diagk == 1] <- offdiag_het/sample_size^2
-    covar_corr[diagk == -1] <- offdiag_het/sample_size^2
+    covar_corr[diagk == 1] <- offdiag_het
+    covar_corr[diagk == -1] <- offdiag_het
     covmat <- covmat + covar_corr - var_corr
   }
 

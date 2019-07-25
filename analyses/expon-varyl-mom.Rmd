@@ -17,7 +17,7 @@ library(tidyverse)
 library(viridis)
 load_all()
 
-for (file in list.files('../R', full.names=TRUE)) source(file) #🖕load_all()
+#for (file in list.files('../R', full.names=TRUE)) source(file) #🖕load_all()
 
 #load('../simdata/expfit-varyl-covs.Rdata')
 load('../simdata/expfit-more-loci-covs.Rdata')
@@ -44,7 +44,7 @@ process_sampled_covs <- function(neut_freqs, as_df=TRUE, remove_fixed=TRUE,
   # this averages across loci#
   temp_cov(t(neut_freqs), as_df=as_df, swap=TRUE,
            remove_fixed=remove_fixed, standardize=standardize, 
-           sample_size=sample_size, use_conditional_variance=TRUE)
+           sample_size=sample_size, use_conditional_variance=use_conditional_variance)
 }
 
 
