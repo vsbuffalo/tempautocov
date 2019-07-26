@@ -249,53 +249,16 @@ by replacing $N$ with $N_e$, the variance effective population size
 
 When there are heritable fitness differences between individuals in the
 population, a third source of stochasticity affects a neutral allele's
-frequency change: a neutral allele may become randomly associated with the
-genetic backgrounds that determine the fitness differences between individuals,
-and consequently the neutral allele's frequency changes is impacted by the
-fitness of these backgrounds. This is a form of linked selection which has
-traditionally been modeled as a reduction in the long-run effective population
-size where an equilibrium between XXX
-
-as fitness-determining alleles persist on their backgrounds until
-disassociated by segregation and recombination \parencite{Robertson1961-ho,
-Santiago1995-hx,Santiago1998-bs}. Like drift, this form of linked selection has
-effect on the net direction of neutral allele frequency change ($\E(\Delta p_t)
-= 0$) because the set of high- or low-fitness genetic backgrounds a neutral
-allele resides on is random. However, 
-
-the higher variance
-leads the neutral allele to experience a faster rate of \emph{apparent}
-`drift'. This has traditionally been thought of as a reduction in the long-run
-effective population size, as fitness-determining alleles persist on their
-backgrounds until disassociated by segregation and recombination
-\parencite{Robertson1961-ho, Santiago1995-hx,Santiago1998-bs}. 
-
-
-neutral alleles recombine onto, or segregate with the genetic
-backgrounds that determine the fitness differences between individuals, and
-these random associations with fitness backgrounds affect neutral allele
-frequency change as high fitness backgrounds leave more descendants, and low
-fitness backgrounds leave fewer. 
-
-
-While classic hitchhiking
-theory \parencite{Maynard_Smith1974-lc} models how neutral alleles are dragged
-towards fixation by new beneficial alleles, we extend a body of theory that
-models linked selection from a quantitative genetics framework
-\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. In this
-framework, a large number of polymorphisms contribute to the heritable fitness
-differences between individuals i.e. the additive genetic variance for
-offspring number. 
-
-Traditionally
-
-
-\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. 
-
-We can partition
-a neutral allele frequency's change into three uncorrelated stochastic
-components (following \citeauthor{Santiago1995-hx}, \citeyear{Santiago1995-hx},
-see our Appendix Section \ref{ap:decomp} for proof),
+frequency change: neutral alleles can become randomly associated with the
+genetic backgrounds that determine the fitness differences between individuals
+\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. Even though the
+neutral alleles do not impact fitness, their frequency trajectories are
+perturbed by their fitness background, as those on advantage backgrounds leave
+more descendants, while those on disadvantageous backgrounds leave fewer. We
+can partition a neutral allele frequency's change into these three uncorrelated
+stochastic components (following \citeauthor{Santiago1995-hx},
+\citeyear{Santiago1995-hx}, see our Appendix Section \ref{ap:decomp} for
+proof),
 
 \begin{align}
   \Delta p_t %&= p_{t} - p_{t-1}  \\
@@ -303,7 +266,6 @@ see our Appendix Section \ref{ap:decomp} for proof),
   \label{eq:delp-decomp}
 \end{align}
 %
-
 where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
 neutral allele's frequency changes due to non-heritable variation in fitness
 \vb{between diploid individuals}, Mendelian segregation of heterozygotes into
@@ -326,11 +288,84 @@ exchangeable with respect to their genotype; \cite{Cannings1974-ps}), while the
 term $\var(\Delta_{_H} p_t)$ captures heritable fitness variation due to
 systematic differences in the fitness of individuals caused by their genotypes.
 
+In addition to inflating the within-generation variance in allele frequency
+change, heritable fitness variation has another profound affect on neutral
+alleles: while the stochastic components of drift have independent effects on
+frequency change each generation, heritable variation in fitness creates
+\emph{temporal autocovariance} in neutral allele frequency changes across
+generations. The contribution of temporal autocovariance is evident by writing
+the total cumulative allele frequency change as the sum of allele frequency
+changes each generation,
 
+\begin{align}
+  \label{eq:var-decomp}
+  \var(p_t - p_0) &= \var(\Delta p_{t-1} + \Delta p_{t-2} + \ldots + \Delta p_0) \nnn \\
+                  &= \sum_{i=0}^{t-1} \var(\Delta p_i) + \sum_{i \ne j} \cov(\Delta p_{i}, \Delta p_{j}) \nnn \\
+  \var(p_t - p_0) &= \underbrace{\sum_{i=0}^{t-1} \left(\var(\Delta_{_N} p_i) +  \var(\Delta_{_M} p_i) \right)}_\text{drift} +  \nonumber\\ 
+                  &\underbrace{\sum_{i=0}^{t-1} \var(\Delta_{_H} p_i)}_\text{genetic variance in offspring number} + \underbrace{\sum_{i \ne j} \cov(\Delta_{_H} p_i, \Delta_{_H} p_j)}_\text{temporal autocovariance}.
+\end{align}
+%
+These covariance terms are expected to be non-zero only when there is heritable
+variation in fitness (assuming there is neither non-Mendelian segregation nor
+covariance between parental and offspring environment, e.g. as in
+\cite{Heyer2005-cl}). 
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./images/keynote-cartoons-figure-1.pdf}
 
+  \caption{A: On an advantageous background (light blue), a neutral allele
+    increases in frequency leading to a positive change in allele frequency
+    early on, $\Delta p_0 = p_1 - p_0$. As long as some fraction of neutral
+    alleles remain associated with this advantageous background, the neutral
+    allele is expected to increase in frequency in later generations, here,
+    $\Delta p_2 = p_3 - p_2$. This creates temporal autocovariance,
+    $\cov(\Delta p_2, \Delta p_0) > 0$. Similarly, had the neutral allele found
+    itself on a low-fitness background (orange), this would also create temporal
+    autocovariance.  B: This depicts the setup for our multilocus model.
+    Multiple alleles (yellow) determine the fitness in a region $R$ 
+    Morgans in length, and these perturb the allele frequency trajectory 
+    of a focal neutral site (light blue). 
+  }
+  \label{fig:cartoon}
+\end{figure}
 
+Temporal autocovariance is caused by the persistence over generations of the
+statistical associations (linkage disequilibria) between a neutral allele and
+the fitnesses of the random genetic backgrounds it finds itself on; as long as
+some fraction of associations persist, the heritable variation for fitness in
+one generation is predictive of the change in later generations, as illustrated
+by the fact that $\cov(\Delta p_2, \Delta p_0) > 0$ (see Figure
+\ref{fig:cartoon}A). Ultimately segregation and recombination break down
+haplotypes and shuffle alleles among chromosomes, leading to the decay of
+autocovariance with time. 
 
+The effect heritable variation has on neutral alleles has traditionally been
+modeled in a quantitative genetics framework where a large number of loosely
+linked polymorphisms contributed to heritable fitness differences between
+individuals, and the impact of heritable fitness variation on a neutral allele
+is quantified as a reduction in its long-run effective population size
+\parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}.  This form of
+linked selection can be contrasted with classic population genetic hitchhiking
+theory (\cite{Maynard_Smith1974-lc}), which considers how neutral alleles
+closely linked to a new beneficial mutation are effected as it sweeps to
+fixation. While classic population genetic linked selection models consider how
+neutral variation is affected by strong associations caused by tight linkage to
+an advantageous site, quantitative genetic model of linked selection considered
+the weakest forms of associations: those between unlinked loci within an
+individual (\cite{Morley1954-yp, Robertson1961-ho, Santiago1995-hx}; see
+\cite{Barton2000-zg} for more on the two models of linked selection). These
+distant associations are quickly established but are rapidly broken down by
+segregation and independent assortment, yet still can have a marked effect on
+diversity \parencite{Robertson1961-ho,Santiago1995-hx}. However, since the
+impact of heritable fitness variation has traditionally been modeled as causing
+a reduction in the effective population size, there has been no direct way to
+separately estimate its effects from those of drift. We show that with temporal
+genomic data, one can directly measure the levels of temporal variances and
+autocovariances of allele frequency change in the population. Additionally, we
+show temporal autocovariance is created under both tight and loose linked
+selection, and below, develop expressions for its magnitude that are applicable
+to both, bridging the two regimes of linked selection.
 
 %We first give an outline of how selection affects linked neutral sites through
 %time. We summarize a neutral allele's frequency trajectory as the differences
@@ -434,25 +469,25 @@ systematic differences in the fitness of individuals caused by their genotypes.
 %%model the covariance across generations, we only need to consider how the
 %%allele frequency change due to heritable fitness differences contributes.
 
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=0.5\textwidth]{./images/keynote-cartoons-figure-1.pdf}
+% \begin{figure}[!ht]
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{./images/keynote-cartoons-figure-1.pdf}
 
-  \caption{A: On an advantageous background (light blue), a neutral allele
-    increases in frequency leading to a positive change in allele frequency
-    early on, $\Delta p_0 = p_1 - p_0$. As long as some fraction of neutral
-    alleles remain associated with this advantageous background, the neutral
-    allele is expected to increase in frequency in later generations, here,
-    $\Delta p_2 = p_3 - p_2$. This creates temporal autocovariance,
-    $\cov(\Delta p_2, \Delta p_0) > 0$. Similarly, had the neutral allele found
-    itself on a low-fitness background (orange), this would also create temporal
-    autocovariance.  B: This depicts the setup for our multilocus model.
-    Multiple alleles (yellow) determine the fitness in a region $R$ 
-    Morgans in length, and these perturb the allele frequency trajectory 
-    of a focal neutral site (light blue). 
-  }
-  \label{fig:cartoon}
-\end{figure}
+%   \caption{A: On an advantageous background (light blue), a neutral allele
+%     increases in frequency leading to a positive change in allele frequency
+%     early on, $\Delta p_0 = p_1 - p_0$. As long as some fraction of neutral
+%     alleles remain associated with this advantageous background, the neutral
+%     allele is expected to increase in frequency in later generations, here,
+%     $\Delta p_2 = p_3 - p_2$. This creates temporal autocovariance,
+%     $\cov(\Delta p_2, \Delta p_0) > 0$. Similarly, had the neutral allele found
+%     itself on a low-fitness background (orange), this would also create temporal
+%     autocovariance.  B: This depicts the setup for our multilocus model.
+%     Multiple alleles (yellow) determine the fitness in a region $R$ 
+%     Morgans in length, and these perturb the allele frequency trajectory 
+%     of a focal neutral site (light blue). 
+%   }
+%   \label{fig:cartoon}
+% \end{figure}
 
 % The temporal autocovariances are due to persistence over generations of the
 % statistical associations (linkage disequilibria) between a neutral allele and
@@ -607,9 +642,10 @@ D_{s,l})$ terms in the expression for temporal autocovariance as
 \begin{subequations}
   \begin{align}
     \cov(\Delta p_t, \Delta p_s) &= \sum_{l=1}^L \alpha_{l}^2 \E(D_{t,l} D_{s,l}) \nnn \\
-                                 &= \sum_{l=1}^L \alpha_{l}^2 \E(\mathcal{R}_{t,l}^2) p_t (1-p_t) p_{s,l} (1-p_{s,l}) (1-r_l)^{s-t}  \\
+                                 &= \sum_{l=1}^L \alpha_{l}^2 \E(\ = mathcal{R}_{t,l}^2) p_t (1-p_t) p_{s,l} (1-p_{s,l}) (1-r_l)^{s-t}  \\
     \frac{\cov(\Delta p_t, \Delta p_s)}{p_t (1-p_t)} &= \sum_{l=1}^L \alpha_{l}^2 p_{s,l} (1-p_{s,l}) \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}, 
   \end{align} 
+  \label{eq:cov-R}
 \end{subequations}
 %
 where $\E(\mathcal{R}^2_{t,l})$ is the square of the correlation between the
@@ -642,6 +678,7 @@ placed on a chromosome and further simplify our model to understand the factors
 that determine temporal autocovariance.
 
 \subsection{Temporal autocovariance for an average neutral polymorphism}
+\label{sec:temp-autocov-aveneut}
 
 In the second part of our derivation, we develop a simple intuitive model of
 how temporal autocovariance is determined by a few key parameters when we make
@@ -707,7 +744,7 @@ is
 
 \begin{align}
   \label{eq:multilocus-triangle}
-  \mathcal{C}(V_a, R, t, s) := \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
+  \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
 \end{align}
 %
 where $\E_n(\cdot)$ indicates an expectation taken over the position of the
@@ -735,11 +772,17 @@ Wright--Fisher model of reproduction, $V_N \approx 2$, this simplifies to
   \label{eq:multilocus-var-2}
 \end{align}
 
-When combined, this expression for the variance in allele frequency change
-and our expression for temporal autocovariance are in agreement with
-Robertson (\citeyear{Robertson1961-ho}) and Santiago and Caballero
+When combined, this expression for the variance in allele frequency change and
+our expression for temporal autocovariance are in agreement with Robertson
+(\citeyear{Robertson1961-ho}) and Santiago and Caballero
 (\citeyear{Santiago1995-hx, Santiago1998-bs}) when predicting the total
 variance in allele frequency change; see Appendix \ref{ap:connecting-sc}.
+\vb{With the above expressions for the variances and covariances, we have a
+  complete set of theoretic expressions for the variance-covariance matrix of
+  allele frequency change, which we call $\mathbf{\Sigma}$, with the diagonal
+  variance elements $\Sigma_{t,t}$ given by Equation \eqref{eq:multilocus-var},
+  and the upper- and lower-triangle covariance elements $\Sigma_{t,s}$ ($t \ne
+  s$) given by Equation \eqref{eq:multilocus-triangle}.}
 
 \subsection{Modeling the dynamics of additive genic and genetic variation}
 \label{sec:dyn-var}
@@ -849,23 +892,24 @@ Wright--Fisher model, we sample the parents of the next generation according to
 a multinomial distribution, where the probability of individual $i$ being a
 parent is $\nicefrac{w(z_i)}{\bar{w}}$. 
 
-We record 50 generations of \vb{simulated evolution}, after which we compute the
-empirical standardized temporal variance-covariance matrix
-$\widehat{\mathbf{Q}}$, for each replicate \vb{as follows}. First, we mark
+We record 50 generations of \vb{simulated evolution}, after which we compute
+the standardized \vb{sample} temporal variance-covariance matrix $\mathbf{Q}$
+\vb{(this is the sample analog of our theoretic variance-covariance matrix
+$\mathbf{\Sigma}$)}, for each replicate \vb{as follows}. First, we mark
 frequencies reaching fixation or loss as missing values. \vb{By marking the
   frequency of sites that are no longer segregating as missing values, we allow
   the allele frequency changes before fixation/loss to contribute to the
-  measured covariance, rather than removing the entire locus's trajectory,
-which would act to condition the covariance on more intermediate frequencies.}
-Then with the frequency matrix, we calculate a vector of allele frequency
-changes $\Delta \vec{p}_n = [\Delta p_{n,1}, \Delta p_{n,2}, \ldots, \Delta
+measured covariance, rather than removing the entire locus's trajectory, which
+would act to condition the covariance on more intermediate frequencies.} Then
+with the frequency matrix, we calculate a vector of allele frequency changes
+$\Delta \vec{p}_n = [\Delta p_{n,1}, \Delta p_{n,2}, \ldots, \Delta
 p_{n,\tau}]$ using each neutral locus $n$'s $\tau+1$ observed generations.
 \vb{Finally}, we calculate the $\tau \times \tau$ standardized
-variance-covariance matrix $\widehat{\mathbf{Q}}$, averaging over $M$ neutral
-loci such that element $q_{t,s}$ is calculated as
+variance-covariance matrix $\mathbf{Q}$, averaging over $M$ neutral loci such
+that element $Q_{t,s}$ is calculated as
 
 \begin{align}
-  q_{t,s} = \frac{\frac{1}{M - 1} \sum_{n=1}^M \left( \Delta p_{n,t} \Delta p_{n,s} - \left(\frac{1}{M} \sum_{n=1}^M \Delta p_{n,t}\right) \left( \frac{1}{M} \sum_{n=1}^M \Delta p_{n,s} \right) \right)}{
+  Q_{t,s} = \frac{\frac{1}{M - 1} \sum_{n=1}^M \left( \Delta p_{n,t} \Delta p_{n,s} - \left(\frac{1}{M} \sum_{n=1}^M \Delta p_{n,t}\right) \left( \frac{1}{M} \sum_{n=1}^M \Delta p_{n,s} \right) \right)}{
   \frac{1}{M} \sum_{n=1}^M p_{\min(t,s)} \left(1 - p_{\min(t,s)}\right)
   }.
   %\frac{\cov_n(\Delta p_s, \Delta p_t)}{\E_n\left(p_{\min(s,t)} (1-p_{\min(s,t)}\right)}
@@ -1125,8 +1169,8 @@ equations, which for the variance and covariance are defined as
                                                      \frac{\nssh(t)}{
                                                      \nssh(1)}
                                                      \mathcal{A}(R, t,t)
-                                                     + \widehat{F} \;\; :=  \;\; Q_{t,t}  \label{eq:mom-moments-var} \\
-  \frac{\cov(\Delta p_t, \Delta p_s)}{\E(p_{t} (1-p_{t}))} \;\; &= \;\; \frac{\widehat{V_A(1)}}{2}\frac{\nssh(s)}{ \nssh(1)} \mathcal{A}(R, t,s) \;\; := \;\; Q_{t,s} \; \; (\text{for} \; s > t ).
+                                                     + \widehat{F} \;\; :=  \;\; \Sigma_{t,t}  \label{eq:mom-moments-var} \\
+  \frac{\cov(\Delta p_t, \Delta p_s)}{\E(p_{t} (1-p_{t}))} \;\; &= \;\; \frac{\widehat{V_A(1)}}{2}\frac{\nssh(s)}{ \nssh(1)} \mathcal{A}(R, t,s) \;\; := \;\; \Sigma_{t,s} \; \; (\text{for} \; s > t ).
  \label{eq:mom-moments-cov}
 \end{align}
 %
@@ -1143,17 +1187,17 @@ t,s)}$ from observed linkage disequilibrium in a region (for details, see
 Appendix Equation \eqref{eq:supp-emp-assoc}).
 
 Following the method-of-moments, we equate each of these independent $\tau +
-\nicefrac{\tau(\tau-1)}{2}$ equations for $Q_{t,s}$ to the observed sampling
-moments, the elements $q_{t,s}$ of the upper triangle of the observed
-heterozygosity-normalized covariance matrix described in Equation
-\eqref{eq:ave-temp-autocov}. This yields $\tau + \nicefrac{\tau (\tau -
-1)}{2}$ equations with 2 unknown parameters: $\widehat{V_A(1)}$ and
+\nicefrac{\tau(\tau-1)}{2}$ equations for $\Sigma_{t,s}$ to the observed
+sampling moments, the elements $Q_{t,s}$ of the upper triangle of the observed
+heterozygosity-normalized covariance matrix $\mathbf{\widehat{Q}}$ described in
+Equation \eqref{eq:ave-temp-autocov}. This yields $\tau + \nicefrac{\tau (\tau
+- 1)}{2}$ equations with 2 unknown parameters: $\widehat{V_A(1)}$ and
 $\widehat{N}$. We solve this overdetermined system of equations using least
 squares, an approach similar to the generalized method-of-moments in
 econometrics \parencite{Hansen1982-ck}. This approach finds parameter estimates
 that minimize the squared error between the moment-based parameter estimate and
 the true parameter value, with respect to the true parameter value. We write
-the elements $q_{t,s}$ of the upper triangle of the observed covariance matrix
+the elements $Q_{t,s}$ of the upper triangle of the observed covariance matrix
 in the vector $\vec{q}$, and write the method-of-moments equations as,
 
 \begin{align}
@@ -1232,7 +1276,7 @@ window $i$ contributes to $v_A(1) w_{\text{BP}}$, our least squares approach
 given by Equation \eqref{eq:mom-regression} becomes
 
 \begin{align}
-  q_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{1}{B} \frac{SSH_n(s)}{SSH_n(1)} \mathcal{A} (R_i, t,s ) +
+  \Sigma_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{1}{B} \frac{SSH_n(s)}{SSH_n(1)} \mathcal{A} (R_i, t,s ) +
             \widehat{F} \delta_{t,s}+ \varepsilon, \;\;  \text{for} \; s \geq t.
 \end{align}
 
@@ -1245,14 +1289,14 @@ similar to background selection and other linked selection models
 write total $V_A(1) = v_A(1) \sum_{i=1}^B w_{\text{CBP},i}$ where
 $w_{\text{CBP},i}$ is the number of coding or exonic basepairs in window $i$
 (this could be any quantifiable annotation feature in the window), and
-$G_\text{CBP} = \sum_{i=1}^B w_{\textrm{BP}},i$ is the total number of coding
+$W_\text{CBP} = \sum_{i=1}^B w_{\textrm{BP}},i$ is the total number of coding
 bases in the genome. With window $i$ contributing $v_A(1) w_{\text{CBP}, i}$ to the
 additive genetic variance and having map length $R_i$, we now define $\vec{q}$,
 $\vec{a}$, and $\vec{b}$ as having elements given by the equations
 
 \begin{align} 
   \label{eq:va-bp}
-  q_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{w_{\text{CBP},i} \; SSH_n(s)}{G_{\text{CBP}} \; SSH_n(1)} \mathcal{A} (R_i, t, s) + \widehat{F} \delta_{t,s} + \varepsilon, \;\; \text{for} \; s \ge t.
+  \Sigma_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{w_{\text{CBP},i} \; SSH_n(s)}{W_{\text{CBP}} \; SSH_n(1)} \mathcal{A} (R_i, t, s) + \widehat{F} \delta_{t,s} + \varepsilon, \;\; \text{for} \; s \ge t.
 \end{align}
 %
 Again, the parameters of this model, $\widehat{V_A(1)}$ and $\widehat{N}$, can
@@ -1762,42 +1806,60 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
   \begin{tabular}{l|p{12cm}}
  Symbol & Usage  \\ \hline
  $p_t$ & Allele frequency in generation/timepoint $t$  \\
- $\Delta p_t$ & Allele frequency change between generations $t+1$ and $t$; $\Delta p_t = p_{t+1} - p_t$ \\
- $\Delta_{_N} p_t $ & Frequency change due to non-heritable variation in fitness  \\
- $\Delta_{_M} p_t $ & Frequency change due to Mendelian segregation \\
- $\Delta_{_H} p_t $ & Frequency change due to heritable differences \\
+ $\Delta p_t$ & Allele frequency change between generations $t+1$ and $t$, $\Delta p_t = p_{t+1} - p_t$ \\
+ $\Delta_{_N} p_t $ & Frequency change due to non-heritable variation in fitness; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1}  \\
+ $\Delta_{_M} p_t $ & Frequency change due to Mendelian segregation; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
+ $\Delta_{_H} p_t $ & Frequency change due to heritable differences; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
  $N$ & Census population size of breeding individuals \\
  $N_e$ & Effect population size \\
- $f_i$ & Fitness (expected number of offspring) of individual $i$\\
- $\alpha_{t,l}$ & Effect size in generation $t$ and locus $l$ \\
- $L$ & Total number of loci impacting fitness \\
- $g_{i,l} \in \{0, 1, 2\}$ & Individual $i$'s gene count at locus $l$ \\
- $x_{i} \in \{0, 1, 2\}$ & Individual $i$'s neutral gene count at the tracked neutral site\\
- $D_{t,l}$ or $D_{t,l}'$ & Gametic linkage disequilibrium between the tracked neutral site and selected locus $l$ at time $t$ (see Supplementary Figure \ref{fig:ld-cartoon}) \\
- $D_{t,l}''$ & Non-gametic disequilibrium between the tracked neutral site and selected locus $l$ at time $t$ (see Supplementary Figure \ref{fig:ld-cartoon}) \\
- $\E(\mathcal{R}_{t,l}^2)$ & The squared correlation coefficient of linkage disequilibrium between the tracked neutral site and selected site $l$ at time $t$\\
- $r_l$ & The recombination fraction between the tracked neutral site and selected site $l$\\
- $V_a(s)$ & The additive genic variance \\ 
- $V_A(s)$ & The additive genetic variance \\ 
- $R$ & The total level of recombination in the region, in Morgans \\ 
- $r(g)$ & A mapping function (i.e. Haldane's), which maps a position $g$ to a recombination fraction.\\ 
- $\rho$ & The population recombination rate, $\rho = 4Nr$\\ 
- $\mathcal{A}(R, t, s)$ & The average linkage disequilibrium in a region of $R$ Morgans, that persisted from generation $t$ to generation $s$. \\
+ $f_i$ & Fitness (expected number of offspring) of individual $i$; \eqref{eq:ap-freq}\\
+ $\alpha_{t,l}$ & Effect size in generation $t$ and locus $l$; \eqref{eq:neut-change}, \eqref{eq:ap-delta-H} \\
+ $L$ & Total number of loci impacting fitness, \eqref{eq:neut-change} \\
+ $g_{i,l} \in \{0, 1, 2\}$ & Individual $i$'s gene count at locus $l$, \eqref{eq:ap-delta-H-2} \\
+ $x_{i} \in \{0, 1, 2\}$ & Individual $i$'s neutral gene count at the tracked neutral site; \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $D_{t,l}$ or $D_{t,l}'$ & \hangindent=1em Gametic linkage disequilibrium between the tracked neutral site and selected locus $l$ at time $t$; Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $D_{t,l}''$ & \hangindent=1em Non-gametic disequilibrium between the tracked neutral site and selected locus $l$ at time $t$; Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $\E(\mathcal{R}_{t,l}^2)$ & \hangindent=1em The squared correlation coefficient of linkage disequilibrium between the tracked neutral site and selected site $l$ at time $t$; \eqref{eq:cov-R}, \eqref{eq:ap-D}\\
+ $r_l$ & \hangindent=1em The recombination fraction between the tracked neutral site and selected site $l$\\
+ $V_a(s)$ & The additive genic variance, \eqref{eq:multilocus-cov-sum} \\ 
+ $V_A(s)$ & The additive genetic variance, \eqref{eq:var-genic-z} \\ 
+ $R$ & The total level of recombination in the region, in Morgans, \eqref{eq:ave-neut-autocov} and Figure \ref{fig:cartoon} \\ 
+ $r(g)$ & \hangindent=1em A mapping function (i.e. Haldane's), which maps a position $g$ to a recombination fraction.\\ 
+ $\rho$ & The population recombination rate, $\rho = 4Nr$, Section \ref{sec:temp-autocov-aveneut} \\ 
+ $\mathcal{A}(R, t, s)$ & \hangindent=1em The average linkage disequilibrium in a region of $R$ Morgans, that persisted from generation $t$ to generation $s$, \eqref{eq:multilocus-triangle} \\
  $V_N$ & The non-heritable variance in offspring number, \eqref{eq:multilocus-var} \\
  $SSH(t)$ & The sum of site heterozygosity at selected sites time $t$, \eqref{eq:VA-SSH} \\
  $SSH_n(t)$ & The sum of site heterozygosity at neutral sites at time $t$, \eqref{eq:VA-SSH} \\
- $ssh_n(t)$ & The proportion of sum of site heterozygosity at neutral sites at time $t$ relative to $SSH(1)$, $SSH_n(t) / SSH_n(1)$ \eqref{eq:VA-ssh} \\
- $z_i$ & The breeding value of the trait that determines fitness, $z_i = \sum_{i=1}^L \alpha g_{i,l}$, see Appendix Section \ref{ap:multilocus} \\
- $w(z_i)$ & The fitness of individual $i$ with fitness function $w(\cdot)$ \\
+ $ssh_n(t)$ & \hangindent=1em The proportion of sum of site heterozygosity at neutral sites at time $t$ relative to $SSH(1)$, $SSH_n(t) / SSH_n(1)$ \eqref{eq:VA-ssh} \\
+ $z_i$ & \hangindent=1em The breeding value of the trait that determines fitness, $z_i = \sum_{i=1}^L \alpha g_{i,l}$, see appendix section \ref{ap:multilocus} \\
+ $w(z_i)$ & The fitness of individual $i$ with fitness function $w(\cdot)$, see appendix section \ref{ap:multilocus} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+  \begin{tabular}{l|p{12cm}}
+ Symbol & Usage  \\ \hline
  $\mathbf{\widehat{Q}}$ & The sample standardized variance-covariance matrix \\
- $q_{t,s}$ & The elements of the matrix $\mathbf{\widehat{Q}}$  \\
- $\Delta p_{n,t}$ & The allele frequency change at site $n$ between times time $t+1$ and $t$, \eqref{eq:ave-temp-autocov} \\
- $\tau$ & The number of allele frequency changes observed, e.g. after sampling for $\tau + 1$ timepoint\\
- $V_{a,ssh_n}(t)$ & The additive genic variation at time $s$ as approximated by the observed decay in the sum of site heterozygosity at neutral sites  \\
+ $Q_{t,s}$ & The elements of the observed sample matrix $\mathbf{\widehat{Q}}$ \\
+ $\mathbf{\Sigma}$ & \hangindent=1em The standardized variance-covariance matrix, based on our theoretic expressions \\
+ $\Sigma_{t,s}$ & The elements of the standardized variance-covariance matrix \\
+ $\Delta p_{n,t}$ & \hangindent=1em The allele frequency change at site $n$ between times time $t+1$ and $t$, \eqref{eq:ave-temp-autocov} \\
+ $\tau$ & \hangindent=1em The number of allele frequency changes observed, e.g. after sampling for $\tau + 1$ timepoints \\
+ $V_{a,ssh_n}(t)$ & \hangindent=1em The additive genic variation at time $s$ as approximated by the observed decay in the sum of site heterozygosity at neutral sites  \\
  $\var_i(z_i)$ & The variance in trait values taken over individuals, \eqref{eq:var-genic-z} \\
-
-
-% stopped at line 452
+ $\widehat{V_A(1)} & \hangindent=1em The method-of-moments estimate of the additive genetic variance in the first generation \\
+ $\widehat{F} & \hangindent=1em The method-of-moments estimate of Wright's standardized variance, $F = \nicefrac{1}{2N}$ \\
+ $\widehat{N} & \hangindent=1em The method-of-moments estimate of drift-effective population size, $N = \nicefrac{1}{2F} \\
+ $\sigma^2$ & \hangindent=1em The sampling noise around each element of the sample variance-covariance matrix. \\
+ %$\vec{a}, \; \vec{b}$ & Vectors of the 
+ $B$ & The total number of windows after partitioning the genome. \\
+ $w_{text{BP}}$ & Width of windows (in basepairs) \\
+ $v_A(1)$ & The average additive genetic variance per basepair \\
+ $w_{\text{CBP}$ & Number of coding basepairs in a window \\
+ $W_{\text{CBP}$ & Total number of coding basepairs in the genome \\
+ $G$ & \hangindent=1em A conservative measure of the total variance in allele frequency change due to linked selection \\
+ $G'$ & \hangindent=1em An alterate, less conservative measure of the total variance in allele frequnecy change due to linked selection \\
+ $G_{abs}$ & A variant of $G$ using the absolute value of covariances \\
 \end{tabular}
 \end{table}
 
@@ -1819,6 +1881,7 @@ generation can be written as
 
 \begin{align}
   p_1 &= \frac{1}{N} \sum_{i=1}^N \left(k_i \frac{x_i}{2} + \sum_{j=1}^{k_i} b_{ij} \right)
+  \label{eq:ap-freq}
 \end{align}
 %
 where $b_{ij} = \delta_{x_i, 1} (\nicefrac{1}{2} - B_j)$, $B_j \sim
@@ -1920,6 +1983,7 @@ in generation $t$,
   \Delta_{_H} p_t &= \frac{1}{2N} \sum_{i=1}^N x_i \left(f_i - 1\right) \\
                   &= \frac{1}{2} \cov_i(x_i, f_i) \\
                   &= \frac{1}{2} \cov_i(x_i, \sum_{l=1}^L \alpha_{t,l} g_{i,l})
+  \label{eq:ap-delta-H}
 \end{align}
 %
 which is the is the Robertson-Price covariance
@@ -1931,6 +1995,7 @@ with the trait locus $g_{i,l} = g_{i,l}' + g_{i,l}''$, where $x_i', x_i'',
 g_i',$ and $g_i''$ are all indicator variables. Expanding out the covariances, we have
 
 \begin{align}
+  \label{eq:ap-delta-H-2}
   \Delta_{_H} p_t &= \frac{1}{2}\cov(x_i' + x_i'', \sum_{l=1}^L \alpha_{t,l} (g_{i,l}' + g_{i,l}'')) \nonumber \\
                 &= \frac{1}{2}\left(\cov(x_i', \sum_{l=1}^L \alpha_{t,l} (g_{i,l}' + g_{i,l}'')) + \cov(x_i'', \sum_{l=1}^L \alpha_{t,l} (g_{i,l}' + g_{i,l}'')) \right) \nonumber \\ 
   % &= \cov(x_i', \sum_{l=1}^L \alpha_{t,l} g_{i,l}' + \sum_{l=1}^L \alpha_{t,l} g_{i,l}'') + \cov(x_i'', \sum_{l=1}^L \alpha_{t,l} g_{i,l}' + \sum_{l=1}^L \alpha_{t,l} g_{i,l}'') \\
@@ -1946,6 +2011,7 @@ These covariances can be written as linkage disequilibrium terms,
                 &= \frac{1}{2} \left( \sum_{l=1}^L \alpha_{t,l} \cov(x_i', g_{i,l}') + \sum_{l=1}^L \alpha_{t,l} \cov(x_i', g_{i,l}'') + \sum_{l=1}^L \alpha_{t,l} \cov(x_i'',  g_{i,l}') + \sum_{l=1}^L \alpha_{t,l} \cov(x_i'',  g_{i,l}'') \right) \nonumber \\
                 &= \frac{1}{2} \left( \sum_{l=1}^L \alpha_{t,l} D_{l}' + \sum_{l=1}^L \alpha_{t,l} D_{l}'' + \sum_{l=1}^L \alpha_{t,l} D_l'' + \sum_{l=1}^L \alpha_{t,l} D_l' \right) \nonumber \\
                 &=  \sum_{l=1}^L \alpha_{t,l} D_{l}' + \sum_{l=1}^L \alpha_{t,l} D_{l}'' 
+  \label{eq:ap-delta-H-3}
 \end{align}
 %
 where $D_L'$ is the linkage disequilibrium between alleles on the same gamete
@@ -2050,6 +2116,7 @@ site and selected site $l$ at time $t$; \cite{Hill1968-ue}),
   \E(D_{t,l} D_{s,l}) &= \E(D_{t,l}^2)\frac{ p_{s,l} (1-p_{s,l})}{p_{t,l} (1-p_{t,l})} (1-r_{l})^{s-t} \nonumber \\
                       &= \E(\mathcal{R}_{t,l}^2) p_{t} (1-p_{t}) p_{t,l} (1-p_{t,l}) \frac{ p_{s,l} (1-p_{s,l})}{p_{t,l} (1-p_{t,l})} (1-r_{l})^{s-t} \nonumber \\
                       &= \E(\mathcal{R}_{t,l}^2) p_{t} (1-p_{t}) p_{s,l} (1-p_{s,l}) (1-r_{l})^{s-t}.
+  \label{eq:ap-D}
 \end{align}
 %
 Returning to Equation \eqref{eq:app-multilocus-twopart} and replacing the
@@ -2333,14 +2400,17 @@ equation 16) to be
   N_e &= \frac{4N}{2 + V_n + Q^2 C^2}
 \end{align}
 %
+
 where $C^2$ is the heritable variation for fitness ($V_A$ in our notation), and
 $V_n$ is the non-heritable variation in offspring number (i.e. under a
 Wright--Fisher model, $V_n \approx 2$). For a neutral locus completely unlinked
 from fitness variation (the situation first considered by
 \cite{Robertson1961-ho}), $Q = 1 + \nicefrac{G}{2} + (\nicefrac{G}{2})^2 +
 (\nicefrac{G}{2})^3 + \ldots = \sum_{i=0}^\infty (\nicefrac{G}{2})^i =
-\nicefrac{2}{(2 - G)}$ (\cite{Santiago1995-hx}, equation 17; note that we've
-simplified their expressions by assuming no assortative mating).
+\nicefrac{2}{(2 - G)}$ (\cite{Santiago1995-hx}, equation 17). \vb{Note that
+we've simplified their expressions by assuming no assortative mating, and that
+we try to follow their notation as closely as possible (consequently, the $Q$
+here is unrelated to the $Q_{t,s}$ of the main text)}.
 \textcite{Santiago1995-hx} assume that continual artificial selection maintains
 a constant level $C^2$ of fitness variation in the population each generation,
 yet the \emph{particular} fitness backgrounds the neutral allele is
