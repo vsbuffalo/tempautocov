@@ -5,8 +5,6 @@ mtext_cex  <- 0.8
 opar <- par(no.readonly=TRUE)
 phi <- (1 + sqrt(5))/2
 title_col='grey12'
-
-
 dashed_gray <- 'gray58'
 
 
@@ -72,7 +70,7 @@ legend(1e-4, 5, inset=0, legend=unique(mom_fitsd$genlen), fill=wescols,
 ymax <- 3e3
 boxplot(Nest ~ Va + genlen, mom_fitsd_subset,
         axes=FALSE, ylim=c(0,ymax), outline=FALSE,
-        #col=brewercols,
+        col=brewercols,
         border=brewercols,
         pars = list(boxcol = "transparent", medlty = "blank", 
                     medpch=16, whisklty = c(1, 1),

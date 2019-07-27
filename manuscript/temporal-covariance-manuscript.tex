@@ -78,6 +78,7 @@
 
 %  TODO
 % - R^2 changes through time note?
+% - check all legends for overflow, Figure 6 has problems
 
 %% RUNNING TITLE
 %% KEYWORDS
@@ -87,7 +88,7 @@
 
   Population genetics seeks to understand how evolution shapes the genetic
   variation in populations. The majority of empirical population genetic
-  studies have sought to infer the evolutionary processes that have shaped
+  studies have tries to understand the evolutionary processes that have shaped
   genetic variation in a single sample taken from a present-day population.
   However, genomic data collected over tens of generations in both natural and
   lab populations are increasingly used to find selected loci underpinning
@@ -601,7 +602,8 @@ allele frequency changes at generations $t$ and $s$ can be written as
 \begin{align}
   \cov(\Delta p_t, \Delta p_s) &=  \E \left[\left(\sum_{l=1}^L \alpha_{t,l} D_{t,l}\right) \left( \sum_{l=1}^L \alpha_{t,l} D_{s,l} \right) \right]\nnn \\ 
                                &=  \underbrace{\sum_{l=1}^L \alpha_{t,l} \alpha_{s,l} \E(D_{t,l}  D_{s,l})}_{\text{persistence of associations selected site} \; l}  \; + 
-  \underbrace{\sum_{l \ne k} \alpha_{t,k} \alpha_{s,l}\E(D_{t,k}  D_{s,l})}_{\text{cross-associations between two selected sites}}. \label{eq:multilocus-twopart}
+  \underbrace{\sum_{l \ne k} \alpha_{t,k} \alpha_{s,l}\E(D_{t,k}  D_{s,l})}_{\text{cross-associations between two selected sites}}. 
+  \label{eq:multilocus-twopart}
 \end{align}
 
 This statement for temporal autocovariance is fairly general, as it can handle
@@ -642,7 +644,7 @@ D_{s,l})$ terms in the expression for temporal autocovariance as
 \begin{subequations}
   \begin{align}
     \cov(\Delta p_t, \Delta p_s) &= \sum_{l=1}^L \alpha_{l}^2 \E(D_{t,l} D_{s,l}) \nnn \\
-                                 &= \sum_{l=1}^L \alpha_{l}^2 \E(\ = mathcal{R}_{t,l}^2) p_t (1-p_t) p_{s,l} (1-p_{s,l}) (1-r_l)^{s-t}  \\
+                                 &= \sum_{l=1}^L \alpha_{l}^2 \E(\mathcal{R}_{t,l}^2) p_t (1-p_t) p_{s,l} (1-p_{s,l}) (1-r_l)^{s-t}  \\
     \frac{\cov(\Delta p_t, \Delta p_s)}{p_t (1-p_t)} &= \sum_{l=1}^L \alpha_{l}^2 p_{s,l} (1-p_{s,l}) \E(\mathcal{R}_{t,l}^2) (1-r_l)^{s-t}, 
   \end{align} 
   \label{eq:cov-R}
@@ -665,10 +667,14 @@ covariance as
   \label{eq:multilocus-cov-sum}
 \end{align}
 %
+
 where $V_a(s)$ is the additive genic variance for fitness, which is the
 additive genetic variance for fitness ($V_A$) without the contribution of
 linkage disequilibria between selected sites, $V_a(s) = 2 \sum_l \alpha_l^2
-p_l(s) (1-p_l(s))$.
+p_l(s) (1-p_l(s))$. \vb{In part, our expression not relying on the linkage
+disequilibria between selected sites is a consequence of ignoring the second
+term in Equation \eqref{eq:multilocus-twopart}; we revisit the consequences of
+this assumption further on in Section \ref{sec:ml-sim-res}.}
 
 This expression allows us to calculate the temporal autocovariance in cases
 where we know the vector of recombination fractions between the neutral and
@@ -744,7 +750,7 @@ is
 
 \begin{align}
   \label{eq:multilocus-triangle}
-  \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
+  \Sigma_{t,s} := \frac{\E_n(\cov(\Delta p_t, \Delta p_s))}{\E_n(p_{t} (1-p_{t}))} &= \frac{V_a(s)}{2} \underbrace{\int_0^R \E(\mathcal{R}_t^2(r(c))) \; (1-r(c))^{(s-t)} \frac{2(R-c)}{R^2} \,d c}_{\mathcal{A}(R, t, s)} 
 \end{align}
 %
 where $\E_n(\cdot)$ indicates an expectation taken over the position of the
@@ -760,7 +766,7 @@ two components: the drift term and the heritable variance in offspring number.
 Adding these independent contributions, the standardized variance is
 
 \begin{align}
-  \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{V_N + 2}{8N} + \frac{V_a}{2} \mathcal{A}(R, t, s)
+  \Sigma_{t,t} := \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{V_N + 2}{8N} + \frac{V_a}{2} \mathcal{A}(R, t, s)
   \label{eq:multilocus-var}
 \end{align}
 %
@@ -1151,7 +1157,12 @@ region. We then equate these sample variances and covariances to our analytic
 expressions for the variance and covariances, leaving us with an overdetermined
 system of equations, which we solve using least squares. We demonstrate this
 simple estimation procedure provides accurate estimations of initial additive
-genetic variance and the drift-effective population size.
+genetic variance and the drift-effective population size. \vb{GC: Sentence here
+  justifying the simple procedure??} \vb{We focus on this procedure, as
+  Throughout, we assume population frequencies are known with certainty (i.e.
+  there is no sampling noise) which simplifies the description of the method;
+in Appendix Section XXX we describe how the method is changed with sampling
+noise.} 
 
 From our multilocus theory, we have analytic expressions for each element of
 the $\tau \times \tau$ covariance matrix of allele frequency changes in a
@@ -1235,14 +1246,15 @@ details).
 Applying our approach to these simulations, we find we can infer both the
 initial level of additive genetic variation $V_A(1)$, and the effective
 population size $N$ from multilocus temporal data. In Figure
-\ref{fig:mom-fits-both}A, we show our method-of-moments gives
-reasonable estimates for the initial level of additive genetic variance over
-orders of magnitude of additive genetic variation, and different recombination
-regimes. As additive genetic variation for fitness becomes weaker (the left
-side of the figure), our estimates become more noisy. In Figure
-\ref{fig:mom-fits-both}B we show the simultaneously estimated
-population size $N$ closely matches the true value, across all different levels
-of recombination.
+\ref{fig:mom-fits-both}A, we show our method-of-moments gives reasonable
+estimates for the initial level of additive genetic variance over orders of
+magnitude of additive genetic variation, and different recombination regimes.
+As additive genetic variation for fitness becomes weaker (the left side of the
+figure), our estimates become more noisy. In Figure \ref{fig:mom-fits-both}B we
+show the simultaneously estimated population size $N$ closely matches the true
+value, across all different levels of recombination. \vb{In Appendix Figure
+XXX, we include a version of this figure calculated using the method of moments
+on sample allele frequencies for a sample of size $n=XXX$.}
 
 \begin{figure}
   \centering
@@ -1278,6 +1290,7 @@ given by Equation \eqref{eq:mom-regression} becomes
 \begin{align}
   \Sigma_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{1}{B} \frac{SSH_n(s)}{SSH_n(1)} \mathcal{A} (R_i, t,s ) +
             \widehat{F} \delta_{t,s}+ \varepsilon, \;\;  \text{for} \; s \geq t.
+            \label{eq:mom-windows}
 \end{align}
 
 However, we expect \emph{a priori} that windows containing more coding bases
@@ -1295,8 +1308,8 @@ additive genetic variance and having map length $R_i$, we now define $\vec{q}$,
 $\vec{a}$, and $\vec{b}$ as having elements given by the equations
 
 \begin{align} 
-  \label{eq:va-bp}
   \Sigma_{t,s,i} &= \frac{\widehat{V_A(1)}}{2} \frac{w_{\text{CBP},i} \; SSH_n(s)}{W_{\text{CBP}} \; SSH_n(1)} \mathcal{A} (R_i, t, s) + \widehat{F} \delta_{t,s} + \varepsilon, \;\; \text{for} \; s \ge t.
+  \label{eq:mom-windows-cbp}
 \end{align}
 %
 Again, the parameters of this model, $\widehat{V_A(1)}$ and $\widehat{N}$, can
@@ -1347,6 +1360,7 @@ First, a simple estimate of the total fraction of the variance in allele
 frequency change ($G$) caused by linked selection is
 
 \begin{align}
+  \label{eq:g-def}
   G = \frac{\sum_{t \ne s}\cov(\Delta p_t, \Delta p_s)}{\var(p_t - p_0)}.
 \end{align}
 
@@ -1503,6 +1517,7 @@ To more fully capture the contribution of selection allele frequency change, we
 modify $G$, using the absolute value of the covariances, 
 
 \begin{align}
+  \label{eq:g-abs}
   G_{abs} = \frac{\sum_{t \ne s}|\cov(\Delta p_t, \Delta p_s)|}{\var(p_t - p_0)}
 \end{align}
 %
@@ -1616,11 +1631,11 @@ Finally, while we demonstrate our method-of-moments estimation approach is
 simple and leads to unbiased estimators, we see there are opportunities for
 simple extensions and other inference procedures. Differences in recombination
 rates and coding density are relatively easily accommodated (Equation
-\ref{eq:va-bp}). In fitting our model we assumed a parametric form to the
+\ref{eq:va-cbp}). In fitting our model we assumed a parametric form to the
 initial LD between neutral and selected loci; however, in practice the initial
 linkage disequilibria between neutral polymorphisms and putatively functional
 sites could be estimated empirically. Using the empirical LDs in Equation
-\eqref{eq:va-bp} could make the inference somewhat analogous to LD Score
+\eqref{eq:va-cbp} could make the inference somewhat analogous to LD Score
 regression \parencite{Bulik-Sullivan2015-ls}. The LD Score of a SNP is simply
 the sum of the $R^2$'s of the focal SNP to all SNPs within some large physical
 genomic window, which could be used in place of the integral in Equation
@@ -1807,19 +1822,19 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
  Symbol & Usage  \\ \hline
  $p_t$ & Allele frequency in generation/timepoint $t$  \\
  $\Delta p_t$ & Allele frequency change between generations $t+1$ and $t$, $\Delta p_t = p_{t+1} - p_t$ \\
- $\Delta_{_N} p_t $ & Frequency change due to non-heritable variation in fitness; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1}  \\
- $\Delta_{_M} p_t $ & Frequency change due to Mendelian segregation; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
- $\Delta_{_H} p_t $ & Frequency change due to heritable differences; \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
+ $\Delta_{_N} p_t $ & Frequency change due to non-heritable variation in fitness, \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1}  \\
+ $\Delta_{_M} p_t $ & Frequency change due to Mendelian segregation, \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
+ $\Delta_{_H} p_t $ & Frequency change due to heritable differences, \eqref{eq:delp-decomp}, \eqref{eq:var-decomp-1} \\
  $N$ & Census population size of breeding individuals \\
  $N_e$ & Effect population size \\
- $f_i$ & Fitness (expected number of offspring) of individual $i$; \eqref{eq:ap-freq}\\
- $\alpha_{t,l}$ & Effect size in generation $t$ and locus $l$; \eqref{eq:neut-change}, \eqref{eq:ap-delta-H} \\
+ $f_i$ & Fitness (expected number of offspring) of individual $i$, \eqref{eq:ap-freq}\\
+ $\alpha_{t,l}$ & Effect size in generation $t$ and locus $l$, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H} \\
  $L$ & Total number of loci impacting fitness, \eqref{eq:neut-change} \\
  $g_{i,l} \in \{0, 1, 2\}$ & Individual $i$'s gene count at locus $l$, \eqref{eq:ap-delta-H-2} \\
- $x_{i} \in \{0, 1, 2\}$ & Individual $i$'s neutral gene count at the tracked neutral site; \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
- $D_{t,l}$ or $D_{t,l}'$ & \hangindent=1em Gametic linkage disequilibrium between the tracked neutral site and selected locus $l$ at time $t$; Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
- $D_{t,l}''$ & \hangindent=1em Non-gametic disequilibrium between the tracked neutral site and selected locus $l$ at time $t$; Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
- $\E(\mathcal{R}_{t,l}^2)$ & \hangindent=1em The squared correlation coefficient of linkage disequilibrium between the tracked neutral site and selected site $l$ at time $t$; \eqref{eq:cov-R}, \eqref{eq:ap-D}\\
+ $x_{i} \in \{0, 1, 2\}$ & Individual $i$'s neutral gene count at the tracked neutral site, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $D_{t,l}$ or $D_{t,l}'$ & \hangindent=1em Gametic linkage disequilibrium between the tracked neutral site and selected locus $l$ at time $t$, Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $D_{t,l}''$ & \hangindent=1em Non-gametic disequilibrium between the tracked neutral site and selected locus $l$ at time $t$, Supplementary Figure \ref{fig:ld-cartoon}, \eqref{eq:neut-change}, \eqref{eq:ap-delta-H-2}, \eqref{eq:ap-delta-H-3} \\
+ $\E(\mathcal{R}_{t,l}^2)$ & \hangindent=1em The squared correlation coefficient of linkage disequilibrium between the tracked neutral site and selected site $l$ at time $t$, \eqref{eq:cov-R}, \eqref{eq:ap-D}\\
  $r_l$ & \hangindent=1em The recombination fraction between the tracked neutral site and selected site $l$\\
  $V_a(s)$ & The additive genic variance, \eqref{eq:multilocus-cov-sum} \\ 
  $V_A(s)$ & The additive genetic variance, \eqref{eq:var-genic-z} \\ 
@@ -1839,27 +1854,27 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
 \begin{table}[]
   \begin{tabular}{l|p{12cm}}
  Symbol & Usage  \\ \hline
- $\mathbf{\widehat{Q}}$ & The sample standardized variance-covariance matrix \\
- $Q_{t,s}$ & The elements of the observed sample matrix $\mathbf{\widehat{Q}}$ \\
+ $\mathbf{Q}$ & The sample standardized variance-covariance matrix, \eqref{eq:ave-temp-autocov} \\
+ $Q_{t,s}$ & The elements of the observed sample matrix $\mathbf{Q}$, \eqref{eq:ave-temp-autocov} \\
  $\mathbf{\Sigma}$ & \hangindent=1em The standardized variance-covariance matrix, based on our theoretic expressions \\
- $\Sigma_{t,s}$ & The elements of the standardized variance-covariance matrix \\
+ $\Sigma_{t,s}$ & The elements of the standardized variance-covariance matrix, \eqref{eq:multilocus-triangle}, \eqref{eq:multilocus-var} \\
  $\Delta p_{n,t}$ & \hangindent=1em The allele frequency change at site $n$ between times time $t+1$ and $t$, \eqref{eq:ave-temp-autocov} \\
  $\tau$ & \hangindent=1em The number of allele frequency changes observed, e.g. after sampling for $\tau + 1$ timepoints \\
- $V_{a,ssh_n}(t)$ & \hangindent=1em The additive genic variation at time $s$ as approximated by the observed decay in the sum of site heterozygosity at neutral sites  \\
+ $V_{a,ssh_n}(t)$ & \hangindent=1em The additive genic variation at time $s$ as approximated by the observed decay in the sum of site heterozygosity at neutral sites, \eqref{eq:VA-ssh} \\
  $\var_i(z_i)$ & The variance in trait values taken over individuals, \eqref{eq:var-genic-z} \\
- $\widehat{V_A(1)} & \hangindent=1em The method-of-moments estimate of the additive genetic variance in the first generation \\
- $\widehat{F} & \hangindent=1em The method-of-moments estimate of Wright's standardized variance, $F = \nicefrac{1}{2N}$ \\
- $\widehat{N} & \hangindent=1em The method-of-moments estimate of drift-effective population size, $N = \nicefrac{1}{2F} \\
+ $\widehat{V_A(1)}$ & \hangindent=1em The method-of-moments estimate of the additive genetic variance in the first generation, \eqref{eq:mom-moments-cov}, \eqref{eq:mom-moments-var} \\
+ $\widehat{F}$ & \hangindent=1em The method-of-moments estimate of Wright's standardized variance, $F = \nicefrac{1}{2N}$, \eqref{eq:mom-moments-cov}, \eqref{eq:mom-moments-var} \\
+ $\widehat{N}$ & \hangindent=1em The method-of-moments estimate of drift-effective population size, $N = \nicefrac{1}{2F}$ \\
  $\sigma^2$ & \hangindent=1em The sampling noise around each element of the sample variance-covariance matrix. \\
  %$\vec{a}, \; \vec{b}$ & Vectors of the 
- $B$ & The total number of windows after partitioning the genome. \\
- $w_{text{BP}}$ & Width of windows (in basepairs) \\
+ $B$ & The total number of windows after partitioning the genome, \eqref{eq:mom-windows} \\
+ $w_{text{BP}}$ & Width of windows (in basepairs), \eqref{eq:mom-windows} \\
  $v_A(1)$ & The average additive genetic variance per basepair \\
- $w_{\text{CBP}$ & Number of coding basepairs in a window \\
- $W_{\text{CBP}$ & Total number of coding basepairs in the genome \\
- $G$ & \hangindent=1em A conservative measure of the total variance in allele frequency change due to linked selection \\
- $G'$ & \hangindent=1em An alterate, less conservative measure of the total variance in allele frequnecy change due to linked selection \\
- $G_{abs}$ & A variant of $G$ using the absolute value of covariances \\
+ $w_{\text{CBP}}$ & Number of coding basepairs in a window, \eqref{eq:mom-windows} \\
+ $W_{\text{CBP}}$ & Total number of coding basepairs in the genome, \eqref{eq:mom-windows-cbp}  \\
+   $G$ & \hangindent=1em A conservative measure of the total variance in allele frequency change due to linked selection, \eqref{eq:g-def} \\
+   $G'$ & \hangindent=1em An alterate, less conservative measure of the total variance in allele frequnecy change due to linked selection, \eqref{eq:g-prime} \\
+   $G_{abs}$ & A variant of $G$ using the absolute value of covariances, \eqref{eq:g-abs} \\
 \end{tabular}
 \end{table}
 
@@ -2892,7 +2907,6 @@ parameters. Here, we estimate $N_e$ with $\widehat{N_e} = \nicefrac{p(1-p)}{2
 \begin{figure}[!ht]
   \centering
   \includegraphics{./images/expfit-vark-types.pdf}
-
   \caption{The dynamics of different variances in our simulations, across a
     variety of initial target $V_A$ and $R$ levels. Orange points represent the
     empirical heritable variance in offspring (e.g. with the noise of the
@@ -2914,14 +2928,17 @@ heterozygosity proxies described in Section \ref{sec:dyn-var}.}
 \begin{figure}[!ht]
   \centering
   \includegraphics{./images/sim-pred13-covs-varyl.pdf}
-
   \caption{Each panel shows the temporal autocovariance $\cov(\Delta p_{13},
     \Delta p_s)$ on the y-axis, where $s$ varies along the x-axis. This is
     analogous to Figure \ref{fig:multilocus-expfit-sims} with a different
     reference generation ($t=13$), and compares the averaged simulation results
-  (points) with the temporal autocovariance predicted by Equation
-\eqref{eq:multilocus-triangle} using the empirical additive genetic variance
-(curve). }
+    (points) with the temporal autocovariance predicted by Equation
+    \eqref{eq:multilocus-triangle} using the empirical additive genetic
+    variance (curve). \vb{The covariances in these panels are weaker compared
+    to those in Figure \ref{fig:multilocus-expfit-sims} because by generation
+    13, additive genetic variance for fitness and the linkage disequilibria
+    between neutral and selected sites has decayed.}
+}
 
 \label{fig:multilocus-expfit-sims-gen13} 
 \end{figure}
