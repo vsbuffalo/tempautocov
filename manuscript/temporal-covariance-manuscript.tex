@@ -221,31 +221,50 @@ timepoint.
 \section{Outline of Temporal Autocovariance Theory}
 \label{sec:outline-temp}
 
-We first give an outline of how selection affects linked neutral sites through
-time. We summarize a neutral allele's frequency trajectory as the differences
-in adjacent timepoints, $\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
-population frequency at time $t$, and we assume a closed population with
-discrete, non-overlapping generations. While throughout the paper we assume
+Our goal is to understand how linked selection affects the
+frequency trajectories of neutral sites by modeling the variances and
+covariances of neutral allele frequency changes ($\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
+population frequency at time $t$). We assume a closed population with
+discrete, non-overlapping generations. When there are no heritable
+fitness differences between individuals, genetic drift is the only source of stochasticity of
+allele frequency change due to two sources of variation: random
+non-heritable, or environmental differences in offspring number, and Mendelian
+segregation of heterozygotes. Both are directionless such that when averaged
+over evolutionary replicates, the expected change in allele frequency due to
+drift alone is $\E(\Delta p_t) = 0$ and quantified by the variance in allele frequency change $\var(\Delta
+p_t)$ \parencite[as quantified by the variance effective population size][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
+
+
+\gc{Put somewhere below: While throughout the paper we assume
 that allele frequencies can be measured every generation, the same approach can
 be extended to situations where the study system cannot be observed every
-generation. Our goal is to understand how linked selection affects the
-frequency trajectories of neutral sites by modeling the variances and
-covariances of neutral allele frequency changes. Before considering the impact
-of linked selection, we first consider a population that lacks heritable
-fitness differences between individuals. In this case, the stochasticity of
-allele frequency change is determined entirely by two components: random
-non-heritable, or environmental differences in offspring number, and Mendelian
-segregation of heterozygotes. These two sources of stochasticity are
-collectively known as drift, and both are directionless such that when averaged
-over evolutionary replicates, the expected change in allele frequency due to
-drift alone is $\E(\Delta p_t) = 0$. The magnitude of drift's stochastic
-effects are quantified by the variance in allele frequency change $\var(\Delta
-p_t)$, which in a Wright--Fisher model of reproduction where offspring number
-has a multinomial distribution, is $\var(\Delta p_t) =
-\nicefrac{p_t(1-p_t)}{(2N)}$. Different mating systems and higher non-heritable
-variance in offspring number can be accommodated under the Wright--Fisher model
-by replacing $N$ with $N_e$, the variance effective population size
-\parencite{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
+generation.}
+
+% We first give an outline of how selection affects linked neutral sites through
+% time. We summarize a neutral allele's frequency trajectory as the differences
+% in adjacent timepoints, $\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
+% population frequency at time $t$, and we assume a closed population with
+% discrete, non-overlapping generations. While throughout the paper we assume
+% that allele frequencies can be measured every generation, the same approach can
+% be extended to situations where the study system cannot be observed every
+% generation. Our goal is to understand how linked selection affects the
+% frequency trajectories of neutral sites by modeling the variances and
+% covariances of neutral allele frequency changes. Before considering the impact
+% of linked selection, we first consider a population that lacks heritable
+% fitness differences between individuals. In this case, the stochasticity of
+% allele frequency change is determined entirely by two components: random
+% non-heritable, or environmental differences in offspring number, and Mendelian
+% segregation of heterozygotes. These two sources of stochasticity are
+% collectively known as drift, and both are directionless such that when averaged
+% over evolutionary replicates, the expected change in allele frequency due to
+% drift alone is $\E(\Delta p_t) = 0$. The magnitude of drift's stochastic
+% effects are quantified by the variance in allele frequency change $\var(\Delta
+% p_t)$, which in a Wright--Fisher model of reproduction where offspring number
+% has a multinomial distribution, is $\var(\Delta p_t) =
+% \nicefrac{p_t(1-p_t)}{(2N)}$. Different mating systems and higher non-heritable
+% variance in offspring number can be accommodated under the Wright--Fisher model
+% by replacing $N$ with $N_e$, the variance effective population size
+% \parencite{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
 
 When there are heritable fitness differences between individuals in the
 population, a third source of stochasticity affects a neutral allele's
@@ -254,7 +273,8 @@ genetic backgrounds that determine the fitness differences between individuals
 \parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. Even though the
 neutral alleles do not impact fitness, their frequency trajectories are
 perturbed by their fitness background, as those on advantage backgrounds leave
-more descendants, while those on disadvantageous backgrounds leave fewer. We
+more descendants, while those on disadvantageous backgrounds leave
+fewer. We
 can partition a neutral allele frequency's change into these three uncorrelated
 stochastic components (following \citeauthor{Santiago1995-hx},
 \citeyear{Santiago1995-hx}, see our Appendix Section \ref{ap:decomp} for
