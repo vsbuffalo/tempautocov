@@ -299,4 +299,20 @@ process_het <- function(x) {
 }
 
 
+## functions for emulating finite sampling
+add_binomial_noise <- function(x, size) {
+  out <- rbinom(length(x), size, x)/size
+  dim(out) <- dim(x)
+  out
+}
+
+# process covariances with finite sampling
+process_sampled_covs <- function(neut_freqs, as_df=TRUE, remove_fixed=TRUE,
+                         standardize=TRUE, sample_size=NULL, use_conditional_variance=FALSE) {
+  # this averages across loci#
+  temp_cov(t(neut_freqs), as_df=as_df, swap=TRUE,
+           remove_fixed=remove_fixed, standardize=standardize, 
+           sample_size=sample_size, use_conditional_variance=use_conditional_variance)
+}
+
 
