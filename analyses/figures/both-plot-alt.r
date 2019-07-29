@@ -21,7 +21,7 @@ pretty_log <- function(x, use_one=TRUE) {
 ## Estimation Figure -- both Va and N estimation, with N boxplot grouped by Va
 pdf('mom-fits-both-alt.pdf', width=textwidth, height=textwidth/2 * 0.9)
 
-data(mom_fitsd_finite)
+#data(mom_fitsd_finite)
 mom_fitsd <- mom_fitsd_finite
 mom_fitsd_subset <- mom_fitsd %>% 
   filter(Va %in% c(0.001, 0.005, 0.01, 0.05, 0.1)) #%>%
@@ -69,9 +69,10 @@ legend(1e-4, 5, inset=0, legend=unique(mom_fitsd$genlen), fill=wescols,
            border=0)
 #text(1e-4, 11, 'A', line=2, cex=2, xpd=TRUE)
 
+ymax <- 3e3
 boxplot(Nest ~ Va + genlen, mom_fitsd_subset,
-        axes=FALSE, ylim=c(0, 1.5e3), outline=FALSE,
-        #col=wescols,
+        axes=FALSE, ylim=c(0,ymax), outline=FALSE,
+        #col=brewercols,
         border=brewercols,
         pars = list(boxcol = "transparent", medlty = "blank", 
                     medpch=16, whisklty = c(1, 1),
@@ -102,7 +103,7 @@ axis(1, at=c(16, 20),
      padj=-2.4,
      tck=0.01, col=axes_col, lwd=1.2, cex.axis=axis_cex)
 
-axis(2, at=c(0, 500, 1e3, 1.5e3), 
+axis(2, at=seq(0, ymax, 500), 
      tck=0.018, hadj=0.4, las=1, col=axes_col, lwd=1.2, cex.axis=axis_cex)
 mtext(latex2exp:::TeX('level of recombination (Morgans)'), 
       1, line=1.2, cex=mtext_cex)
