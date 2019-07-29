@@ -19,8 +19,7 @@ pretty_log <- function(x, use_one=TRUE) {
 ## Estimation Figure -- both Va and N estimation, with N boxplot grouped by Va
 pdf('mom-fits-both-alt.pdf', width=textwidth, height=textwidth/2 * 0.9)
 
-#data(mom_fitsd_finite)
-mom_fitsd <- mom_fitsd_finite
+data(mom_fitsd)
 mom_fitsd_subset <- mom_fitsd %>% 
   filter(Va %in% c(0.001, 0.005, 0.01, 0.05, 0.1)) #%>%
   #filter(genlen %in% c(0.1, 0.5, 1.5))
@@ -67,20 +66,28 @@ legend(1e-4, 5, inset=0, legend=unique(mom_fitsd$genlen), fill=wescols,
            border=0)
 #text(1e-4, 11, 'A', line=2, cex=2, xpd=TRUE)
 
-ymax <- 3e3
+ymax <- 1.5e3
+spacing <- c(seq(1.5, 4.5, length.out=5),
+             seq(6.5, 9.5, length.out=5),
+             seq(11.5, 14.5, length.out=5),
+             seq(16.5, 19.5, length.out=5))
+
 boxplot(Nest ~ Va + genlen, mom_fitsd_subset,
         axes=FALSE, ylim=c(0,ymax), outline=FALSE,
+        at=spacing,
         col=brewercols,
+        xlab='',
         border=brewercols,
         pars = list(boxcol = "transparent", medlty = "blank", 
-                    medpch=16, whisklty = c(1, 1),
+                    medpch=16, whisklty = c(0, 0),
+                    boxwex=0.05,
                     medcex = 0.5, outcex = 0, staplelty = "blank"))
 
 #abline(h=1e3, col=dashed_gray, lty=2)
 y <- mom_fitsd_subset %>% group_by(Va, genlen) %>% 
   summarize(Ne_est=mean(Ne_est, na.rm=TRUE)) %>%
   arrange(genlen, Va) %>% pull(Ne_est)
-x <- 1:length(y)
+x <- spacing
 segments(0, 1e3, length(x), 1e3, col=dashed_gray, lty=2)
 points(x, y, pch='-', col=brewercols)
 hadj  <- 2.3
@@ -107,7 +114,7 @@ mtext(latex2exp:::TeX('level of recombination (Morgans)'),
       1, line=1.2, cex=mtext_cex)
 mtext(latex2exp:::TeX('estimated N'), 2, line=2, cex=mtext_cex)
 
-legend(11, 1500, inset=0, legend=unique(mom_fitsd_subset$Va), fill=brewercols,
+legend(11, 1485, inset=0, legend=unique(mom_fitsd_subset$Va), fill=brewercols,
        title=latex2exp:::TeX('additive genetic variation'),
        cex=0.6,
        ncol=3,
@@ -115,22 +122,6 @@ legend(11, 1500, inset=0, legend=unique(mom_fitsd_subset$Va), fill=brewercols,
        bty='n', text.col=title_col,
        border=0)
 
-
-#boxplot(Nest ~ genlen, mom_fitsd, axes=FALSE, ylim=c(0, 2e3), outline=FALSE,
-#        pars = list(boxcol = "transparent", medlty = "blank", 
-#                    medpch=16, whisklty = c(1, 1),
-#                    medcex = 0.7,  outcex = 0, staplelty = "blank"))
-##abline(h=1e3, col=dashed_gray, lty=2)
-#segments(0.3, 1e3, 4.4, 1e3, col=dashed_gray, lty=2)
-#axis(1, at=unique(mom_fitsd$genlen), labels=levels(mom_fitsd$genlen), 
-#     padj=-2.4,
-#     tck=0.01, col=axes_col, lwd=1.2, cex.axis=axis_cex)
-#axis(2, at=c(0, 500, 1e3, 1.5e3, 2e3), 
-#     tck=0.018, hadj=0.4, las=1, col=axes_col, lwd=1.2, cex.axis=axis_cex)
-#mtext(latex2exp:::TeX('level of recombination (Morgans)'), 
-#      1, line=1.2, cex=mtext_cex)
-#mtext(latex2exp:::TeX('estimated N'), 2, line=2, cex=mtext_cex)
-#text(0, 2010, 'B', line=2, cex=2, xpd=TRUE)
 dev.off()
 
 

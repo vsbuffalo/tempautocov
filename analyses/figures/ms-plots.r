@@ -729,59 +729,8 @@ dev.off()
 # the code for the fluctuating selection figure 
 source('./fluct-plot.r')
 
-
-## LD plot
-#data(ld_selint)
-#pdf('ld-selint', width=textwidth/2, height=textwidth/2)
-
-#ld_selint_subset <- ld_selint %>% filter(rec %in% c(0.1, 0.01))  %>%
-#                      gather(type, val, diag, offdiag, ac_cov, ac_var)  
-
-#with(ld_selint_subset,
-#     plot(gen, val, col=wescols[as.factor(type)],
-#          xlab='', ylab='',
-#          pch=19, cex=0.5, axes=FALSE,
-#          lwd=0))
-
-#abline(a=0, b=1, col=dashed_gray, lty=2)
-#axes_col <- 'gray12'
-#axis_cex <- 1*0.7
-#axis(1, at=10^(-(4:0)), labels=pretty_log(-(4:0)), 
-#     padj=-1.5,
-#     tck=0.01, col=axes_col, lwd=1.2, cex.axis=axis_cex)
-#axis(2, at=10^(c(-(4:0), 1)), labels=pretty_log(c(-(4:0), 1)), 
-#     tck=0.018, hadj=0.4, las=1, col=axes_col, lwd=1.2, cex.axis=axis_cex)
-#mtext(latex2exp:::TeX('empirical $V_A(1)$'), 1, line=1.3, cex=mtext_cex)
-#mtext(latex2exp:::TeX('estimated $V_A(1)$'), 2, line=1.5, cex=mtext_cex)
-#title_col='grey12'
-#legend(1e-4, 5, inset=0, legend=unique(mom_fitsd$genlen), fill=wescols,
-#           title=latex2exp:::TeX('level of\nrecombination (Morgans)'),
-#           cex=0.6,
-#           ncol=2,
-#           bty='n', text.col=title_col,
-#           border=0)
-##text(1e-4, 11, 'A', line=2, cex=2, xpd=TRUE)
-#dev.off()
-
-
-
-
-
-
-# panel_plot(pd5f, predf, gen, cov, Va, genlen, L, 
-#            row_lab='$V_A = $', col_lab = '$r = $', 
-#            axis_cex=2, mtext_cex=2.1,
-#            row_lab_cex=2.6,
-#            col_lab_cex=2.6,
-#            legend_cex=2.4,
-#            y_axis_line=5.5,
-#            x_axis_line=4,
-#            legend_prop=0.7,
-#            lwd=3,
-#            axis_lwd=3,
-#            pch_cex=2,
-#            oma=c(7,8.5,2,1),
-#            xlab='generation', 
-#            ylab=latex2exp::TeX('$cov(\\Delta p_5, \\; \\Delta p_s)$'), 
-#            legend_title='number\nof loci')
-
+# code for new method of moment plots, for finite sample,
+# and relative error
+source('./both-plot-alt-finite.r')
+source('./both-plot-alt.r')
+source('./relative-error.r')

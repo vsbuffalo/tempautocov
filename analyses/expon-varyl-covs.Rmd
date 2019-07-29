@@ -333,8 +333,8 @@ ggplot() +  geom_point(data=pd5f, aes(t1, cov, color=as.factor(L)),
 # tables and Rda files for plots:
 write_tsv(pd5f, '../data/pd5f.tsv')
 write_tsv(predf, '../data/predf.tsv')
-devtools::use_data(pd5f, overwrite=TRUE)
-devtools::use_data(predf, overwrite=TRUE)
+usethis::use_data(pd5f, overwrite=TRUE)
+usethis::use_data(predf, overwrite=TRUE)
 
 ```
 
@@ -379,8 +379,8 @@ pd13f <- pd13 %>% filter(Va < 0.02, genlen %in% rec_params) %>%
 # tables and Rda files for plots:
 write_tsv(pd13f, '../data/pd13f.tsv')
 write_tsv(pred13f, '../data/pred13f.tsv')
-devtools::use_data(pd13f, overwrite=TRUE)
-devtools::use_data(pred13f, overwrite=TRUE)
+usethis::use_data(pd13f, overwrite=TRUE)
+usethis::use_data(pred13f, overwrite=TRUE)
 
 ```
 
@@ -502,7 +502,7 @@ levels(vark_types$var_type)  <- c('offspring', 'additive genic', 'neutral SSH',
                                   'sel SSH', 'additive genetic')
 
 write_tsv(vark_types, '../data/expfit_vark_types.tsv')
-devtools::use_data(vark_types, overwrite=TRUE)
+usethis::use_data(vark_types, overwrite=TRUE)
 
 ```
 
@@ -541,8 +541,8 @@ predf_ssh <- pred_ssh %>%
 
 levels(predf_ssh$var_type) <- c('additive genic', 'neutral SSH', 'additive genetic')
 
-devtools::use_data(predf_ssh, overwrite=TRUE)
-devtools::use_data(pd5f_ssh, overwrite=TRUE)
+usethis::use_data(predf_ssh, overwrite=TRUE)
+usethis::use_data(pd5f_ssh, overwrite=TRUE)
 
 write_tsv(predf_ssh, '../data/predf_ssh.tsv')
 write_tsv(pd5f_ssh, '../data/pd5f_ssh.tsv')
@@ -558,8 +558,8 @@ predf_ssh2 <- pred_ssh %>%
 
 levels(predf_ssh2$var_type) <- c('additive genic', 'neutral SSH', 'additive genetic')
 
-devtools::use_data(predf_ssh2, overwrite=TRUE)
-devtools::use_data(pd5f_ssh2, overwrite=TRUE)
+usethis::use_data(predf_ssh2, overwrite=TRUE)
+usethis::use_data(pd5f_ssh2, overwrite=TRUE)
 
 write_tsv(predf_ssh2, '../data/predf_ssh2.tsv')
 write_tsv(pd5f_ssh2, '../data/pd5f_ssh2.tsv')
@@ -724,13 +724,13 @@ cumcov_panels(cumcov_plot_all_df, TRUE,  ylab="var$(p_{t} - p_{0})$",
  
 # tables and Rda files for plots:
 write_tsv(cumcov_plot_df, '../data/cumcov.tsv')
-devtools::use_data(cumcov_plot_df, overwrite=TRUE)
+usethis::use_data(cumcov_plot_df, overwrite=TRUE)
 
 write_tsv(pred_covs_all, '../data/cumcov_all.tsv')
-devtools::use_data(cumcov_plot_all_df, overwrite=TRUE)
+usethis::use_data(cumcov_plot_all_df, overwrite=TRUE)
 
 # unfiltered version
-devtools::use_data(cumcov_plot_all_nofilt_df, overwrite=TRUE)
+usethis::use_data(cumcov_plot_all_nofilt_df, overwrite=TRUE)
 
 ```
 
@@ -773,7 +773,7 @@ pd5_vard %>% filter(t1 < 30) %>% ggplot(aes(va_r, cov, color=gen)) +
 
 # tables and Rda files for plots:
 write_tsv(pd5_vard, '../data/pd5_vard.tsv')
-devtools::use_data(pd5_vard, overwrite=TRUE)
+usethis::use_data(pd5_vard, overwrite=TRUE)
 
 
 ```
@@ -844,10 +844,11 @@ if (!file.exists(mom_fits_data)) {
   mom_fits <- expfit_varyl_res %>% 
     filter(rep %in% 1:20) %>%
     mutate(mom_df = pmap(list(covs_mat, genlen, N, hets, res), 
-                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5$pos, trange=c(5, 10)))) 
+                         ~ make_neutld_df(..1, ..2, ..3, ssh=..4, pos=..5$pos, 
+                                          trange=c(5, 10)))) 
     mom_fits <- mom_fits %>% mutate(lsfit = map(mom_df, fit_mom)) %>%
                 mutate(params=map(lsfit, fit2params))
-  devtools::use_data(mom_fits, overwrite=TRUE)
+  usethis::use_data(mom_fits, overwrite=TRUE)
 } else {
   data(mom_fits)
 }
@@ -913,7 +914,7 @@ mom_fitsd <- mom_fitsd %>% left_join(temporal_Ne_ests) %>%
                mutate(genlen=as.factor(genlen))
 
 # save results for graphics
-devtools::use_data(mom_fitsd, overwrite=TRUE)
+usethis::use_data(mom_fitsd, overwrite=TRUE)
 write_tsv(mom_fitsd, '../data/mom_fits.tsv')
 
 ```
@@ -936,7 +937,7 @@ mom_fits_g <- expfit_varyl_res %>%
   mutate(G_before=map_dbl(covs_mat, G, start=1, end=4)) %>%
   mutate(G_after=map_dbl(covs_mat, G, start=5, end=10)) 
 
-devtools::use_data(mom_fits_g, overwrite=TRUE)
+usethis::use_data(mom_fits_g, overwrite=TRUE)
 
 ggplot(mom_fits_g, aes(x=as.factor(Va), G_before, fill=as.factor(genlen))) + 
   geom_boxplot(position='dodge') 
@@ -955,7 +956,7 @@ mom_fits_gp <- mom_fits %>%
   mutate(Gp_before = map2_dbl(before_sel_var, N_est, Gprime)) %>%
   mutate(Gp_after = map2_dbl(after_sel_var, N_est, Gprime))
 
-devtools::use_data(mom_fits_gp, overwrite=TRUE)
+usethis::use_data(mom_fits_gp, overwrite=TRUE)
 
 ggplot(mom_fits_gp, aes(x=as.factor(Va), Gp_after, fill=as.factor(genlen))) + 
   geom_boxplot(position='dodge') 

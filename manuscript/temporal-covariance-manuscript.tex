@@ -937,14 +937,17 @@ that element $Q_{t,s}$ is calculated as
 \begin{align}
   Q_{t,s} = \frac{\frac{1}{M - 1} \sum_{n=1}^M \left( \Delta p_{n,t} \Delta p_{n,s} - \left(\frac{1}{M} \sum_{n=1}^M \Delta p_{n,t}\right) \left( \frac{1}{M} \sum_{n=1}^M \Delta p_{n,s} \right) \right)}{
   \frac{1}{M} \sum_{n=1}^M p_{\min(t,s)} \left(1 - p_{\min(t,s)}\right)
-  }.
+  },
   %\frac{\cov_n(\Delta p_s, \Delta p_t)}{\E_n\left(p_{\min(s,t)} (1-p_{\min(s,t)}\right)}
   \label{eq:ave-temp-autocov}
 \end{align}
 %
-
-Sums over missing values only use pairwise-complete observations, implemented
-by R's \texttt{cov()} function's \texttt{use='pairwise.complete'} argument.
+\vb{though see Appendix Section \ref{sec:sampling} for a bias-corrected version
+necessary when using sampled, rather than population, allele frequencies; we
+assume population frequencies are known throughout to simplify the explanation
+of our method.} Sums over missing values only use pairwise-complete
+observations, implemented by R's \texttt{cov()} function's
+\texttt{use='pairwise.complete'} argument.
 
 We have extensively validated our simulation procedure in a neutrally evolving
 population, ensuring that the decay of linkage disequilibrium and the allele
@@ -1278,7 +1281,7 @@ on sample allele frequencies for a sample of size $n=XXX$.}
 
 \begin{figure}
   \centering
-  \includegraphics{./images/mom-fits-both.pdf} 
+  \includegraphics{./images/mom-fits-both-alt.pdf} 
 
   \caption{True parameter values and estimates using the method-of-moments
     approach on multilocus simulation data. (A) The true $V_A(1)$ (x-axis) and
@@ -1287,11 +1290,16 @@ on sample allele frequencies for a sample of size $n=XXX$.}
     (indicated by each point's color). The dashed gray line shows the $y=x$
     line where an estimate is exactly true to its real value. Note that the
     plot is on a log-log scale, as $V_A$ varies across orders of magnitude in
-    our simulations. (B) A box-and-whisker plot of inferred $\widehat{N}$
-    across different levels of recombination. Each point denotes the median,
-    with lines below (above) the point representing the first quartile
-  (third quartile) to minimum (maximum). The true value ($N = 1,000$) is shown
-with the dashed gray line.} 
+    our simulations. (B) \vb{Estimated drift-effective population size
+      ($\widehat{N}$) across a range of simulations with different levels of
+      additive genetic variance and recombination. Each point denotes the
+    median, with lines denoting the interquartile range. A simple temporal
+  estimate of the effective population size, estimated with accounting for the
+effects of selection, is averaged for each replicate and plotted as a dash.}
+The true value ($N = 1,000$) is shown with the dashed gray line. \vb{Population
+frequencies (without sampling noise) are used in this figure; see Appendix
+Figure \ref{fig:mom-fits-both-finite} for an analogous figure calculated with
+sample frequencies.}}
 
 \label{fig:mom-fits-both}
 \end{figure}
@@ -2747,71 +2755,6 @@ terms in underbraces indicate the corresponding terms in Equation
 \subsection{Multilocus simulation details}
 \label{sec:supp-ml-sim}
 
-\subsection{The effects of sampling}
-\label{sec:sampling}
-
-\vb{GC: this section is all new and needs to be reviewed.}
-
-In practice, one will calculate the temporal variance-covariance matrix on
-allele frequency trajectories calculated from sampled chromosomes from the
-population. We assume a binomial sampling process, such that $\widetilde{p} =
-\nicefrac{X}{n}$, and $X \sim \textrm{Binom}(p, n)$. We can then write
-$\widetilde{p}_t = p_t + \varepsilon_t$, and our covariances can be written as
-
-\begin{align}
-  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(\widetilde{p}_{t+1} - \widetilde{p}_{t}, \widetilde{p}_{s+1} - \widetilde{p}_{s}) \nonumber \\
-  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{s+1} + \varepsilon_{s+1} - p_{s} - \varepsilon_{s}).
-\end{align}
-%
-Note this simplifies to
-
-\begin{align}
-  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(p_{t+1} - p_{t}, p_{s+1} - p_{s}) \; \; \mathrm{if} \;\; |t-s| > 1,
-\end{align}
-%
-since there the covariance between sampling noise at different timepoints is
-zero. However, if $|t - s| = 1$ the sampling noise from timepoint $t+1$ is
-shared, leading to a biased estimator of covariance:
-
-\begin{align}
-\cov(\Delta \widetilde{p_t}, \Delta \widetilde{p}_{t+1}) 
-  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{t+2} + \varepsilon_{t+2} - p_{t+1} - \varepsilon_{t+1}) \nonumber \\
-  &= \cov( \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}, \Delta p_{t+1} + \varepsilon_{t+2} - \varepsilon_{t+1}) \nonumber \\
-  &= \cov(\Delta p_{t}, \Delta p_{t+1}) - \var(\varepsilon_{t+1}).
-\end{align}
-%
-Similarly, the variance ($t = s$) is biased, as it is impacted by the binomial
-sampling noise too,
-%
-
-\begin{align} 
-  \var(\Delta \widetilde{p_t}) &= \cov( \Delta p_{t} + \varepsilon_{t+1} - 
-      \varepsilon_{t}, \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}) \nonumber \\ 
-                               &= \var( \Delta p_{t} ) + \var(\varepsilon_{t+1}) +
-\var(\varepsilon_{t}) \end{align}
-%
-In practice, these covariances are calculated over loci in a region or across the
-entire genome. We assume that the tracked allele has been randomly swapped
-(e.g. the tracked allele frequency is not systematically the minor, major, or
-reference allele, such that $\E(\Delta p_{t,l}) = 0$ for all $t$ and $l$. Then,
-the unbiased covariance estimate as calculated over loci is
-
-\begin{align}
-  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
-  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
-  + \frac{1}{L} \sum_{l=1}^L \varepsilon_{t+1,l}^2.
-\end{align}
-%
-We use a plugin estimate of $\E(\varepsilon_{t+1,l}^2) =
-\V(\varepsilon_{t+1,l}) = \nicefrac{p_{t+1,l}(1-p_{t+1,l})}{n_{t,l}}$ to find
-an unbiased estimator of the covariance, 
-
-\begin{align}
-  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
-  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
-  + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l}}.
-\end{align}
-
 
 \paragraph{Targeting an initial level of Additive Genetic Variation}
 \label{sec:supp-ml-sim-va}
@@ -2997,6 +2940,160 @@ LD from our burnin across varying $N$.}
 
   \label{fig:multilocus-expfit-sims-varyn}
 \end{figure}
+
+\subsection{Accounting for allele frequency sampling noise}
+\label{sec:sampling}
+
+\vb{GC: this section is all new and needs to be reviewed.}
+
+In practice, one will calculate the temporal variance-covariance matrix on
+allele frequency trajectories calculated from sampled chromosomes from the
+population. We assume a binomial sampling process, where $n$ chromosomes are
+sampled from the population such that $\widetilde{p} = \nicefrac{X}{n}$, and $X
+\sim \textrm{Binom}(p, n)$. We can then write $\widetilde{p}_t = p_t +
+\varepsilon_t$, and our covariances can be written as
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(\widetilde{p}_{t+1} - \widetilde{p}_{t}, \widetilde{p}_{s+1} - \widetilde{p}_{s}) \nonumber \\
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{s+1} + \varepsilon_{s+1} - p_{s} - \varepsilon_{s}).
+\end{align}
+%
+Note this simplifies to
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(p_{t+1} - p_{t}, p_{s+1} - p_{s}) \; \; \mathrm{if} \;\; |t-s| > 1,
+\end{align}
+%
+since in these cases, the sampling noise at a timepoint is not shared between
+the estimated allele frequency changes. However, if $|t - s| = 1$ the sampling
+noise from timepoint $t+1$ is shared, biasing the sample estimate of
+covariance:
+
+\begin{align}
+\cov(\Delta \widetilde{p_t}, \Delta \widetilde{p}_{t+1}) 
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{t+2} + \varepsilon_{t+2} - p_{t+1} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov( \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}, \Delta p_{t+1} + \varepsilon_{t+2} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov(\Delta p_{t}, \Delta p_{t+1}) - \var(\varepsilon_{t+1}).
+\end{align}
+%
+Similarly, the variance ($t = s$) is biased, as it is impacted by the binomial
+sampling noise too,
+%
+
+\begin{align} 
+  \var(\Delta \widetilde{p_t}) &= \cov( \Delta p_{t} + \varepsilon_{t+1} - 
+      \varepsilon_{t}, \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}) \nonumber \\ 
+                               &= \var( \Delta p_{t} ) + \var(\varepsilon_{t+1}) +
+\var(\varepsilon_{t}) \end{align}
+%
+In practice, these covariances are calculated over loci in a region or across the
+entire genome. We assume that the tracked allele has been randomly swapped
+(e.g. the tracked allele frequency is not systematically the minor, major, or
+reference allele, such that $\E(\Delta p_{t,l}) = 0$ for all $t$ and $l$. Then,
+the unbiased covariance estimate as calculated over loci is
+
+\begin{align}
+  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \varepsilon_{t+1,l}^2.
+\end{align}
+%
+Then, we can use a plugin estimate of the frequency sampling variance
+$\E(\varepsilon_{t+1,l}^2) = \V(\varepsilon_{t+1,l}) =
+\nicefrac{p_{t+1,l}(1-p_{t+1,l})}{(n_{t,l}-1)}$ to estimator these bias terms,
+and add or subtract them from the estimator accordingly. Accounting for finite
+sampling, the unbiased sample variance-covariance now has elements:
+
+\begin{align}
+  Q_{t,t+1} &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1},
+\end{align}
+and variance
+
+\begin{align}
+  Q_{t,t} &=
+  \frac{1}{L} \sum_{l=1}^L (\Delta \widetilde{p}_{t,l})^2
+  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t,l}(1-p_{t,l})}{n_{t,l} - 1}
+  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1}.
+\end{align}
+
+In Section \ref{sec:ml-sim-res}, we used population frequencies in
+demonstrating the method of moments estimators of $\widehat{V_A(1)}$ and
+$\widehat{N}$. Here, we discuss the performance of these estimators with sample
+allele frequencies. Our simulations are identical to those described in Section
+\ref{sec:ml-sim}, except we have increased the target number of neutral sites
+in each region so it is around $10,000$. We mimic sampling of $n=\{50, 100,
+200, 500\}$ chromosomes from there population, and use the bias-corrected
+sample variance-covariance matrix in the method-of-moments approach described
+in Section \ref{sec:meth-moments} to estimate $\widehat{V_A(1)}$ and
+$\widehat{N}$.
+
+In Figure \ref{fig:mom-fits-both-finite}, we show the performance of our
+estimators in the case where $n=100$ chromosomes have been sampled from the
+population. Overall, there are two important differences compared with Figure
+\ref{fig:mom-fits-both} of the main text. First, while the estimator
+$\widehat{V_A(1)}$ performs well for high levels around $V_A \sim 0.1$, the
+variance around the estimator increases significantly as $V_A$ grows weaker.
+As the covariances are proportional to $\nicefrac{V_A}{R}$, sampling noise
+grows larger than the theoretic temporal autocovariance as $V_A$ become weaker.
+Then, one cannot discriminate against the chance covariances formed by the
+sampling process from the temporal autocovariance created by linked selection
+without either a large sample size or more timepoints. Second, the approach
+underestimates $V_A(1)$ for very loose linkage ($R > \nicefrac{1}{2}$). This is
+another consequence of the first problem; as sampling noise grows equal, or
+larger than the magnitude of temporal autocovariance, the estimation procedure
+performs poorly. As the linkage becomes more loose, the magnitude of temporal
+autocovariance grows weak relative to the sampling noise, and this noise can be
+partially absorbed by $\widehat{N}$. This effect can be somewhat ameliorated by
+calculating the sample variance-covariance matrix over a shorter region of the
+genome (such that $R$ is smaller) (as long as SNP density is sufficient), or by
+increasing the sample size. To understand how sample size affects the
+method-of-moments estimators, Figure \ref{fig:mom-relative} shows how sample
+size affects median relative error of $\widehat{V_A(1)}$ and $\widehat{N}$.
+Finally, the estimation of effective population size shown in Figure
+\ref{fig:mom-fits-both-finite} are also affected by $V_A$, as discussed in
+Section \ref{sec:meth-moments} (though the effect is obscured by the sampling
+noise): high levels of $V_A$ in regions with low recombination generally lead
+to underestimates of $\widehat{N}$.
+
+\begin{figure}
+  \centering
+  \includegraphics{./images/mom-fits-both-alt-finite.pdf} 
+
+  \caption{\vb{True parameter values and estimates using the method-of-moments
+      approach on sample ($n=100$ individuals) multilocus simulation data;
+      these figures are analogous to Figure \ref{fig:mom-fits-both} in the main
+      text, except the estimators have been calculated on sample, rather than
+      population frequency data. (A) The true $V_A(1)$ (x-axis) and
+      $\widehat{V_A(1)}$ estimated from the sample variance/covariance matrix
+      (y-axis) for each simulation replicate across different levels of
+      recombination (indicated by each point's color). (B) Estimated
+      drift-effective population size ($\widehat{N}$) across a range of
+      simulations with different levels of additive genetic variance and
+      recombination. Each point denotes the median, with lines denoting the
+      interquartile range. A simple temporal estimate of the effective
+      population size, estimated with accounting for the effects of selection,
+  is averaged for each replicate and plotted as a dash. The true value ($N =
+  1,000$) is shown with the dashed gray line.}} 
+
+\label{fig:mom-fits-both-finite}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+  \includegraphics{./images/supp-relative-error.pdf} 
+
+  \caption{The median relative estimation error, over 30 replicate simulations,
+  of the method of moments estimator for drift effective population size
+($\widehat{N}$) and the initial additive genetic variance ($\widehat{V_A(1)}$).
+} 
+
+\label{fig:mom-relative}
+\end{figure}
+
+
 
 
 \end{document}

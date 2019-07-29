@@ -42,7 +42,9 @@ copy: $(ALL_FIGS)
 	cp fluct-sel.pdf ../../manuscript/images/
 	cp sim-pred-covs-varyl-va-oom.pdf ../../manuscript/images/
 	cp keynote-cartoons-wide.pdf ../../manuscript/images/
-	cp keynote-cartoons-figure-1.pdf ../../manuscript/images/
+	cp mom-fits-both-alt-finite.pdf ../../manuscript/images/
+	cp mom-fits-both-alt.pdf ../../manuscript/images/
+	cp supp-relative-error.pdf ../../manuscript/images/
 
 clean:
 	rm -f $(ALL_FIGS)
