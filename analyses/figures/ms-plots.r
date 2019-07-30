@@ -91,7 +91,8 @@ pdf('cummulative-cov-var-all.pdf', width=textwidth, height=textwidth/1.9,
 cumcov_panels(cumcov_plot_all_df, TRUE,  ylab="var$(p_{15} - p_{5})$", 
 	     lx=0.5/2, ly=0.5, lwd=1.2, ymax=0.5, basic=FALSE)
 dev.off()
- 
+
+
 ## Figure 3
 data(cumcov_plot_df)
 pdf('cummulative-cov-var.pdf', width=textwidth, height=textwidth/1.9, pointsize=12)
@@ -165,7 +166,7 @@ panel_plot2(pd5f_ssh2, predf_ssh_alt2, gen, cov, Va, genlen, L, var_type,
            lwd=1.7,
            point_alpha=0.6,
            line_alpha=0.8,
-           legend_prop=1.2,
+           legend_prop=1.4,
            lg1y=0.5,
            axis_lwd=1.2,
            ylab=latex2exp::TeX('$cov(\\Delta p_5, \\; \\Delta p_s)$'), 
@@ -618,7 +619,7 @@ yscale <- seq(-1, 1, by=1/4)
 x <- boxplot(Gp_after ~ genlen + Va, mom_fits_gp %>% filter(Va %in% box_va_params), axes=FALSE, 
         col = wesboxcols,
         outline=FALSE,
-        #ylim=c(-3/4,1.1),
+        ylab='', xlab='',
         ylim=c(min(yscale) - 0.1, max(yscale) + 0.1),
         at=atsfun(7, length(box_va_params)),
         pars = list(boxcol = "transparent", medlty = "blank", 

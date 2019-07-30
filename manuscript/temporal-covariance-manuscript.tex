@@ -79,6 +79,7 @@
 %  TODO
 % - R^2 changes through time note?
 % - check all legends for overflow, Figure 6 has problems
+% - put a description of temporal Ne estimation (Fig 5) in main text.
 
 %% RUNNING TITLE
 %% KEYWORDS
@@ -222,24 +223,20 @@ timepoint.
 \section{Outline of Temporal Autocovariance Theory}
 \label{sec:outline-temp}
 
-Our goal is to understand how linked selection affects the
-frequency trajectories of neutral sites by modeling the variances and
-covariances of neutral allele frequency changes ($\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
-population frequency at time $t$). We assume a closed population with
-discrete, non-overlapping generations. When there are no heritable
-fitness differences between individuals, genetic drift is the only source of stochasticity of
-allele frequency change due to two sources of variation: random
-non-heritable, or environmental differences in offspring number, and Mendelian
-segregation of heterozygotes. Both are directionless such that when averaged
-over evolutionary replicates, the expected change in allele frequency due to
-drift alone is $\E(\Delta p_t) = 0$ and quantified by the variance in allele frequency change $\var(\Delta
-p_t)$ \parencite[as quantified by the variance effective population size][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
-
-
-\gc{Put somewhere below: While throughout the paper we assume
-that allele frequencies can be measured every generation, the same approach can
-be extended to situations where the study system cannot be observed every
-generation.}
+Our goal is to understand how linked selection affects the frequency
+trajectories of neutral sites by modeling the variances and covariances of
+neutral allele frequency changes ($\Delta p_t = p_{t+1} - p_t$, where $p_t$ is
+the population frequency at time $t$). We assume a closed population with
+discrete, non-overlapping generations. When there are no heritable fitness
+differences between individuals, genetic drift is the only source of
+stochasticity of allele frequency change due to two sources of variation:
+random non-heritable, or environmental differences in offspring number, and
+Mendelian segregation of heterozygotes. Both are directionless such that when
+averaged over evolutionary replicates, the expected change in allele frequency
+due to drift alone is $\E(\Delta p_t) = 0$ and quantified by the variance in
+allele frequency change $\var(\Delta p_t)$ \parencite[as quantified by the
+variance effective population
+size][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
 
 % We first give an outline of how selection affects linked neutral sites through
 % time. We summarize a neutral allele's frequency trajectory as the differences
@@ -274,8 +271,7 @@ genetic backgrounds that determine the fitness differences between individuals
 \parencite{Robertson1961-ho,Santiago1995-hx,Santiago1998-bs}. Even though the
 neutral alleles do not impact fitness, their frequency trajectories are
 perturbed by their fitness background, as those on advantage backgrounds leave
-more descendants, while those on disadvantageous backgrounds leave
-fewer. We
+more descendants, while those on disadvantageous backgrounds leave fewer. We
 can partition a neutral allele frequency's change into these three uncorrelated
 stochastic components (following \citeauthor{Santiago1995-hx},
 \citeyear{Santiago1995-hx}, see our Appendix Section \ref{ap:decomp} for
@@ -291,11 +287,14 @@ where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
 neutral allele's frequency changes due to non-heritable variation in fitness
 \vb{between diploid individuals}, Mendelian segregation of heterozygotes into
 offspring, and heritable variation in fitness (we refer to this as the
-\emph{heritable change} in neutral allele frequency), respectively. Note that
-each of these stochastic components is directionless, such that when averaged
-over evolutionary replicates the expected change in allele frequency is
-$\E(\Delta p_t) = 0$. Additionally, since each component is uncorrelated with
-the others, the variance in allele frequency change is
+\emph{heritable change} in neutral allele frequency), respectively. \vb{Note
+  while throughout the paper we consider the allele frequency change between
+  adjacent generations, the same approach can be extended to situations where
+  the study system cannot be observed every generation.} Each of these
+  stochastic components of allele frequency change is directionless, such that
+  when averaged over evolutionary replicates the expected change in allele
+  frequency is $\E(\Delta p_t) = 0$.  Additionally, since each component is
+  uncorrelated with the others, the variance in allele frequency change is
 
 \begin{align}
   \var(\Delta p_t) &= \var(\Delta_{_N} p_t)  + \var(\Delta_{_M} p_t) + \var(\Delta_{_H} p_t).
@@ -652,14 +651,15 @@ D_{s,l})$ (for $k \ne l$), to temporal autocovariance. Under the case where the
 population is initially at mutation-drift-recombination equilibrium, we expect
 this product to be zero as there is no directional association between the two
 selected sites and the neutral site. \vb{However, we note that interaction
-between selected sites (Hill-Robertson interference) will cause this term to
-become negative, a point we return to later.} Third, we assume that the
-selected sites increase in frequency independently, such that the dynamics of
-the linkage disequilibria between the neutral and selected sites pairs can be
-modeled using two-locus dynamics. Using a deterministic continuous-time model
-for the dynamics of the linkage disequilibrium between the selected and neutral
-site \parencite{Maynard_Smith1974-lc,Barton2000-zg}, we rewrite the $\E(D_{t,l}
-D_{s,l})$ terms in the expression for temporal autocovariance as
+  between selected sites (Hill-Robertson interference) will cause this term to
+become negative \parencite{Barton2005-zq}, a point we return to later.} Third,
+we assume that the selected sites increase in frequency independently, such
+that the dynamics of the linkage disequilibria between the neutral and selected
+sites pairs can be modeled using two-locus dynamics. Using a deterministic
+continuous-time model for the dynamics of the linkage disequilibrium between
+the selected and neutral site \parencite{Maynard_Smith1974-lc,Barton2000-zg},
+we rewrite the $\E(D_{t,l} D_{s,l})$ terms in the expression for temporal
+autocovariance as
 
 \begin{subequations}
   \begin{align}
@@ -713,22 +713,26 @@ uniformly distributed along the chromosome, such that a site's position on the
 genetic map is a random variable $g \sim U(-\nicefrac{R}{2}, \nicefrac{R}{2})$
 (where $R$ is the region's length in Morgans), and the focal neutral site with
 which we calculate temporal autocovariance lies in the middle of this idealized
-chromosome at the origin (as depicted in Figure \ref{fig:cartoon}B). Then,
-the recombination fraction between the focal neutral site and a selected site
-at random position $g$ is given by the mapping function $r(g)$, which maps
-the position $g$ to a recombination fraction. A simple choice for $r(g)$ is
+chromosome at the origin (as depicted in Figure \ref{fig:cartoon}B). Then, the
+recombination fraction between the focal neutral site and a selected site at
+random position $g$ is given by the mapping function $r(g)$, which maps the
+position $g$ to a recombination fraction. A simple choice for $r(g)$ is
 Haldane's mapping function, $r(g) = \frac{1}{2} (1 - e^{-2|g|})$,
-(\cite{Haldane1919-qp}; note we take the absolute value of $g$ to translate
-the position $g$ to a distance to the focal neutral site) and we use that
-here. Second, we assume the linkage disequilibrium between each selected site
-and the focal neutral site depends only the recombination fraction $r(g)$
-between the two loci, and not their absolute positions or effect sizes; then,
-we rewrite $\E(\mathcal{R}^2_{t,l})$ as the function
-$\E(\mathcal{R}^2_t(r(g)))$. For example, if the population was initially at
-drift-recombination balance, this would be $\E(\mathcal{R}^2) = (10 + \rho)/(22
-+ 13 \rho + \rho^2)$ where $\rho = 4Nr(g)$ \parencite{Ohta1969-ae,Hill1968-ue}.
-We then write the temporal autocovariance experienced by a neutral allele in a region
-$R$ Morgans long containing $V_a(s)$ fitness variation at time $s$ as
+(\cite{Haldane1919-qp}; note we take the absolute value of $g$ to translate the
+position $g$ to a distance to the focal neutral site) and we use that here.
+Second, we assume the linkage disequilibrium between each selected site and the
+focal neutral site depends only the recombination fraction $r(g)$ between the
+two loci, and not their absolute positions or effect sizes; then, we rewrite
+$\E(\mathcal{R}^2_{t,l})$ as the function $\E(\mathcal{R}^2_t(r(g)))$. For
+example, if the population was initially at drift-recombination balance, this
+would be $\E(\mathcal{R}^2) = (10 + \rho)/(22 + 13 \rho + \rho^2)$ where $\rho
+= 4Nr(g)$ \parencite{Ohta1969-ae,Hill1968-ue}.  \vb{These assumptions allow us
+  to conceptually understand the factors that determine temporal
+autocovariance; in practice, in temporal studies with linkage disequilibria
+data and recombination maps, one can directly calculate the sum in Equation
+\eqref{eq:multilocus-cov-sum} (see Appendix Section \ref{ap:empirical-ld}).} We
+then write the temporal autocovariance experienced by a neutral allele in a
+region $R$ Morgans long containing $V_a(s)$ fitness variation at time $s$ as
 
 \begin{align}
   \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &\approx \frac{V_a(s)}{2 R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}_t^2(r(g))) (1-r(g))^{(s-t)} \,dg
@@ -745,12 +749,14 @@ for fitness for the region divided by the genetic map length of the region
 temporal covariance is the additive genic variance per Morgan, a quantity
 somewhat similar to the ratio of new adaptive mutations per basepair to
 recombination per basepair, $\nicefrac{\nu_\text{BP}}{r_\text{BP}}$, that
-occurs in models of recurrent sweeps \parencite{Stephan1992-jc}. Note that we
-could further include the effects of genome-wide fitness variation by adding an
-additional term encompassing the additive variation residing on other
-chromosomes, but because the magnitude of these effects is roughly similar to
-those of the non-gametic LD, we could no longer ignore the $D_{t,l}''$ terms as
-we did after Equation \eqref{eq:neut-change}.
+occurs in models of recurrent sweeps \parencite{Stephan1992-jc} \vb{and models
+  of the limits of selection with linked loci
+\parencite{Robertson1970-xk,Robertson1976-la}}. Note that we could further
+include the effects of genome-wide fitness variation by adding an additional
+term encompassing the additive variation residing on other chromosomes, but
+because the magnitude of these effects is roughly similar to those of the
+non-gametic LD, we could no longer ignore the $D_{t,l}''$ terms as we did after
+Equation \eqref{eq:neut-change}.
 
 %GRAHAM'S ALT VERSION
  % Imagine that an average base
@@ -786,7 +792,7 @@ two components: the drift term and the heritable variance in offspring number.
 Adding these independent contributions, the standardized variance is
 
 \begin{align}
-  \Sigma_{t,t} := \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{V_N + 2}{8N} + \frac{V_a}{2} \mathcal{A}(R, t, s)
+  \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{V_N + 2}{8N} + \frac{V_a}{2} \mathcal{A}(R, t, s)
   \label{eq:multilocus-var}
 \end{align}
 %
@@ -794,7 +800,7 @@ where $V_N$ is the non-heritable variance in offspring number. Under a
 Wright--Fisher model of reproduction, $V_N \approx 2$, this simplifies to
 
 \begin{align}
-  \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{1}{2N}  + \frac{V_a}{2} \mathcal{A}(R, t, s)
+  \Sigma_{t,t} := \frac{\E_n(\var(\Delta p_t))}{\E_n(p_t(1-p_t))} = \frac{1}{2N}  + \frac{V_a}{2} \mathcal{A}(R, t, s).
   \label{eq:multilocus-var-2}
 \end{align}
 
@@ -806,7 +812,7 @@ variance in allele frequency change; see Appendix \ref{ap:connecting-sc}.
 \vb{With the above expressions for the variances and covariances, we have a
   complete set of theoretic expressions for the variance-covariance matrix of
   allele frequency change, which we call $\mathbf{\Sigma}$, with the diagonal
-  variance elements $\Sigma_{t,t}$ given by Equation \eqref{eq:multilocus-var},
+  variance elements $\Sigma_{t,t}$ given by Equation \eqref{eq:multilocus-var-2},
   and the upper- and lower-triangle covariance elements $\Sigma_{t,s}$ ($t \ne
   s$) given by Equation \eqref{eq:multilocus-triangle}.}
 
@@ -930,7 +936,7 @@ would act to condition the covariance on more intermediate frequencies.} Then
 with the frequency matrix, we calculate a vector of allele frequency changes
 $\Delta \vec{p}_n = [\Delta p_{n,1}, \Delta p_{n,2}, \ldots, \Delta
 p_{n,\tau}]$ using each neutral locus $n$'s $\tau+1$ observed generations.
-\vb{Finally}, we calculate the $\tau \times \tau$ standardized
+\vb{Finally}, we calculate the $\tau \times \tau$ sample standardized
 variance-covariance matrix $\mathbf{Q}$, averaging over $M$ neutral loci such
 that element $Q_{t,s}$ is calculated as
 
@@ -943,11 +949,9 @@ that element $Q_{t,s}$ is calculated as
 \end{align}
 %
 \vb{though see Appendix Section \ref{sec:sampling} for a bias-corrected version
-necessary when using sampled, rather than population, allele frequencies; we
-assume population frequencies are known throughout to simplify the explanation
-of our method.} Sums over missing values only use pairwise-complete
-observations, implemented by R's \texttt{cov()} function's
-\texttt{use='pairwise.complete'} argument.
+when sample, rather than population allele frequencies are used.} Sums over
+missing values only use pairwise-complete observations, implemented by R's
+\texttt{cov()} function's \texttt{use='pairwise.complete'} argument.
 
 We have extensively validated our simulation procedure in a neutrally evolving
 population, ensuring that the decay of linkage disequilibrium and the allele
@@ -1060,11 +1064,10 @@ The additive genic variation $V_a(s)$ ignores the contribution of linkage
 disequilibria between selected sites. We can write the additive genetic
 variance as
 
-\begin{align}
-  V_A(s) = \var_i(z_i, s) = \underbrace{2 \alpha^2 \sum_{l=1}^L p_{l}(s) (1-p_{l}(s))}_{\text{genic variation}, \; V_a(s)} +
-  \underbrace{\alpha^2 \sum_{i\ne j} D_{i,j}(s)}_\text{LD contribution }
-\label{eq:var-genic-z}
-\end{align}
+\begin{align} V_A(s) = \var_i(z_i, s) = \underbrace{2 \alpha^2 \sum_{l=1}^L
+p_{l}(s) (1-p_{l}(s))}_{\text{genic variation}, \; V_a(s)} +
+\underbrace{\alpha^2 \sum_{i\ne j} D_{i,j}(s)}_\text{LD contribution }
+\label{eq:var-genic-z} \end{align}
 %
 where $D_{i,j}(s)$ is the LD between selected sites $i$ and $j$ at time $s$.
 At the onset of selection, there is no expected linkage disequilibria between
@@ -1077,21 +1080,29 @@ genetic variances over time). Over time, these two quantities diverge as
 negative linkage disequilibria build up. While negative linkage disequilibria
 between selected sites build up due to epistasis under some forms of selection
 (known as the Bulmer effect, \cite{Bulmer1971-ae,Bulmer1980-zo}), this is known
-not to happen under multiplicative selection (\cite{Burger2000-an}, p. 50, 177) that is equivalent to the exponential directional
-selection fitness surface we have used in our simulations. Instead, the build
-up of negative linkage disequilibria between selected sites is likely due to
-Hill-Robertson interference (HRi) between selected sites
-\parencite{Hill1966-kd}, which affects the total additive genetic variation
-that selection is acting on. HRi refers to the creation of negative LD among
-beneficial alleles in finite population resulting from the fact that beneficial
-alleles that are on the same haplotype move more quickly through the population
-than beneficial alleles on deleterious backgrounds, resulting in negative LD.
-This negative LD among beneficial alleles lowers $V_A$ compared to the genic
-$V_a$ \parencite{Hill1966-kd,Barton2005-zq,Crouch2017-xr,Good2014-yz}.  Importantly, our
-simulation results suggest that the negative linkage disequilibria created by
-selective interference only affects the temporal autocovariances through the
-variance term $V_a(s)$, and that the actual variance determining temporal
-autocovariance is the additive genetic variance, $V_A(s)$.
+not to happen under multiplicative selection (\cite{Burger2000-an}, p. 50, 177)
+that is equivalent to the exponential directional selection fitness surface we
+have used in our simulations. Instead, the build up of negative linkage
+disequilibria between selected sites is likely due to Hill-Robertson
+interference (HRi) between selected sites \parencite{Hill1966-kd}, which
+affects the total additive genetic variation that selection is acting on. HRi
+refers to the creation of negative LD among beneficial alleles in finite
+population resulting from the fact that beneficial alleles that are on the same
+haplotype move more quickly through the population than beneficial alleles on
+deleterious backgrounds, resulting in negative LD.  This negative LD among
+beneficial alleles lowers $V_A$ compared to the genic $V_a$
+\parencite{Hill1966-kd,Barton2005-zq,Crouch2017-xr,Good2014-yz}. \vb{In the
+  derivation of our expression for temporal autocovariance, we greatly
+  simplified the multilocus dynamics by ignoring the second term in Equation
+  \eqref{eq:multilocus-twopart}. This term includes the expected product of two
+  LD terms; each is the LD between the neutral site and a selected site. Using
+  full multilocus theory, one may find that by including these LD products,
+  that $V_A$ rather than $V_a$ factors out the expression in Equation
+  \eqref{eq:cov-R}, but we leave this for future work.} Importantly, our
+  simulation results suggest that the negative linkage disequilibria created by
+  selective interference only affects the temporal autocovariances through the
+  variance term $V_a(s)$, and that the actual variance determining temporal
+  autocovariance is the additive genetic variance, $V_A(s)$.
 
 % \vb{Should we include mention of HRi / N, AND mention the measured negative LD?}
 %\paragraph{Total variance in allele frequencies} 
@@ -1273,11 +1284,17 @@ population size $N$ from multilocus temporal data. In Figure
 estimates for the initial level of additive genetic variance over orders of
 magnitude of additive genetic variation, and different recombination regimes.
 As additive genetic variation for fitness becomes weaker (the left side of the
-figure), our estimates become more noisy. In Figure \ref{fig:mom-fits-both}B we
-show the simultaneously estimated population size $N$ closely matches the true
-value, across all different levels of recombination. \vb{In Appendix Figure
-XXX, we include a version of this figure calculated using the method of moments
-on sample allele frequencies for a sample of size $n=XXX$.}
+figure), our estimates become more noisy. \vb{In Figure
+  \ref{fig:mom-fits-both}B we show the simultaneously estimated population size
+  $N$ against the true population size value. We also plot the estimated $N_e$
+  (not accounting for selection) from a simple temporal estimator, $N_e = -t /
+  (2 \log(1-F))$ \parencite{Krimbas1971-et,Waples1989-sj} where $F$ is Wright's
+  standardized variance \parencite{Wright1931-fl}. While with high $V_A$ and
+  low $R$, the method-of-moments approach still underestimates $N$, it performs
+  far better than a standard temporal $N_e$ estimator that does not account for
+  selection.} \vb{In Appendix Figure \ref{fig:mom-fits-both-finite}, we
+include a version of this figure calculated using the method of moments on
+sample allele frequencies for a sample of size $n=100$.}
 
 \begin{figure}
   \centering
@@ -1825,13 +1842,14 @@ at \url{https://github.com/vsbuffalo/tempautocov}.
 
 \section{Acknowledgments}
 
-We thank Matt Osmond, Doc Edge, Enrique Santiago, and Michael Turelli for
-feedback on previous versions of the manuscript, and Aneil Agrawal, Nick
-Barton, Dave Begun, Sarah Friedman, Bill Hill, John Kelly, Tyler Kent, Chuck
-Langley, Sally Otto, Jonathan Pritchard, Anita To, Kevin Thornton, and members
-of the Coop lab for helpful conversations. This research was supported by an
-NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
-(R01-GM108779) and NSF (1353380) awarded to GC.
+We thank Nick Barton, Doc Edge, Matt Osmond, Enrique Santiago, Michael Turelli,
+and two anonymous reviewers for feedback on previous versions of the
+manuscript, and Aneil Agrawal, Dave Begun, Sarah Friedman, Bill Hill, John
+Kelly, Tyler Kent, Chuck Langley, Sally Otto, Jonathan Pritchard, Kevin
+Thornton, Anita To, and members of the Coop lab for helpful conversations.
+This research was supported by an NSF Graduate Research Fellowship grant
+awarded to VB (1650042), and NIH (R01-GM108779) and NSF (1353380) awarded to
+GC.
 
 \printbibliography
 
@@ -1846,7 +1864,7 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
 \subsection{Table of Notation}
 
 \begin{table}[]
-  \begin{tabular}{l|p{12cm}}
+  \begin{tabular}{r|p{12cm}}
  Symbol & Usage  \\ \hline
  $p_t$ & Allele frequency in generation/timepoint $t$  \\
  $\Delta p_t$ & Allele frequency change between generations $t+1$ and $t$, $\Delta p_t = p_{t+1} - p_t$ \\
@@ -1880,7 +1898,7 @@ NSF Graduate Research Fellowship grant awarded to VB (1650042), and NIH
 \end{table}
 
 \begin{table}[]
-  \begin{tabular}{l|p{12cm}}
+  \begin{tabular}{r|p{12cm}}
  Symbol & Usage  \\ \hline
  $\mathbf{Q}$ & The sample standardized variance-covariance matrix, \eqref{eq:ave-temp-autocov} \\
  $Q_{t,s}$ & The elements of the observed sample matrix $\mathbf{Q}$, \eqref{eq:ave-temp-autocov} \\
@@ -2286,6 +2304,7 @@ a ratio of expectations rather than the expectation of the ratio
 \parencite{Bhatia2013-zy}.
 
 \subsection{Empirically Calculating the Average LD Persisting Across Generations}
+\label{ap:empirical-ld}
 
 In the previous expressions for temporal autocovariance, we stepped through a
 conceptual model for the average levels of linkage disequilibria between
@@ -2820,6 +2839,162 @@ representative subset of this parameter grid in our figures.
 
 \setcounter{figure}{0}    
 
+\subsection{Accounting for allele frequency sampling noise}
+\label{sec:sampling}
+
+\vb{GC: this section is all new and needs to be reviewed.}
+
+In practice, one will calculate the temporal variance-covariance matrix on
+allele frequency trajectories calculated from sampled chromosomes from the
+population. We assume a binomial sampling process, where $n$ chromosomes are
+sampled from the population such that $\widetilde{p} = \nicefrac{X}{n}$, and $X
+\sim \textrm{Binom}(p, n)$. We can then write $\widetilde{p}_t = p_t +
+\varepsilon_t$, and our covariances can be written as
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(\widetilde{p}_{t+1} - \widetilde{p}_{t}, \widetilde{p}_{s+1} - \widetilde{p}_{s}) \nonumber \\
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{s+1} + \varepsilon_{s+1} - p_{s} - \varepsilon_{s}).
+\end{align}
+%
+Note this simplifies to
+
+\begin{align}
+  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(p_{t+1} - p_{t}, p_{s+1} - p_{s}) \; \; \mathrm{if} \;\; |t-s| > 1,
+\end{align}
+%
+since in these cases, the sampling noise at a timepoint is not shared between
+the estimated allele frequency changes. However, if $|t - s| = 1$ the sampling
+noise from timepoint $t+1$ is shared, biasing the sample estimate of
+covariance:
+
+\begin{align}
+\cov(\Delta \widetilde{p_t}, \Delta \widetilde{p}_{t+1}) 
+  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{t+2} + \varepsilon_{t+2} - p_{t+1} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov( \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}, \Delta p_{t+1} + \varepsilon_{t+2} - \varepsilon_{t+1}) \nonumber \\
+  &= \cov(\Delta p_{t}, \Delta p_{t+1}) - \var(\varepsilon_{t+1}).
+\end{align}
+%
+Similarly, the variance ($t = s$) is biased, as it is impacted by the binomial
+sampling noise too,
+%
+
+\begin{align} 
+  \var(\Delta \widetilde{p_t}) &= \cov( \Delta p_{t} + \varepsilon_{t+1} - 
+      \varepsilon_{t}, \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}) \nonumber \\ 
+                               &= \var( \Delta p_{t} ) + \var(\varepsilon_{t+1}) +
+\var(\varepsilon_{t}) \end{align}
+%
+In practice, these covariances are calculated over loci in a region or across the
+entire genome. We assume that the tracked allele has been randomly swapped
+(e.g. the tracked allele frequency is not systematically the minor, major, or
+reference allele, such that $\E(\Delta p_{t,l}) = 1$ for all $t$ and $l$. Then,
+the unbiased covariance estimate as calculated over loci is
+
+\begin{align}
+  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \varepsilon_{t+1,l}^2.
+\end{align}
+%
+Then, we can use a plugin estimate of the frequency sampling variance
+$\E(\varepsilon_{t+1,l}^2) = \V(\varepsilon_{t+1,l}) =
+\nicefrac{p_{t+1,l}(1-p_{t+1,l})}{(n_{t,l}-1)}$ to estimator these bias terms,
+and add or subtract them from the estimator accordingly. Accounting for finite
+sampling, the unbiased sample variance-covariance now has elements:
+
+\begin{align}
+  Q_{t,t+1} &=
+  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
+  + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1},
+\end{align}
+and variance
+
+\begin{align}
+  Q_{t,t} &=
+  \frac{1}{L} \sum_{l=1}^L (\Delta \widetilde{p}_{t,l})^2
+  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t,l}(1-p_{t,l})}{n_{t,l} - 1}
+  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1}.
+\end{align}
+
+In Section \ref{sec:ml-sim-res}, we used population frequencies in
+demonstrating the method of moments estimators of $\widehat{V_A(1)}$ and
+$\widehat{N}$. Here, we discuss the performance of these estimators with sample
+allele frequencies. Our simulations are identical to those described in Section
+\ref{sec:ml-sim}, except we have increased the target number of neutral sites
+in each region so it is around $10,000$. We mimic sampling of $n=\{50, 100,
+200, 500\}$ chromosomes from there population, and use the bias-corrected
+sample variance-covariance matrix in the method-of-moments approach described
+in Section \ref{sec:meth-moments} to estimate $\widehat{V_A(1)}$ and
+$\widehat{N}$.
+
+In Figure \ref{fig:mom-fits-both-finite}, we show the performance of our
+estimators in the case where $n=100$ chromosomes have been sampled from the
+population. Overall, there are two important differences compared with Figure
+\ref{fig:mom-fits-both} of the main text. First, while the estimator
+$\widehat{V_A(1)}$ performs well for high levels around $V_A \sim 0.1$, the
+variance around the estimator increases significantly as $V_A$ grows weaker.
+As the covariances are proportional to $\nicefrac{V_A}{R}$, sampling noise
+grows larger than the theoretic temporal autocovariance as $V_A$ become weaker.
+Then, one cannot discriminate against the chance covariances formed by the
+sampling process from the temporal autocovariance created by linked selection
+without either a large sample size or more timepoints. Second, the approach
+underestimates $V_A(1)$ for very loose linkage ($R > \nicefrac{1}{2}$). This is
+another consequence of the first problem; as sampling noise grows equal, or
+larger than the magnitude of temporal autocovariance, the estimation procedure
+performs poorly. As the linkage becomes more loose, the magnitude of temporal
+autocovariance grows weak relative to the sampling noise, and this noise can be
+partially absorbed by $\widehat{N}$. This effect can be somewhat ameliorated by
+calculating the sample variance-covariance matrix over a shorter region of the
+genome (such that $R$ is smaller) (as long as SNP density is sufficient), or by
+increasing the sample size. To understand how sample size affects the
+method-of-moments estimators, Figure \ref{fig:mom-relative} shows how sample
+size affects median relative error of $\widehat{V_A(1)}$ and $\widehat{N}$.
+Finally, the estimation of effective population size shown in Figure
+\ref{fig:mom-fits-both-finite} are also affected by $V_A$, as discussed in
+Section \ref{sec:meth-moments} (though the effect is obscured by the sampling
+noise): high levels of $V_A$ in regions with low recombination generally lead
+to underestimates of $\widehat{N}$.
+
+
+\begin{figure}
+  \centering
+  \includegraphics{./images/mom-fits-both-alt-finite.pdf} 
+
+  \caption{\vb{True parameter values and estimates using the method-of-moments
+      approach on sample ($n=100$ individuals) multilocus simulation data;
+      these figures are analogous to Figure \ref{fig:mom-fits-both} in the main
+      text, except the estimators have been calculated on sample, rather than
+      population frequency data. (A) The true $V_A(1)$ (x-axis) and
+      $\widehat{V_A(1)}$ estimated from the sample variance/covariance matrix
+      (y-axis) for each simulation replicate across different levels of
+      recombination (indicated by each point's color). (B) Estimated
+      drift-effective population size ($\widehat{N}$) across a range of
+      simulations with different levels of additive genetic variance and
+      recombination. Each point denotes the median, with lines denoting the
+      interquartile range. A simple temporal estimate of the effective
+      population size, estimated with accounting for the effects of selection,
+  is averaged for each replicate and plotted as a dash. The true value ($N =
+  1,000$) is shown with the dashed gray line.}} 
+
+\label{fig:mom-fits-both-finite}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+  \includegraphics{./images/supp-relative-error.pdf} 
+
+  \caption{The median relative estimation error, over 30 replicate simulations,
+  of the method of moments estimator for drift effective population size
+($\widehat{N}$) and the initial additive genetic variance ($\widehat{V_A(1)}$).
+} 
+
+\label{fig:mom-relative}
+\end{figure}
+
+
+
+
 \newpage
 \section{Appendix Figures}
 
@@ -2940,160 +3115,6 @@ LD from our burnin across varying $N$.}
 
   \label{fig:multilocus-expfit-sims-varyn}
 \end{figure}
-
-\subsection{Accounting for allele frequency sampling noise}
-\label{sec:sampling}
-
-\vb{GC: this section is all new and needs to be reviewed.}
-
-In practice, one will calculate the temporal variance-covariance matrix on
-allele frequency trajectories calculated from sampled chromosomes from the
-population. We assume a binomial sampling process, where $n$ chromosomes are
-sampled from the population such that $\widetilde{p} = \nicefrac{X}{n}$, and $X
-\sim \textrm{Binom}(p, n)$. We can then write $\widetilde{p}_t = p_t +
-\varepsilon_t$, and our covariances can be written as
-
-\begin{align}
-  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(\widetilde{p}_{t+1} - \widetilde{p}_{t}, \widetilde{p}_{s+1} - \widetilde{p}_{s}) \nonumber \\
-  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{s+1} + \varepsilon_{s+1} - p_{s} - \varepsilon_{s}).
-\end{align}
-%
-Note this simplifies to
-
-\begin{align}
-  \cov(\Delta \widetilde{p_t}, \Delta \widetilde{p_s}) &= \cov(p_{t+1} - p_{t}, p_{s+1} - p_{s}) \; \; \mathrm{if} \;\; |t-s| > 1,
-\end{align}
-%
-since in these cases, the sampling noise at a timepoint is not shared between
-the estimated allele frequency changes. However, if $|t - s| = 1$ the sampling
-noise from timepoint $t+1$ is shared, biasing the sample estimate of
-covariance:
-
-\begin{align}
-\cov(\Delta \widetilde{p_t}, \Delta \widetilde{p}_{t+1}) 
-  &= \cov(p_{t+1} + \varepsilon_{t+1} - p_{t} - \varepsilon_{t}, p_{t+2} + \varepsilon_{t+2} - p_{t+1} - \varepsilon_{t+1}) \nonumber \\
-  &= \cov( \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}, \Delta p_{t+1} + \varepsilon_{t+2} - \varepsilon_{t+1}) \nonumber \\
-  &= \cov(\Delta p_{t}, \Delta p_{t+1}) - \var(\varepsilon_{t+1}).
-\end{align}
-%
-Similarly, the variance ($t = s$) is biased, as it is impacted by the binomial
-sampling noise too,
-%
-
-\begin{align} 
-  \var(\Delta \widetilde{p_t}) &= \cov( \Delta p_{t} + \varepsilon_{t+1} - 
-      \varepsilon_{t}, \Delta p_{t} + \varepsilon_{t+1} - \varepsilon_{t}) \nonumber \\ 
-                               &= \var( \Delta p_{t} ) + \var(\varepsilon_{t+1}) +
-\var(\varepsilon_{t}) \end{align}
-%
-In practice, these covariances are calculated over loci in a region or across the
-entire genome. We assume that the tracked allele has been randomly swapped
-(e.g. the tracked allele frequency is not systematically the minor, major, or
-reference allele, such that $\E(\Delta p_{t,l}) = 0$ for all $t$ and $l$. Then,
-the unbiased covariance estimate as calculated over loci is
-
-\begin{align}
-  \frac{1}{L} \sum_{l=1}^L \left(\Delta p_{t,l} \Delta p_{t+1,l} \right)  &=
-  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
-  + \frac{1}{L} \sum_{l=1}^L \varepsilon_{t+1,l}^2.
-\end{align}
-%
-Then, we can use a plugin estimate of the frequency sampling variance
-$\E(\varepsilon_{t+1,l}^2) = \V(\varepsilon_{t+1,l}) =
-\nicefrac{p_{t+1,l}(1-p_{t+1,l})}{(n_{t,l}-1)}$ to estimator these bias terms,
-and add or subtract them from the estimator accordingly. Accounting for finite
-sampling, the unbiased sample variance-covariance now has elements:
-
-\begin{align}
-  Q_{t,t+1} &=
-  \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
-  + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1},
-\end{align}
-and variance
-
-\begin{align}
-  Q_{t,t} &=
-  \frac{1}{L} \sum_{l=1}^L (\Delta \widetilde{p}_{t,l})^2
-  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t,l}(1-p_{t,l})}{n_{t,l} - 1}
-  - \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1}.
-\end{align}
-
-In Section \ref{sec:ml-sim-res}, we used population frequencies in
-demonstrating the method of moments estimators of $\widehat{V_A(1)}$ and
-$\widehat{N}$. Here, we discuss the performance of these estimators with sample
-allele frequencies. Our simulations are identical to those described in Section
-\ref{sec:ml-sim}, except we have increased the target number of neutral sites
-in each region so it is around $10,000$. We mimic sampling of $n=\{50, 100,
-200, 500\}$ chromosomes from there population, and use the bias-corrected
-sample variance-covariance matrix in the method-of-moments approach described
-in Section \ref{sec:meth-moments} to estimate $\widehat{V_A(1)}$ and
-$\widehat{N}$.
-
-In Figure \ref{fig:mom-fits-both-finite}, we show the performance of our
-estimators in the case where $n=100$ chromosomes have been sampled from the
-population. Overall, there are two important differences compared with Figure
-\ref{fig:mom-fits-both} of the main text. First, while the estimator
-$\widehat{V_A(1)}$ performs well for high levels around $V_A \sim 0.1$, the
-variance around the estimator increases significantly as $V_A$ grows weaker.
-As the covariances are proportional to $\nicefrac{V_A}{R}$, sampling noise
-grows larger than the theoretic temporal autocovariance as $V_A$ become weaker.
-Then, one cannot discriminate against the chance covariances formed by the
-sampling process from the temporal autocovariance created by linked selection
-without either a large sample size or more timepoints. Second, the approach
-underestimates $V_A(1)$ for very loose linkage ($R > \nicefrac{1}{2}$). This is
-another consequence of the first problem; as sampling noise grows equal, or
-larger than the magnitude of temporal autocovariance, the estimation procedure
-performs poorly. As the linkage becomes more loose, the magnitude of temporal
-autocovariance grows weak relative to the sampling noise, and this noise can be
-partially absorbed by $\widehat{N}$. This effect can be somewhat ameliorated by
-calculating the sample variance-covariance matrix over a shorter region of the
-genome (such that $R$ is smaller) (as long as SNP density is sufficient), or by
-increasing the sample size. To understand how sample size affects the
-method-of-moments estimators, Figure \ref{fig:mom-relative} shows how sample
-size affects median relative error of $\widehat{V_A(1)}$ and $\widehat{N}$.
-Finally, the estimation of effective population size shown in Figure
-\ref{fig:mom-fits-both-finite} are also affected by $V_A$, as discussed in
-Section \ref{sec:meth-moments} (though the effect is obscured by the sampling
-noise): high levels of $V_A$ in regions with low recombination generally lead
-to underestimates of $\widehat{N}$.
-
-
-\begin{figure}
-  \centering
-  \includegraphics{./images/mom-fits-both-alt-finite.pdf} 
-
-  \caption{\vb{True parameter values and estimates using the method-of-moments
-      approach on sample ($n=100$ individuals) multilocus simulation data;
-      these figures are analogous to Figure \ref{fig:mom-fits-both} in the main
-      text, except the estimators have been calculated on sample, rather than
-      population frequency data. (A) The true $V_A(1)$ (x-axis) and
-      $\widehat{V_A(1)}$ estimated from the sample variance/covariance matrix
-      (y-axis) for each simulation replicate across different levels of
-      recombination (indicated by each point's color). (B) Estimated
-      drift-effective population size ($\widehat{N}$) across a range of
-      simulations with different levels of additive genetic variance and
-      recombination. Each point denotes the median, with lines denoting the
-      interquartile range. A simple temporal estimate of the effective
-      population size, estimated with accounting for the effects of selection,
-  is averaged for each replicate and plotted as a dash. The true value ($N =
-  1,000$) is shown with the dashed gray line.}} 
-
-\label{fig:mom-fits-both-finite}
-\end{figure}
-
-
-\begin{figure}
-  \centering
-  \includegraphics{./images/supp-relative-error.pdf} 
-
-  \caption{The median relative estimation error, over 30 replicate simulations,
-  of the method of moments estimator for drift effective population size
-($\widehat{N}$) and the initial additive genetic variance ($\widehat{V_A(1)}$).
-} 
-
-\label{fig:mom-relative}
-\end{figure}
-
 
 
 \end{document}
