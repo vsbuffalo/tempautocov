@@ -576,6 +576,7 @@ x <- boxplot(G_after ~ genlen + Va, mom_fits_g %>% filter(Va %in% box_va_params)
         #ylim=c(-3/4,1.1),
         ylim=c(min(yscale) - 0.1, max(yscale) + 0.1),
         at=atsfun(7, length(box_va_params)),
+        ylab='', xlab='',
         pars = list(boxcol = "transparent", medlty = "blank", 
                     medpch=19, whisklty = c(1, 1),
                     whiskcol='gray61',
