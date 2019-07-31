@@ -931,14 +931,17 @@ $\mathbf{\Sigma}$)}, for each replicate \vb{as follows}. First, we mark
 frequencies reaching fixation or loss as missing values. \vb{By marking the
   frequency of sites that are no longer segregating as missing values, we allow
   the allele frequency changes before fixation/loss to contribute to the
-measured covariance, rather than removing the entire locus's trajectory, which
-would act to condition the covariance on more intermediate frequencies.} Then
-with the frequency matrix, we calculate a vector of allele frequency changes
-$\Delta \vec{p}_n = [\Delta p_{n,1}, \Delta p_{n,2}, \ldots, \Delta
-p_{n,\tau}]$ using each neutral locus $n$'s $\tau+1$ observed generations.
-\vb{Finally}, we calculate the $\tau \times \tau$ sample standardized
-variance-covariance matrix $\mathbf{Q}$, averaging over $M$ neutral loci such
-that element $Q_{t,s}$ is calculated as
+  measured covariance, rather than removing the entire locus's trajectory,
+  which would act to condition the covariance on more intermediate frequencies.
+  Note that one cannot ignore fixations or losses, as these have $\Delta p_t=0$
+and thus an autocovariance of zero, which when averaged over loci acts to
+underestimate the true level of autocovariance at segregating sites. Having
+marked fixations/losses as missing, we take the frequency matrix} and calculate
+a vector of allele frequency changes $\Delta \vec{p}_n = [\Delta p_{n,1},
+\Delta p_{n,2}, \ldots, \Delta p_{n,\tau}]$ using each neutral locus $n$'s
+$\tau+1$ observed generations.  \vb{Finally}, we calculate the $\tau \times
+\tau$ sample standardized variance-covariance matrix $\mathbf{Q}$, averaging
+over $M$ neutral loci such that element $Q_{t,s}$ is calculated as
 
 \begin{align}
   Q_{t,s} = \frac{\frac{1}{M - 1} \sum_{n=1}^M \left( \Delta p_{n,t} \Delta p_{n,s} - \left(\frac{1}{M} \sum_{n=1}^M \Delta p_{n,t}\right) \left( \frac{1}{M} \sum_{n=1}^M \Delta p_{n,s} \right) \right)}{
@@ -1032,7 +1035,7 @@ Morgans), our theory using the empirical additive genic variation fits much
 more closely over a longer duration ($\sim$10-15 generations). Note that some
 variability is caused by the noise of each simulation replicate around the
 target initial additive genetic variation $V_a$ (see Section \ref{sec:ml-sim}),
-as each replicate samples sites from a neutral coalescent.  Our theory also
+as each replicate samples sites from a neutral coalescent. Our theory also
 accurately predicts the temporal autocovariance for different choices of
 reference generation, i.e.  varying $t$, see Supplementary Figure
 \ref{fig:multilocus-expfit-sims-gen13}.
