@@ -867,7 +867,7 @@ cumcov_panels <- function(x, include_data=FALSE, cex=1, N=1e3,
     twoN <- 2*N  # if later, we want to add drift expectation
     axis(1, barx, pd$genlen, las=1, tick=FALSE, 
          line=-0.9,
-         cex.axis=0.7*cex, 
+         cex.axis=0.5*cex, 
          col.axis=axs_col)
     if (va_i == 1) {
       axis(2, col.axis=axs_col, cex.axis=cex*0.8, col=axs_col, 
