@@ -694,7 +694,7 @@ panel_plot(neut_het_sims, neut_het_fits, x=gen, y=het, col=rho, row=N, groups=gr
                   point_alpha=1,
                   line_alpha=0.6,
                   grp_cols=wesanderson::wes_palette('Darjeeling1')[1],,
-                  ylab=latex2exp::TeX('Heterozygosity'), xlab='generation',
+                  ylab=latex2exp::TeX('heterozygosity'), xlab='generation',
                   legend_prop=0.0001, legend_title='')
 
 dev.off()
@@ -723,7 +723,7 @@ panel_plot(neut_ld_sims, neut_ld_fits, x=gen, y=D, col=N, row=r, groups=grp,
                   point_alpha=1,
                   line_alpha=0.6,
                   grp_cols=wesanderson::wes_palette('Darjeeling1')[1],,
-                  ylab=latex2exp::TeX('Linkage Disequilibrium (D)'), xlab='generation',
+                  ylab=latex2exp::TeX('linkage disequilibrium (D)'), xlab='generation',
                   legend_prop=0.0001, legend_title='')
 
 dev.off()

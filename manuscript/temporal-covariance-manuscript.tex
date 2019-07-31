@@ -1566,17 +1566,19 @@ modify $G$, using the absolute value of the covariances,
   G_{abs} = \frac{\sum_{t \ne s}|\cov(\Delta p_t, \Delta p_s)|}{\var(p_t - p_0)}
 \end{align}
 %
+
 which prevents negative temporal autocovariances from canceling out the effects
 of positive temporal autocovariances, since both are a reflection of linked
 selection acting on neutral allele frequency changes. We show $G_{abs}$ in
 Figure \ref{fig:fluct-sel}C, where even after the change in the directional
 selection we see a steady accumulation of covariance contributing to total
 variance $\nicefrac{\var(p_t - p_0)}{t}$. This also suggests one plausible way
-to check for genomically wide-spread fluctuating selection would be to
-test if $G_{abs} > G$. However, we note that in contrast to our
-simulations, it is likely that in natural populations only a subset of
-alleles change their relationship to fitness, and so different approaches may
-be needed to identify fluctuations.
+to check for genomically wide-spread fluctuating selection would be to test if
+$G_{abs} > G$. However, we note that in contrast to our simulations, it is
+likely that in natural populations only a subset of alleles change their
+relationship to fitness. \vb{This may act to dampen the magnitude of, but not
+completely reverse the direction of genome-wide temporal autocovariance, and so
+different approaches may be needed to identify fluctuations.}
 
 \section{Discussion}
 
@@ -1693,12 +1695,45 @@ polymorphic sites. Then, genome-wide or region-wide estimates could be found
 via composite likelihood methods, in a similar manner to
 \textcite{McVicker2009-ax} and \textcite{Elyashiv2016-vt}. Furthermore, one
 could include different $V_A$ parameters for neighboring polymorphic sites with
-specific functional annotations, such as those in genic regions, introns, exons,
-etc. to see how different classes of sites contribute to the additive genetic
-variance for fitness. Our hope is that statistical methods to quantify the
-effects of linked selection over short timescales will improve and be combined
-with measures of phenotypic change, leading to a more synthetic view of how
-selection on ecological timescales occurs at the genetic and phenotypic levels.
+specific functional annotations, such as those in genic regions, introns,
+exons, etc. to see how different classes of sites contribute to the additive
+genetic variance for fitness. Our hope is that statistical methods to quantify
+the effects of linked selection over short timescales will improve and be
+combined with measures of phenotypic change, leading to a more synthetic view
+of how selection on ecological timescales occurs at the genetic and phenotypic
+levels.
+
+\vb{As the number of empirical temporal genomic studies continue to increase,
+  it is worth mentioning how our study of temporal autocovariance suggests a
+  few ways to optimize experimental design to increase the power to
+  differentiate the effects of selection from drift. First, one should ideally
+  sample frequencies from consecutive generations for at least some timepoints
+  during the duration of the experiment. This is because the variance in allele
+  frequency change $\var(\Delta p_t)$ between adjacent generations is only
+  impacted the heritable variance in offspring number, $\var(\Delta_{_H} p_t)$
+  (see Equation \ref{eq:var-decomp-1}), and not by the accumulation of temporal
+  autocovariance terms (e.g. Equation \ref{eq:var-decomp}); this allows for
+  more accurate estimates of $G$. In cases where a long study duration is
+  needed but sequencing is limited to only a subset of generations, a mixed
+  duration sampling design, such as sampling generations 1 through 4, and then
+  10 through 14, and so forth could serve as a compromise. Second, as designed
+  in Appendix Section \ref{sec:sampling}, the shared sampling noise between
+  adjacent timepoints creates a negative bias in autocovariance that must be
+  corrected for. As described in Equations \eqref{eq:corrected-var} and
+  \eqref{eq:corrected-cov}, we can estimate this bias from data, but this
+  introduces additional uncertainty in our estimates. In cases where the
+  experimenter suspects \emph{a priori} that fluctuating selection is
+  occurring, e.g. between two seasons, we recommend at least two temporal
+  samples per season. This allows one to differentiate negative covariance
+  occurring from the bias correction procedure underestimating bias from
+  negative covariance caused by fluctuating selection through comparing
+  non-adjacent timepoints that differ in season. Finally, once can directly
+  remove the effects of the technical sampling noise created by variation in
+  sequencing by dividing up temporal samples and barcoding them into two groups
+  (e.g. A and B). Then, the sample covariance estimate $\cov(\Delta p_{t,A},
+p_{s,B})$ does not share the technical sampling noise, reducing the bias (but
+note some bias remains due to the sampling process where individuals are
+sampled from the population.)}
 
 \subsection{\vb{Connecting} Temporal Linked Selection with Single Timepoint Studies}
 
@@ -2903,6 +2938,7 @@ and add or subtract them from the estimator accordingly. Accounting for finite
 sampling, the unbiased sample variance-covariance now has elements:
 
 \begin{align}
+  \label{eq:corrected-var}
   Q_{t,t+1} &=
   \frac{1}{L} \sum_{l=1}^L \Delta \widetilde{p}_{t,l} \Delta \widetilde{p}_{t+1,l}
   + \frac{1}{L} \sum_{l=1}^L \frac{p_{t+1,l}(1-p_{t+1,l})}{n_{t+1,l} - 1},
@@ -2910,6 +2946,7 @@ sampling, the unbiased sample variance-covariance now has elements:
 and variance
 
 \begin{align}
+  \label{eq:corrected-cov}
   Q_{t,t} &=
   \frac{1}{L} \sum_{l=1}^L (\Delta \widetilde{p}_{t,l})^2
   - \frac{1}{L} \sum_{l=1}^L \frac{p_{t,l}(1-p_{t,l})}{n_{t,l} - 1}
