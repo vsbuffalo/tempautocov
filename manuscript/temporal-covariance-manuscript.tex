@@ -2153,9 +2153,9 @@ map,
 
 \begin{subequations}
   \begin{align}
-    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E_{r_l} \left( \E(\mathcal{R}_{t}^2(r_l)) (1-r_l)^{s-t} \right)  \\
+    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2L} \sum_{l=1}^L \E_{r_l} \left( \E(\mathcal{R}_{t}^2(r_l)) (1-r_l)^{s-t} \right) \label{eq:cont-approx-step-1} \\
                                                      &= \frac{V_a(s)}{2L} \sum_{l=1}^L \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} \frac{1}{R} d g \label{eq:exp-overselpos} \\
-                                                     &= \frac{V_a(s)}{2R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g
+                                                     &= \frac{V_a(s)}{2R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \label{eq:integral-overselpos}
   \end{align}
 \end{subequations}
 %
@@ -2165,6 +2165,45 @@ As our trait is neutrally evolving before directional selection starts we use
 the expected neutral LD, $\E(\mathcal{R}^2) = (10 + \rho)/(22 + 13 \rho +
 \rho^2)$ where $\rho = 4Nr(g)$ \parencite{Ohta1969-ae,Hill1968-ue} when $t$ is
 the first generation selection begins. 
+
+\subsection{The contribution of the rest of the genome to temporal autocovariance at a locus}
+
+\vb{Additionally we can consider the impact that other linked selected sites
+  have on the neutral allele's frequency trajectory. From
+  equation \eqref{eq:integral-overselpos}, we can take a piecewise integral
+  over all linked sites (those less than a recombination fraction of one-half
+  away), and all unlinked sites (those at a recombination fraction of
+one-half away).}
+
+  \begin{align}
+    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
+                                                     &= \frac{V_a(s)}{2R} \left[ 2 \int_{0}^{\nicefrac{1}{2}} \E(\mathcal{R}^2_{t}(r)) (1-r)^{s-t} d r  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (R - g(\nicefrac{1}{2})) \right] 
+  \end{align}
+\vb{
+Here, $g(r)$ is the inverse function of $r(g)$ and $R$ is the total map length
+of the chromosome that contained the focal neutral site. The second term in the
+braces are the two unlinked selections of this chromosome, e.g.
+$[-\nicefrac{R}{2}, -g(\nicefrac{1}{2})]$ and $[g(\nicefrac{1}{2}),
+\nicefrac{R}{2}]$ (this is zero if $g(\nicefrac{1}{2}) > \nicefrac{R}{2}$).
+With this construction, we can then consider the contribution of additive
+variation on the $M$ Morgans on other chromosomes of a genome of $M + R$
+Morgans of total length.
+}
+
+\begin{align}
+    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2R} \left[ 2 \int_{0}^{\nicefrac{1}{2}} \E(\mathcal{R}^2_{t}(r)) (1-r)^{s-t} d r  + \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (M + 2R - 2g(\nicefrac{1}{2})) \right] 
+\end{align}
+
+\vb{Ideally, we could evaluate the inverse mapping function at $\nicefrac{1}{2}$ to
+find what genetic distance a site becomes unlinked to the focal neutral site.
+However, mapping functions asymptotes to $\nicefrac{1}{2}$, so here
+calculations, one may want to assume $0.49$ is approximately unlinked. 
+
+As a simple thought experiment, we can imagine the focal chromosome is exactly
+$2 g(\nicefrac{1}{2})$ Morgans long, so that we just have to consider the
+impact of variation on other chromosomes. Then we might ask for what value of
+$M$ does the contribution from unlinked sites dominate the contribution from
+linked sites?}
 
 \subsection{Averaging covariance across multiple loci}
 
