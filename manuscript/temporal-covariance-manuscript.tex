@@ -94,24 +94,24 @@
   stochastically associated with the genetic backgrounds that lead to fitness
   differences between individuals.  Previous theoretical work has established
   that the random associations between a neutral allele and heritable fitness
-  backgrounds \vb{reduces} \vince{didn't really know what Nick was looking for
-  here?} effective population experienced by this neutral allele
-  \parencite{Santiago1995-hx,Santiago1998-bs}. These associations perturb
-  neutral allele frequency trajectories, creating autocovariance in the allele
-  frequency changes across generations. Here, we show how temporal genomic data
-  allows us to measure the temporal autocovariance in allele frequency changes
-  and characterize the genome-wide impact of polygenic selection. We develop
-  expressions for these temporal autocovariances, showing their magnitude is
-  determined by the level of additive genetic variation, recombination, and
-  linkage disequilibria in a region. Furthermore, by using analytic expressions
-  for the temporal variances and autocovariances in allele frequency, we
-  demonstrate that one can estimate the additive genetic variation for fitness
-  and the drift-effective population size from temporal genomic data. We also
-  show how the proportion of total variation in allele frequency change due to
-  linked selection can be estimated from temporal data. Overall, we demonstrate
-  temporal genomic data offers opportunities to identify the role of linked
-  selection on genome-wide diversity over short timescales, and can help bridge
-  population genetic and quantitative genetic studies of adaptation.
+  backgrounds acts to reduce the effective population size experienced by this
+  neutral allele \parencite{Santiago1995-hx,Santiago1998-bs}. These
+  associations perturb neutral allele frequency trajectories, creating
+  autocovariance in the allele frequency changes across generations. Here, we
+  show how temporal genomic data allows us to measure the temporal
+  autocovariance in allele frequency changes and characterize the genome-wide
+  impact of polygenic selection. We develop expressions for these temporal
+  autocovariances, showing their magnitude is determined by the level of
+  additive genetic variation, recombination, and linkage disequilibria in a
+  region. Furthermore, by using analytic expressions for the temporal variances
+  and autocovariances in allele frequency, we demonstrate that one can estimate
+  the additive genetic variation for fitness and the drift-effective population
+  size from temporal genomic data. We also show how the proportion of total
+  variation in allele frequency change due to linked selection can be estimated
+  from temporal data. Overall, we demonstrate temporal genomic data offers
+  opportunities to identify the role of linked selection on genome-wide
+  diversity over short timescales, and can help bridge population genetic and
+  quantitative genetic studies of adaptation.
 
  \end{abstract}
 
@@ -229,7 +229,7 @@ averaged over evolutionary replicates, the expected change in allele frequency
 due to drift alone is $\E(\Delta p_t) = 0$ and quantified by the variance in
 allele frequency change $\var(\Delta p_t)$ \parencite[as quantified by the
 variance effective population
-size:][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
+size;][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
 
 % We first give an outline of how selection affects linked neutral sites through
 % time. We summarize a neutral allele's frequency trajectory as the differences
@@ -280,9 +280,9 @@ where, $\Delta_{_N} p_t$, $\Delta_{_M} p_t$, and $\Delta_{_H} p_t$ are the
 neutral allele's frequency changes due to non-heritable variation in fitness
 between diploid individuals, Mendelian segregation of heterozygotes into
 offspring, and heritable variation in fitness (we refer to this as the
-\emph{heritable change} in neutral allele frequency), respectively. Note
+\emph{heritable change} in neutral allele frequency), respectively. Note that 
   while throughout the paper we consider the allele frequency change between
-  adjacent generations, that \vince{see Nick's comment - is this where the "that" goes?} the same approach can be extended to situations where
+  adjacent generations, the same approach can be extended to situations where
 the study system cannot be observed every generation. Like the stochastic
 components of drift, the allele frequency change due to heritable fitness
 differences is directionless ($\E(\Delta_{_H} p_t) = 0$).
@@ -375,10 +375,9 @@ a reduction in the effective population size, there has been no direct way to
 separately estimate its effects from those of drift. We show that with temporal
 genomic data, one can directly measure the levels of temporal variances and
 autocovariances of allele frequency change in the population. Additionally, we
-that show temporal autocovariance is created under both tight and loose linked
-selection, and below, develop expressions for its magnitude that are applicable
-to both, bridging \vince{what's nick's comment?}the two regimes of linked
-selection.
+that show temporal autocovariance is created under both tight and loosely
+linked selection, and below, develop expressions for its magnitude that are
+applicable to both, bridging the two regimes of linked selection.
 
 \section{A model for multilocus temporal autocovariance}
 
@@ -457,7 +456,7 @@ allele frequency changes at generations $t$ and $s$ can be written as
 
 \begin{align}
   \cov(\Delta p_t, \Delta p_s) &=  \E \left[\left(\sum_{l=1}^L \alpha_{t,l} D_{t,l}\right) \left( \sum_{l=1}^L \alpha_{t,l} D_{s,l} \right) \right]\nnn \\ 
-                               &=  \underbrace{\sum_{l=1}^L \alpha_{t,l} \alpha_{s,l} \E(D_{t,l}  D_{s,l})}_{\text{persistence of associations selected site} \; l}  \; + 
+                               &=  \underbrace{\sum_{l=1}^L \alpha_{t,l} \alpha_{s,l} \E(D_{t,l}  D_{s,l})}_{\text{persistence of associations with selected site} \; l}  \; + 
   \underbrace{\sum_{l \ne k} \alpha_{t,k} \alpha_{s,l}\E(D_{t,k}  D_{s,l})}_{\text{cross-associations between two selected sites}}. 
   \label{eq:multilocus-twopart}
 \end{align}
@@ -475,9 +474,6 @@ temporal autocovariance will be.
 
 \subsection{The multilocus temporal autocovariance model with directional selection}
 \label{sec:temp-autocov-dirsel}
-
-\vince{I can't get at Nick's comment here. I've looked at the paper, but don't
-see a connection?}
 
 Thus far, in reaching Equation \eqref{eq:multilocus-twopart} we assume only
 that fitness is additive across loci. In this section, we develop a model of
@@ -738,7 +734,7 @@ Before the onset of selection, we create the initial diploid population from a
 pool of gametes created by \texttt{msprime} \parencite{Kelleher2016-oi}, such
 that the initial allele frequency distribution and linkage disequilibria
 between sites is at mutation-drift-recombination balance. Details of how
-\texttt{msprime} was called are available on \vb{our} Github repository
+\texttt{msprime} was called are available this paper's code repository
 (\url{https://github.com/vsbuffalo/tempautocov}), in \texttt{R/simpop.r}. Then, we
 pass this pool of gametes into a forward Wright--Fisher-with-recombination
 simulation routine and let it evolve for four generations neutrally before
@@ -1489,11 +1485,11 @@ recombination and high functional density
 approaches that estimate the genome-wide effect of drift and admixture.
 
 Second, our method-of-moments approach relies on assuming we can approximate
-the dynamics of \vb{the additive genetic variance associated with a particular
-fitness background through time} by using the empirically observed changes in
-sum of site heterozygosity in a region as a proxy for its decay. While we have
-shown this model works under directional selection in a relatively idealized
-setting, inference in natural populations may be complicated by changes in the
+the dynamics of \vb{the decay of the additive genetic variance that was present
+at a reference timepoint} by using the observed changes in sum of site
+heterozygosity in a region as a proxy for its decay. While we have shown this
+model works under directional selection in a relatively idealized setting,
+inference in natural populations may be complicated by changes in the
 environment that induce the effect sizes across loci to vary across timepoints.
 While our fluctuating selection results show that our directional selection
 theory extends to changes in the direction of selection with minor adjustments
@@ -1518,7 +1514,8 @@ to reduce the initial additive genetic variance in low recombination regions.
 Simulating the effect of truncation selection and stabilizing selection on
 temporal covariances in allele frequencies seems a useful direction. Our model
 may prove to be a useful null model of selection that the complications of
-epistasis could be tested against. 
+epistasis \vb{and different dynamics of the additive genetic variance} could be
+tested against. 
 
 Finally, while we demonstrate that our method-of-moments estimation approach is
 simple and leads to unbiased estimators, we see opportunities for simple
@@ -2169,41 +2166,59 @@ the first generation selection begins.
 \subsection{The contribution of the rest of the genome to temporal autocovariance at a locus}
 
 \vb{Additionally we can consider the impact that other linked selected sites
-  have on the neutral allele's frequency trajectory. From
-  equation \eqref{eq:integral-overselpos}, we can take a piecewise integral
-  over all linked sites (those less than a recombination fraction of one-half
-  away), and all unlinked sites (those at a recombination fraction of
-one-half away).}
+  have on the neutral allele's frequency trajectory. In equation
+  \eqref{eq:integral-overselpos}, we are modeling the temporal autocovariance
+  at focal neutral site in a chromosome with total length $R$. Here, we assume
+  the whole genome can be modeled in a similar fashion, as a single very large
+  chromosome with genetic length $C$, the entire map length of the genome, and
+  the focal neutral falls in the center of this. Then, we can take a piecewise
+  integral over all linked sites with respect to the recombination fraction
+  (those less than a recombination fraction of one-half away), and all unlinked
+  sites with respect to the genetic distance (those at a recombination fraction
+of one-half away).}
 
   \begin{align}
-    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2R} \int_{-\nicefrac{R}{2}}^{\nicefrac{R}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
-                                                     &= \frac{V_a(s)}{2R} \left[ 2 \int_{0}^{\nicefrac{1}{2}} \E(\mathcal{R}^2_{t}(r)) (1-r)^{s-t} d r  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (R - g(\nicefrac{1}{2})) \right] 
+    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2C} \int_{-\nicefrac{C}{2}}^{\nicefrac{C}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
+                                                     &= \frac{V_a(s)}{2C} \left[ 2 \int_{0}^{\nicefrac{1}{2}} \E(\mathcal{R}^2_{t}(r)) (1-r)^{s-t} d r  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (C - g(\nicefrac{1}{2})) \right]  \label{eq:rel-contributions}
   \end{align}
-\vb{
-Here, $g(r)$ is the inverse function of $r(g)$ and $R$ is the total map length
-of the chromosome that contained the focal neutral site. The second term in the
-braces are the two unlinked selections of this chromosome, e.g.
-$[-\nicefrac{R}{2}, -g(\nicefrac{1}{2})]$ and $[g(\nicefrac{1}{2}),
-\nicefrac{R}{2}]$ (this is zero if $g(\nicefrac{1}{2}) > \nicefrac{R}{2}$).
-With this construction, we can then consider the contribution of additive
-variation on the $M$ Morgans on other chromosomes of a genome of $M + R$
-Morgans of total length.
-}
 
-\begin{align}
-    \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2R} \left[ 2 \int_{0}^{\nicefrac{1}{2}} \E(\mathcal{R}^2_{t}(r)) (1-r)^{s-t} d r  + \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (M + 2R - 2g(\nicefrac{1}{2})) \right] 
-\end{align}
+  As we move away from the neutral site, the first term in the braces accounts
+  for the accumulation of linked selected sites. Eventually, the genetic
+  distance away from the neutral site becomes unlinked and the second term
+  accounts for the contribution of these unlinked sites on both the same
+  chromosome, as well as sites on other chromosomes. Note that here we assume the density of additive genetic variance per Morgan is constant.
 
-\vb{Ideally, we could evaluate the inverse mapping function at $\nicefrac{1}{2}$ to
-find what genetic distance a site becomes unlinked to the focal neutral site.
-However, mapping functions asymptotes to $\nicefrac{1}{2}$, so here
-calculations, one may want to assume $0.49$ is approximately unlinked. 
+  As a simple thought experiment, we can imagine the focal chromosome is
+  exactly $2 g(\nicefrac{1}{2})$ Morgans long, so that we just have to consider
+  the impact of variation on other chromosomes. Then we might ask for what
+  value of $M$ does the contribution from unlinked sites dominate the
+  contribution from linked sites? For $N=1000$ and assuming that the level of
+  LD is that under mutation-drift-recombination balance (e.g. using the
+  equation of \citeauthor{Tomoko_Ohta1971-hb}), we plot the relative contributions of
+  linked selected sites (on the focal chromosome) and unlinked selected sites
+  (on other chromosomes) for various spans of the covariance (e.g. $|s-t|$})
+  and the size of the remaining portion of the genome in Morgans ($M$) in
+  Figure \ref{fig:linked-unlinked}.
 
-As a simple thought experiment, we can imagine the focal chromosome is exactly
-$2 g(\nicefrac{1}{2})$ Morgans long, so that we just have to consider the
-impact of variation on other chromosomes. Then we might ask for what value of
-$M$ does the contribution from unlinked sites dominate the contribution from
-linked sites?}
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[]{./images/unlinked_linked_contributions.pdf}
+
+  \caption{Here, we show the relative contributions of the linked and unlinked
+    portions of the genome to the temporal autocovariance experienced by a
+    neutral allele, for different generations elapsed (on the x-axis) and
+    different map lengths of the unlinked genome (y-axis) for two different
+    population sizes. The color gradient is determined by the $\log_{10}$ value
+    of the ratio of unlinked to linked contributions, the terms inside the
+    braces in equation \eqref{eq:rel-contributions}. The dashed line indicates
+    where the log ratio is zero, e.g. the relative contributions are equal;
+    this was determined numerically.  These assume LD is determined by
+    mutation-drift-recombination balance \parencite{Tomoko_Ohta1971-hb}.}
+
+  \label{fig:linked-unlinked}
+\end{figure}
+
+
 
 \subsection{Averaging covariance across multiple loci}
 
@@ -2372,7 +2387,7 @@ independent sweeps and we ignore the LD between selected sites). We show that
 we can reconcile the two approaches, and demonstrate that the temporal
 autocovariance expressions we develop in our models are implicit in their
 model. We also work through their expressions for $N_e$ with heritable
-variance, because it represents quite useful result but their original
+variance, because it represents a quite useful result but their original
 presentation was spread across two papers (and a change in notation).
 
 \paragraph{Santiago and Caballero's 1995 and 1998 models for $N_e$}

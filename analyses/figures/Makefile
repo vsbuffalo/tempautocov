@@ -1,6 +1,6 @@
 all: figures copy
 
-figures: figure-1.pdf cummulative-cov-var.pdf cummulative-cov-var-all.pdf mom-fits-va1.pdf mom-fits-N.pdf sim-pred-covs-varyn.pdf estimate-g.pdf estimate-gp.pdf fluct-sel.pdf sim-pred13-covs-varyl.pdf sim-pred-covs-varyl-va-oom.pdf keynote-cartoons-figure-1.pdf
+figures: figure-1.pdf cummulative-cov-var.pdf cummulative-cov-var-all.pdf mom-fits-va1.pdf mom-fits-N.pdf sim-pred-covs-varyn.pdf estimate-g.pdf estimate-gp.pdf fluct-sel.pdf sim-pred13-covs-varyl.pdf sim-pred-covs-varyl-va-oom.pdf keynote-cartoons-figure-1.pdf unlinked_linked_contributions.pdf
 
 .PHONY: copy clean
 
@@ -45,6 +45,7 @@ copy: $(ALL_FIGS)
 	cp mom-fits-both-alt-finite.pdf ../../manuscript/images/
 	cp mom-fits-both-alt.pdf ../../manuscript/images/
 	cp supp-relative-error.pdf ../../manuscript/images/
+	cp unlinked_linked_contributions.pdf ../../manuscript/images/
 
 clean:
 	rm -f $(ALL_FIGS)
