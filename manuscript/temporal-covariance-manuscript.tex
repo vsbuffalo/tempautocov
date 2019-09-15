@@ -2165,7 +2165,7 @@ the first generation selection begins.
 
 \subsection{The contribution of the rest of the genome to temporal autocovariance at a locus}
 
-\vb{Additionally we can consider the impact that other linked selected sites
+\Additionally we can consider the impact that other \gc{unlinked} selected sites
   have on the neutral allele's frequency trajectory. In equation
   \eqref{eq:integral-overselpos}, we are modeling the temporal autocovariance
   at focal neutral site in a chromosome with total length $R$. Here, we assume
@@ -2175,7 +2175,7 @@ the first generation selection begins.
   integral over all linked sites with respect to the recombination fraction
   (those less than a recombination fraction of one-half away), and all unlinked
   sites with respect to the genetic distance (those at a recombination fraction
-of one-half away).}
+of one-half away). \gc{Our piece-wise integral gives us}
 
   \begin{align}
     \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2C} \int_{-\nicefrac{C}{2}}^{\nicefrac{C}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
