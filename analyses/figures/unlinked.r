@@ -7,7 +7,10 @@ load_all()
 
 inverse_haldane <- function(r) log(1-2*r) * -0.5
 
-linked <- function(t=2, N=1e3) integrate(function(r) ok71(4*N*r)*(1-r)^t, 0, 0.5)$value
+linked <- function(t=2, N=1e3) {
+  integrate(function(g) ok71(4*N*haldane(g))*(1-haldane(g))^t, 0, inverse_haldane(0.49))$value
+}
+
 unlinked <- function(M, t=2, N=1e3) ok71(4*N*0.5) * 0.5^t * (M)
 
 
@@ -17,8 +20,8 @@ d1e3 <- crossing(M=seq(0, 40, length.out=500), t=seq(0, 7, length.out=500)) %>%
  
 # OLD NAME: we use 1e5 here now
 d1e4 <- crossing(M=seq(0, 40, length.out=500), t=seq(0, 7, length.out=500)) %>% 
-  mutate(f=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e5) - linked(t, N=1e5))) %>% 
-  mutate(g=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e5) / linked(t, N=1e5))) %>% 
+  mutate(f=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) - linked(t, N=1e5))) %>% 
+  mutate(g=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) / linked(t, N=1e5))) %>% 
   arrange(M, t) 
 
 
