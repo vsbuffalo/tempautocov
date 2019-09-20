@@ -584,14 +584,13 @@ for fitness for the region divided by the genetic map length of the region
 temporal covariance is the additive genic variance per Morgan, a quantity
 somewhat similar to the ratio of new adaptive mutations per basepair to
 recombination per basepair, $\nicefrac{\nu_\text{BP}}{r_\text{BP}}$, that
-occurs in models of recurrent sweeps \parencite{Stephan1992-jc} and models
-  of the limits of selection with linked loci
-\parencite{Robertson1970-xk,Robertson1976-la}. Note that we could further
-include the effects of genome-wide fitness variation by adding an additional
-term encompassing the additive variation residing on other chromosomes, but
-because the magnitude of these effects is roughly similar to those of the
-non-gametic LD, we could no longer ignore the $D_{t,l}''$ terms as we did after
-Equation \eqref{eq:neut-change}.
+occurs in models of recurrent sweeps \parencite{Stephan1992-jc} and models of
+the limits of selection with linked loci
+\parencite{Robertson1970-xk,Robertson1976-la}. \vb{Note that this does not
+  include the effects of genome-wide fitness variation, e.g. the impact
+  unlinked selected sites have on the neutral site due to the associations
+created when the sites sort within the same individuals. We quantify the
+magnitude of these in Appendix \ref{ap:unlinked-contribution}}.
 
 %GRAHAM'S ALT VERSION
  % Imagine that an average base
@@ -2166,7 +2165,7 @@ the first generation selection begins.
 \subsection{The contribution of the rest of the genome to temporal autocovariance at a locus}
 \label{ap:unlinked-contribution}
 
-Additionally, we can consider the impact that other \gc{unlinked} selected
+\vb{Additionally, we can consider the impact that other unlinked selected
 sites have on the neutral allele's frequency trajectory. In equation
 \eqref{eq:integral-overselpos}, we are modeling the temporal autocovariance at
 focal neutral site in a chromosome with total length $R$. Here, we assume the
@@ -2176,29 +2175,29 @@ the focal neutral falls in the center of this. Then, we can take a piecewise
 integral over all linked sites with respect to the recombination fraction
 (those less than a recombination fraction of one-half away), and all unlinked
 sites with respect to the genetic distance (those at a recombination fraction
-of one-half away). \gc{Our piece-wise integral gives us}
+of one-half away). Our piece-wise integral gives us
 
   \begin{align}
     \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2C} \int_{-\nicefrac{C}{2}}^{\nicefrac{C}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
                                                      &= \frac{V_a(s)}{2C} \left[ 2 \int_{0}^{g^*} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (C - g(\nicefrac{1}{2})) \right]  \label{eq:rel-contributions}
   \end{align}
 
-\vb{where $g^*$ is the map distance at which a selected site becomes
+where $g^*$ is the map distance at which a selected site becomes
 approximately unlinked to the neutral site, e.g. the recombination fraction
-is $\nicefrac{1}{2}$.} As we move away from the neutral site, the first term in
+is $\nicefrac{1}{2}$. As we move away from the neutral site, the first term in
 the braces accounts for the accumulation of linked selected sites. Eventually,
 the genetic distance away from the neutral site becomes unlinked and the second
 term accounts for the contribution of these unlinked sites on both the same
 chromosome, as well as sites on other chromosomes. Note that here we assume the
 density of additive genetic variance per Morgan is constant.
 
-\vb{As a simple thought experiment, } we might ask for what value of $M$ does
+As a simple thought experiment, we might ask for what value of $M$ does
 the contribution from unlinked sites dominate the contribution from linked
 sites? For $N=1000$ and assuming that the level of LD is that under
 mutation-drift-recombination balance (e.g. using the equation of
 \citeauthor{Tomoko_Ohta1971-hb}), we plot the relative contributions of linked
 selected sites (on the focal chromosome) and unlinked selected sites (on other
-chromosomes) for various spans of the covariance (e.g.  $|s-t|$}) and the size
+chromosomes) for various spans of the covariance (e.g.  $|s-t|$) and the size
 of the remaining portion of the genome in Morgans ($M$) in Figure
 \ref{fig:linked-unlinked}.
 
@@ -2210,16 +2209,18 @@ of the remaining portion of the genome in Morgans ($M$) in Figure
     portions of the genome to the temporal autocovariance experienced by a
     neutral allele, for different generations elapsed (on the x-axis) and
     different map lengths of the unlinked genome (y-axis) for two different
-    population sizes. The color gradient is determined by the $\log_{10}$ value
-    of the ratio of unlinked to linked contributions, the terms inside the
-    braces in equation \eqref{eq:rel-contributions}. The dashed line indicates
-    where the log ratio is zero, e.g. the relative contributions are equal;
-    this was determined numerically.  These assume LD is determined by
-    mutation-drift-recombination balance \parencite{Tomoko_Ohta1971-hb}.}
+    population sizes ($N=10^3$ and $N=10^6$). The color gradient is determined
+    by the $\log_{10}$ value of the ratio of unlinked to linked contributions,
+    the terms inside the braces in equation \eqref{eq:rel-contributions}. The
+    dashed line indicates where the log ratio is zero, e.g. the relative
+    contributions are equal; this was determined numerically. These assume LD
+    is determined by mutation-drift-recombination balance
+  \parencite{Tomoko_Ohta1971-hb}.}
 
   \label{fig:linked-unlinked}
 \end{figure}
 
+}
 
 
 \subsection{Averaging covariance across multiple loci}

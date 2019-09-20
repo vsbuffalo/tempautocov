@@ -18,10 +18,11 @@ d1e3 <- crossing(M=seq(0, 40, length.out=500), t=seq(0, 7, length.out=500)) %>%
   mutate(f=map2_dbl(M, t, function(M, t) unlinked(M, t) - linked(t))) %>% 
   mutate(g=map2_dbl(M, t, function(M, t) unlinked(M, t) / linked(t))) %>% arrange(M, t) 
  
-# OLD NAME: we use 1e5 here now
+
+# OLD NAME: we use 1e6 here now
 d1e4 <- crossing(M=seq(0, 40, length.out=500), t=seq(0, 7, length.out=500)) %>% 
-  mutate(f=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) - linked(t, N=1e5))) %>% 
-  mutate(g=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) / linked(t, N=1e5))) %>% 
+  mutate(f=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) - linked(t, N=1e6))) %>% 
+  mutate(g=map2_dbl(M, t, function(M, t) unlinked(M, t, N=1e6) / linked(t, N=1e6))) %>% 
   arrange(M, t) 
 
 
