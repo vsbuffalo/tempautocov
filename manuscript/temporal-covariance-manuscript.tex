@@ -366,12 +366,17 @@ neutral variation is affected by strong associations caused by tight linkage to
 an advantageous site, quantitative genetic models of linked selection
 considered the weakest forms of associations: those between unlinked loci
 within an individual (\cite{Morley1954-yp, Robertson1961-ho, Santiago1995-hx};
-see \cite{Barton2000-zg} for more on the two models of linked selection). These
-distant associations are quickly established but are rapidly broken down by
-segregation and independent assortment, yet still can have a marked effect on
-diversity \parencite{Robertson1961-ho,Santiago1995-hx}. However, since the
-impact of heritable fitness variation has traditionally been modeled as causing
-a reduction in the effective population size, there has been no direct way to
+see \cite{Barton2000-zg} for more on the two models of linked selection).
+\vb{These quantitative genetic models of linked selection match the expressions
+  for the loss of diversity found in classic models a sweeping advantageous
+  allele (p. 2110, \cite{Santiago1998-bs}) and genome-wide background selection
+  (p. see equation 12 of \cite{Santiago1998-bs}, \cite{Nordborg1996-nq}).  The
+distant associations considered by these models} are quickly established but
+are rapidly broken down by segregation and independent assortment, yet still
+can have a marked effect on diversity
+\parencite{Robertson1961-ho,Santiago1995-hx}. However, since the impact of
+heritable fitness variation has traditionally been modeled as causing a
+reduction in the effective population size, there has been no direct way to
 separately estimate its effects from those of drift. We show that with temporal
 genomic data, one can directly measure the levels of temporal variances and
 autocovariances of allele frequency change in the population. Additionally, we
@@ -421,7 +426,7 @@ and the number of the tracked neutral alleles they carry, $x_i \in \{0, 1,
 %
 \parencite{Santiago1995-hx}. Substituting each fitness $f_i$ with its genetic
 basis and simplifying (see Appendix Section \ref{ap:multilocus} for
-\vb{derivation and eqn. 10 of \cite{Kirkpatrick2002-aw}}) gives,
+\vb{derivation and equation 10 of \cite{Kirkpatrick2002-aw}}) gives,
 
 \begin{align}
   \Delta_{_H} p_t &=  \sum_{l=1}^L \alpha_{t,l} D_{t,l}' + \sum_{l=1}^L \alpha_{t,l} D_{t,l}'' 
@@ -684,10 +689,11 @@ this would require knowing \emph{a priori} which sites are being selected.
 Instead, we assume that the trait is sufficiently polygenic that frequency
 changes due to selection are weak, and that the change in heterozygosity at
 neighboring neutral polymorphic sites approximately mirrors that at selected
-polymorphisms \vb{(this is the case under the infinitesimal model;
-\parencite{Barton2017-ac,Turelli2017-sw})}. Then, using the sum of site
-heterozygosity at neutral sites, $SSH_n(t)$, as a proxy for the sum of site
-heterozygosity at selected sites, 
+polymorphisms \vb{(this is the case under the infinitesimal model, where the
+change in frequencies due to selection is no different than the change due to
+drift; \cite{Bulmer1980-zo,Robertson1960-jz}, \cite{Kimura1984-ia}, Ch.6)}.
+Then, using the sum of site heterozygosity at neutral sites, $SSH_n(t)$, as a
+proxy for the sum of site heterozygosity at selected sites, 
 
 \begin{align}
   V_{a,ssh_n}(t) := V_a(1) ssh_n(s)
@@ -1613,7 +1619,6 @@ with larger population sizes. However, these reductions fall short of the many
 orders of magnitude required for linked selection to explain Lewontin's paradox
 \parencite{Coop2016-gx}.   
 
-
 One limitation of these approaches is that they require estimating $\pi_0$, the
 level of diversity in the absence of linked selection, usually from the
 diversity in high-recombination regions with low gene content. The average
@@ -1962,7 +1967,7 @@ D_{l}'' \label{eq:ap-delta-H-3} \end{align}
 where $D_L'$ is the linkage disequilibrium between alleles on the same gamete
 (the gametic LD), and the $D_l''$ is the across-gamete LD (non-gametic LD); see
 \textcite{Weir1996-mv}, p. 121. \vb{This equation also appears in
-\textcite{Kirkpatrick2002-aw} (eqn. 10).}
+\textcite{Kirkpatrick2002-aw} (equation 10).}
 
 We ignore non-gametic linkage disequilibria $D_l''$ as these are weak under
 random mating, and write the multilocus temporal covariance between the allele
@@ -2182,14 +2187,23 @@ of one-half away). Our piece-wise integral gives us
                                                      &= \frac{V_a(s)}{2C} \left[ 2 \int_{0}^{g^*} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (C - g(\nicefrac{1}{2})) \right]  \label{eq:rel-contributions}
   \end{align}
 
-where $g^*$ is the map distance at which a selected site becomes
-approximately unlinked to the neutral site, e.g. the recombination fraction
-is $\nicefrac{1}{2}$. As we move away from the neutral site, the first term in
-the braces accounts for the accumulation of linked selected sites. Eventually,
-the genetic distance away from the neutral site becomes unlinked and the second
+where $g^*$ is the map distance at which a selected site becomes approximately
+unlinked to the neutral site, e.g. the recombination fraction is
+$\nicefrac{1}{2}$. As we move away from the neutral site, the first term in the
+braces accounts for the accumulation of linked selected sites. Eventually, the
+genetic distance away from the neutral site becomes unlinked and the second
 term accounts for the contribution of these unlinked sites on both the same
 chromosome, as well as sites on other chromosomes. Note that here we assume the
-density of additive genetic variance per Morgan is constant.
+density of additive genetic variance per Morgan is constant. As in the main
+text, this ignores the contribution of non-gametic LD, formed as two gametes
+unite in an individual and can be converted into gametic LD via recombination
+(see Figure \ref{fig:ld-cartoon}; this process is elaborated in Appendix
+Section \ref{ap:strength-assoc}, and see also \cite{Tenesa2007-nl}, p.  521).
+Selected sites that are unlinked or loosely linked to the neutral site (e.g. $r
+\approx \nicefrac{1}{2}$) quickly become associated with the neutral site, but
+also quickly decay; their contribution acts to further decrease the population
+size by a factor of two (see the discussion on p. 2115 in
+\cite{Santiago1998-bs}).
 
 As a simple thought experiment, we might ask for what value of $M$ does
 the contribution from unlinked sites dominate the contribution from linked
