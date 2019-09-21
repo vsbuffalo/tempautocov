@@ -368,9 +368,10 @@ considered the weakest forms of associations: those between unlinked loci
 within an individual (\cite{Morley1954-yp, Robertson1961-ho, Santiago1995-hx};
 see \cite{Barton2000-zg} for more on the two models of linked selection).
 \vb{These quantitative genetic models of linked selection match the expressions
-  for the loss of diversity found in classic models a sweeping advantageous
-  allele (p. 2110, \cite{Santiago1998-bs}) and genome-wide background selection
-  (p. see equation 12 of \cite{Santiago1998-bs}, \cite{Nordborg1996-nq}).  The
+  for the loss of diversity found in classic hitchhiking models under a 
+  steady flux of loosely-linked advantageous alleles entering the population
+  (p. 2110, \cite{Santiago1998-bs}) and genome-wide background selection (p.
+see equation 12 of \cite{Santiago1998-bs}, \cite{Nordborg1996-nq}).  The
 distant associations considered by these models} are quickly established but
 are rapidly broken down by segregation and independent assortment, yet still
 can have a marked effect on diversity
@@ -2170,23 +2171,23 @@ the first generation selection begins.
 \subsection{The contribution of the rest of the genome to temporal autocovariance at a locus}
 \label{ap:unlinked-contribution}
 
-\vb{Additionally, we can consider the impact that other unlinked selected
-sites have on the neutral allele's frequency trajectory. In equation
-\eqref{eq:integral-overselpos}, we are modeling the temporal autocovariance at
-focal neutral site in a chromosome with total length $R$. Here, we assume the
-whole genome can be modeled in a similar fashion, as a single very large
+\vb{Additionally, we can consider the impact that other unlinked selected sites
+have on the neutral allele's frequency trajectory. In equation
+\eqref{eq:integral-overselpos}, we are modeling the temporal autocovariance
+at focal neutral site in a chromosome with total length $R$. Here, we assume
+the whole genome can be modeled in a similar fashion, as a single very large
 chromosome with genetic length $C$, the entire map length of the genome, and
 the focal neutral falls in the center of this. Then, we can take a piecewise
-integral over all linked sites with respect to the recombination fraction
-(those less than a recombination fraction of one-half away), and all unlinked
-sites with respect to the genetic distance (those at a recombination fraction
-of one-half away). Our piece-wise integral gives us
+integral over all linked sites (those less than a recombination fraction of
+one-half away), and all unlinked sites with respect to the genetic distance
+(those at a recombination fraction of one-half away). Our piece-wise integral
+gives us
 
   \begin{align}
     \frac{\cov(\Delta p_t, \Delta p_s)}{p_t(1-p_t) } &= \frac{V_a(s)}{2C} \int_{-\nicefrac{C}{2}}^{\nicefrac{C}{2}} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g \\
                                                      &= \frac{V_a(s)}{2C} \left[ 2 \int_{0}^{g^*} \E(\mathcal{R}^2_{t}(r(g))) (1-r(g))^{s-t} d g  + 2 \frac{\E(\mathcal{R}^2_{t}(\nicefrac{1}{2}))}{2^{s-t}} (C - g(\nicefrac{1}{2})) \right]  \label{eq:rel-contributions}
   \end{align}
-
+%
 where $g^*$ is the map distance at which a selected site becomes approximately
 unlinked to the neutral site, e.g. the recombination fraction is
 $\nicefrac{1}{2}$. As we move away from the neutral site, the first term in the
@@ -2956,9 +2957,13 @@ $\widehat{N}$ for various sample sizes.
 
 
 
-
 \newpage
-\subsection{Appendix Figures}
+\clearpage
+\section{Supplementary Figures}
+\counterwithin{figure}{section}
+\setcounter{figure}{0}    
+
+
 
 \subsubsection{Validation of simulation routine}
 
