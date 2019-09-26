@@ -12,6 +12,8 @@
 \RequirePackage{bm}
 \RequirePackage{bbm}
 \RequirePackage{tikz}
+\RequirePackage{xr}
+\externaldocument{supplementary-figures}
 
 % line numbers:
 \RequirePackage{lineno}
@@ -29,8 +31,9 @@
                 maxbibnames=9,maxnames=5,maxcitenames=2,
                 backend=biber,uniquelist=false,uniquename=false,
                 % style=apa,
-                % sorting=nyt,
+                %sorting=nyt,
                 sorting=ynt,
+                %style=alphabetic,
                 hyperref=true]{biblatex}
 \RequirePackage[colorinlistoftodos]{todonotes}  %disable
 \RequirePackage{color}
@@ -219,7 +222,8 @@ timepoint.
 Our goal is to understand how linked selection affects the frequency
 trajectories of neutral sites by modeling the variances and covariances of
 neutral allele frequency changes ($\Delta p_t = p_{t+1} - p_t$, where $p_t$ is
-the population frequency at time $t$). We assume a closed population with
+the population frequency at time $t$; see Table \ref{ap:table-1} in the
+Appendix for all list of all notation). We assume a closed population with
 discrete, non-overlapping generations. When there are no heritable fitness
 differences between individuals, genetic drift is the only source of
 stochasticity of allele frequency change due to two sources of variation:
@@ -230,32 +234,6 @@ due to drift alone is $\E(\Delta p_t) = 0$ and quantified by the variance in
 allele frequency change $\var(\Delta p_t)$ \parencite[as quantified by the
 variance effective population
 size;][]{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
-
-% We first give an outline of how selection affects linked neutral sites through
-% time. We summarize a neutral allele's frequency trajectory as the differences
-% in adjacent timepoints, $\Delta p_t = p_{t+1} - p_t$, where $p_t$ is the
-% population frequency at time $t$, and we assume a closed population with
-% discrete, non-overlapping generations. While throughout the paper we assume
-% that allele frequencies can be measured every generation, the same approach can
-% be extended to situations where the study system cannot be observed every
-% generation. Our goal is to understand how linked selection affects the
-% frequency trajectories of neutral sites by modeling the variances and
-% covariances of neutral allele frequency changes. Before considering the impact
-% of linked selection, we first consider a population that lacks heritable
-% fitness differences between individuals. In this case, the stochasticity of
-% allele frequency change is determined entirely by two components: random
-% non-heritable, or environmental differences in offspring number, and Mendelian
-% segregation of heterozygotes. These two sources of stochasticity are
-% collectively known as drift, and both are directionless such that when averaged
-% over evolutionary replicates, the expected change in allele frequency due to
-% drift alone is $\E(\Delta p_t) = 0$. The magnitude of drift's stochastic
-% effects are quantified by the variance in allele frequency change $\var(\Delta
-% p_t)$, which in a Wright--Fisher model of reproduction where offspring number
-% has a multinomial distribution, is $\var(\Delta p_t) =
-% \nicefrac{p_t(1-p_t)}{(2N)}$. Different mating systems and higher non-heritable
-% variance in offspring number can be accommodated under the Wright--Fisher model
-% by replacing $N$ with $N_e$, the variance effective population size
-% \parencite{Wright1938-tv,Crow1970-wm,Charlesworth2009-sg}.
 
 When there are heritable fitness differences between individuals in the
 population, a third source of stochasticity affects a neutral allele's
@@ -1735,9 +1713,8 @@ This research was supported by an NSF Graduate Research Fellowship grant
 awarded to VB (1650042), and NIH (R01-GM108779) and NSF (1353380) awarded to
 GC.
 
-%\bibliographystyle{chicago}
+\newrefcontext[sorting=nyt,maxcitenames=5]
 \printbibliography
-
 
 \newpage
 
@@ -1781,6 +1758,7 @@ GC.
  $z_i$ & \hangindent=1em The breeding value of the trait that determines fitness, $z_i = \sum_{i=1}^L \alpha g_{i,l}$, see appendix section \ref{ap:multilocus} \\
  $w(z_i)$ & The fitness of individual $i$ with fitness function $w(\cdot)$, see appendix section \ref{ap:multilocus} \\
 \end{tabular}
+ \label{ap:table-1}
 \end{table}
 
 \begin{table}[!htbp]
@@ -2954,134 +2932,5 @@ $\widehat{N}$ for various sample sizes.
 
 \label{fig:mom-relative}
 \end{figure}
-
-
-
-\newpage
-\clearpage
-\section{Supplementary Figures}
-\counterwithin{figure}{section}
-\setcounter{figure}{0}    
-
-
-
-\subsubsection{Validation of simulation routine}
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/supp-het-neutral.pdf}
-
-\caption{The neutral decay of heterozygosity due to drift, averaged across 100
-replicates and a variety of $N$ and $\rho$ levels. The red line is the
-theoretical expectation $H_t = H_1 (1-1/(2N))^{t-1}$.}
-
-\label{fig:het-neut}
-\end{figure}
-
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/supp-ld-neutral.pdf}
-
-  \caption{The decay of LD between neutral sites due to recombination, across
-    100 replicates and a variety of $V_A$ and $R$ levels. The initial
-    population is created to have an artificial level of initial LD, with half
-    the gametes carrying all derived alleles, and the other half carrying all
-  ancestral alleles. The red line is the theoretical expectation $D_t = D_1 (1-1/(2N))^{t-1} (1-r)^{t-1}$.}
-
-  \label{fig:ld-neut}
-\end{figure}
-
-
-\begin{figure}[!ht] \centering
-  \includegraphics{./images/supp-Ne-est-neutral.pdf} 
-  
-  \caption{$N_e$ estimated through time from neutral forward simulations is
-  consistent with true $N$ across a variety of recombination $\rho$ and $N$
-parameters. Here, we estimate $N_e$ with $\widehat{N_e} = \nicefrac{p(1-p)}{2
-\var(\Delta p)}$ from neutral allele frequency changes.}
-
-  \label{fig:ne-neut}
-\end{figure}
-
-\clearpage
-\newpage
-
-\subsubsection{Dynamics of Variances}
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/expfit-vark-types.pdf}
-  \caption{The dynamics of different variances in our simulations, across a
-    variety of initial target $V_A$ and $R$ levels. Orange points represent the
-    empirical heritable variance in offspring (e.g. with the noise of the
-    Wright--Fisher reproduction process removed). These closely track the
-    additive genetic variance for the trait undergoing directional selection,
-    $V_A = \var(z)$. The red line shows the dynamics of additive genic
-    variance, $V_a = 2 \sum_l \alpha_l^2 p_l(1-p_l)$, which is closely tracked
-  by both the selected (yellow line) and neutral (green line) sum of site
-heterozygosity proxies described in Section \ref{sec:dyn-var}.}
-
-  \label{fig:multilocus-expfit-vark}
-\end{figure}
-
-\clearpage
-\newpage
-
-\subsubsection{Supplementary Temporal Autocovariance Figures}
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/sim-pred13-covs-varyl.pdf}
-  \caption{Each panel shows the temporal autocovariance $\cov(\Delta p_{13},
-    \Delta p_s)$ on the y-axis, where $s$ varies along the x-axis. This is
-    analogous to Figure \ref{fig:multilocus-expfit-sims} with a different
-    reference generation ($t=13$), and compares the averaged simulation results
-    (points) with the temporal autocovariance predicted by Equation
-    \eqref{eq:multilocus-triangle} using the empirical additive genetic
-    variance (curve). The covariances in these panels are weaker compared
-    to those in Figure \ref{fig:multilocus-expfit-sims} because by generation
-    13, additive genetic variance for fitness and the linkage disequilibria
-    between neutral and selected sites has decayed.
-}
-
-\label{fig:multilocus-expfit-sims-gen13} 
-\end{figure}
-
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/sim-pred-covs-varyl-va-oom.pdf}
-
-  \caption{A version of Figure \ref{fig:multilocus-expfit-sims} with a subset
-    of $V_A$ parameters used in our simulations that vary over orders of
-    magnitude. This demonstrates that our theory using the empirical additive
-    genic variance (solid gray line), additive genetic variance (long dashed
-    gray line), and the neutral SSH proxy (short dashed gray lines) performs as
-    described in Section \ref{sec:ml-sim-res} even when $V_A$ varies over
-    orders of magnitude in a region. Higher variance in the empirical
-    covariances with weak selection ($V_A = 0.001$) are due to chance covariances
-    due to drift. The light gray dashed line depicts $\cov(\Delta p_5, \Delta p_s) =
-  0$.}
-  
-
-  \label{fig:multilocus-expfit-sims-va-oom}
-\end{figure}
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics{./images/sim-pred-covs-varyn.pdf}
-
-  \caption{A version of Figure \ref{fig:multilocus-expfit-sims} demonstrating
-    temporal autocovariance simulation results and theoretical predictions with
-    varying $N$. This demonstrates that our theory using the empirical additive
-    genetic variance (lines) fits simulations across a variety of $N$
-    parameters.  The light gray dashed line depicts $\cov(\Delta p_5, \Delta p_s) =
-  0$. Note that the initial LD varies due to differing equilibrium levels of
-LD from our burnin across varying $N$.}
-
-  \label{fig:multilocus-expfit-sims-varyn}
-\end{figure}
-
 
 \end{document}
